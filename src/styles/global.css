@@ -1,0 +1,92 @@
+@import "tailwindcss";@import "tailwindcss";
+
+@theme {
+  --color-forest: #2d5016;
+  --color-forest-light: #3d6b1f;
+  --color-forest-dark: #1a2e0a;
+  --color-sage: #6b8f47;
+  --color-sage-light: #8aaf60;
+  --color-earth: #8b6914;
+  --color-earth-light: #c49a25;
+  --color-cream: #f5f0e8;
+  --color-cream-dark: #ede5d0;
+  --color-bark: #3d2b1f;
+  --color-mist: #f0f4eb;
+
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Source Sans 3", "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    color: var(--color-bark);
+    background-color: var(--color-cream);
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+
+  ::selection {
+    background-color: var(--color-sage);
+    color: white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    display: inline-block;
+    background-color: var(--color-forest);
+    color: white;
+    padding: 0.75rem 2rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    border: 2px solid var(--color-forest);
+  }
+
+  .btn-primary:hover {
+    background-color: transparent;
+    color: var(--color-forest);
+  }
+
+  .btn-outline {
+    display: inline-block;
+    background-color: transparent;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    border: 2px solid white;
+  }
+
+  .btn-outline:hover {
+    background-color: white;
+    color: var(--color-forest);
+  }
+
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-sage);
+  }
+
+  .container-site {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+}

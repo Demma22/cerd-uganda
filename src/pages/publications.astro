@@ -1,0 +1,217 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Sample publications data - this will be replaced with data from your API
+const publications = [
+  {
+    id: 1,
+    title: "Seeds of Transformation: Highlights from the Kisumu Community of Practice Gathering",
+    date: "Nov 6, 2025",
+    type: "Report",
+    file: "/documents/seeds-of-transformation.pdf",
+    abstract: "A comprehensive report on community-led agroecological transformation in East Africa."
+  },
+  {
+    id: 2,
+    title: "When a Good Policy Goes Bad: Policy Implementation Challenges in Ugandan Agriculture",
+    date: "Aug 2, 2023",
+    type: "Policy Paper",
+    file: "/documents/when-policy-goes-bad.pdf",
+    abstract: "Analysis of agricultural policy implementation gaps and recommendations."
+  },
+  {
+    id: 3,
+    title: "Monitoring Environmental Policy Process: A Systems Approach",
+    date: "Mar 15, 2022",
+    type: "Research Paper",
+    file: "/documents/monitoring-policy-process.pdf",
+    abstract: "Namanji, S., Francis, C., Ssekyewa, C., Lieblein G."
+  },
+  {
+    id: 4,
+    title: "Oil palm intercropping in Uganda — an assessment of farmer practices and suggestion of alternatives",
+    date: "Feb 28, 2022",
+    type: "Research Paper",
+    file: "/documents/oil-palm-intercropping.pdf",
+    abstract: "Evaluating intercropping systems and proposing sustainable alternatives."
+  },
+  {
+    id: 5,
+    title: "Agroecology as a Pathway to Food Security in Uganda",
+    date: "Oct 10, 2021",
+    type: "Policy Brief",
+    file: "/documents/agroecology-food-security.pdf",
+    abstract: "Policy recommendations for scaling agroecological practices."
+  }
+];
+---
+
+<BaseLayout title="Publications" description="Research papers, reports, and publications from CERD-UG">
+
+  <section class="publications-hero">
+    <div class="container-site">
+      <span class="section-label">Knowledge Hub</span>
+      <h1 class="page-title">Publications & Research</h1>
+      <p class="page-subtitle">Access our latest research papers, policy briefs, and technical reports on agroecology and sustainable agriculture.</p>
+    </div>
+  </section>
+
+  <section class="publications-list">
+    <div class="container-site">
+      <div class="filters">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Research Papers</button>
+        <button class="filter-btn">Policy Briefs</button>
+        <button class="filter-btn">Reports</button>
+      </div>
+
+      <div class="publications-grid" id="publicationsGrid">
+        {publications.map(pub => (
+          <div class="publication-card" data-type={pub.type}>
+            <div class="pub-type">{pub.type}</div>
+            <h3 class="pub-title">{pub.title}</h3>
+            <p class="pub-abstract">{pub.abstract}</p>
+            <div class="pub-footer">
+              <time class="pub-date">{pub.date}</time>
+              <a href={pub.file} class="download-link" download>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download PDF
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .publications-hero {
+      background: linear-gradient(135deg, var(--color-forest) 0%, var(--color-forest-dark) 100%);
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      color: white;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .page-subtitle {
+      font-size: 1rem;
+      color: rgba(245, 240, 232, 0.8);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .publications-list {
+      padding: 4rem 0;
+      background: var(--color-cream);
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1.25rem;
+      background: white;
+      border: 1px solid var(--color-sage);
+      color: var(--color-forest);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 2rem;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--color-forest);
+      color: white;
+    }
+
+    .publications-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .publication-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .publication-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+
+    .pub-type {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-sage);
+      background: var(--color-mist);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .pub-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-forest-dark);
+      line-height: 1.4;
+      margin-bottom: 0.75rem;
+    }
+
+    .pub-abstract {
+      font-size: 0.85rem;
+      color: #5a4a3a;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .pub-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #eee;
+      padding-top: 0.75rem;
+    }
+
+    .pub-date {
+      font-size: 0.7rem;
+      color: #999;
+    }
+
+    .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-forest);
+      text-decoration: none;
+    }
+
+    .download-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</BaseLayout>

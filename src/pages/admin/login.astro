@@ -1,0 +1,79 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Admin Login">
+  <section class="login-section">
+    <div class="container-site">
+      <div class="login-card">
+        <h1>Admin Login</h1>
+        
+        <form method="POST" action="/api/login">
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          
+          <button type="submit" class="btn-primary">Login</button>
+        </form>
+        
+        <!-- Show error if present -->
+        {Astro.url.searchParams.has('error') && (
+          <div class="error">Invalid password</div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .login-section {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-mist);
+    }
+
+    .login-card {
+      background: white;
+      padding: 3rem;
+      border-radius: 1rem;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .login-card h1 {
+      color: var(--color-forest-dark);
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--color-forest);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+    }
+
+    .error {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      background: #fee;
+      color: #c00;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+    }
+  </style>
+</BaseLayout>

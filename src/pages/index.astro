@@ -1,0 +1,988 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Home" description="CERD-UG promotes an ecosystems and systems thinking approach in research, education and community engagement in Uganda.">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img
+        src="https://placehold.co/1400x800/2d5016/6b8f47?text=Agroecology+in+Uganda"
+        alt="CERD Uganda field work"
+        class="hero-img"
+      />
+      <div class="hero-overlay"></div>
+    </div>
+
+    <div class="container-site hero-content">
+      <div class="hero-badge">
+        <span class="section-label">5+ years of impact</span>
+      </div>
+      <h1 class="hero-title">
+        Center for Ecosystems<br />
+        Research &amp;<br />
+        <em>Development</em>
+      </h1>
+      <p class="hero-sub">
+        CERD-UG is a Non Profit Organization which aims to promote an ecosystems
+        and systems thinking approach in research, education and community engagement.
+      </p>
+      <div class="hero-actions">
+        <a href="/about-us" class="btn-primary">Discover Our Work</a>
+        <a href="/contact" class="btn-outline">Book a Call</a>
+      </div>
+    </div>
+
+    <!-- Location chip -->
+    <a href="/contact" class="hero-location">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      Uganda — Mpala, Entebbe Road
+    </a>
+  </section>
+
+  <!-- MISSION + CEO IMAGE -->
+  <section class="mission">
+    <div class="container-site mission-grid">
+      <div class="mission-image">
+        <img
+          src="https://placehold.co/480x620/3d6b1f/f5f0e8?text=Our+CEO"
+          alt="CERD-UG CEO"
+          class="mission-photo"
+        />
+        <div class="mission-image-tag">
+          <span>NGOsource Verified</span>
+        </div>
+      </div>
+
+      <div class="mission-content">
+        <span class="section-label">Our Mission &amp; Goal</span>
+        <h2 class="mission-heading">
+          Building a Sustainable Agro-Ecosystem
+        </h2>
+        <p class="mission-text">
+          The mission of CERD-UG is to provide all stakeholders with comprehensive
+          and relevant knowledge and skills that contribute to the sustainability of
+          the ecosystem, health, prosperity, food and nutritional security.
+        </p>
+        <p class="mission-text">
+          <strong>Our goal</strong> is to share our extensive experience in working
+          with the agro-ecosystem to bring about development policy change, improve
+          people's livelihoods, and contribute to achieving food and nutrition
+          security, hence transforming the food system.
+        </p>
+
+        <div class="mission-pillars">
+          <div class="mission-pillar">
+            <div class="pillar-icon">🌱</div>
+            <p>We provide agriculture services and support Organic Agriculture</p>
+          </div>
+          <div class="mission-pillar">
+            <div class="pillar-icon">🤝</div>
+            <p>We support small scale farmers to transition to Agroecology and transform the current food system</p>
+          </div>
+        </div>
+
+        <a href="/about-us" class="btn-primary">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISION BANNER -->
+  <section class="vision">
+    <div class="container-site">
+      <span class="section-label" style="color: rgba(245,240,232,0.6)">Our Vision</span>
+      <blockquote class="vision-quote">
+        A sustainable agro-ecosystem in which every aspect of development is in
+        harmony and complements each other.
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- IMPACT -->
+  <section class="impact">
+    <div class="container-site impact-inner">
+      <div class="impact-header">
+        <span class="section-label">Our Impact</span>
+        <h2 class="impact-heading">
+          Changing lives together through sustainable farming
+        </h2>
+        <p class="impact-sub">
+          We believe that we can change more lives together by promoting sustainable
+          agricultural practices, engaging with local communities, and supporting local economies.
+          We strive to create a better future for everyone.
+        </p>
+        <a href="/about-us" class="btn-primary">About Us</a>
+      </div>
+
+      <div class="impact-video">
+        <a href="https://youtu.be/vTRxLLMVqHQ" target="_blank" rel="noopener" class="video-thumb">
+          <img
+            src="https://placehold.co/580x400/1a2e0a/6b8f47?text=▶+Watch+Our+Work"
+            alt="CERD Uganda in action"
+          />
+          <div class="play-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </a>
+
+        <a href="https://www.ngosource.org" target="_blank" rel="noopener" class="ngosource-badge">
+          <img
+            src="https://placehold.co/180x60/ffffff/2d5016?text=NGOsource+Verified"
+            alt="NGOsource verified"
+          />
+          <p>We are a verified organization by NGOsource</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRINCIPLES -->
+  <section class="principles">
+    <div class="container-site">
+      <span class="section-label">Our Principles</span>
+      <h2 class="principles-heading">What We Stand For</h2>
+
+      <div class="principles-grid">
+        {[
+          { title: "Biodiversity", img: "https://placehold.co/420x280/3d6b1f/f5f0e8?text=Biodiversity", desc: "Preserving the rich variety of plant, animal, and microbial life that sustains healthy ecosystems." },
+          { title: "Ecological Balance", img: "https://placehold.co/420x280/2d5016/c8e6a0?text=Ecological+Balance", desc: "Maintaining the natural equilibrium of ecosystems to ensure long-term environmental health." },
+          { title: "Animal Welfare", img: "https://placehold.co/420x280/6b8f47/f5f0e8?text=Animal+Welfare", desc: "Ensuring humane and ethical treatment of animals in all farming and research activities." },
+          { title: "Sustainability", img: "https://placehold.co/420x280/1a2e0a/8aaf60?text=Sustainability", desc: "Developing practices that meet today's needs without compromising future generations." },
+        ].map(p => (
+          <article class="principle-card">
+            <div class="principle-img-wrap">
+              <img src={p.img} alt={p.title} />
+            </div>
+            <div class="principle-body">
+              <h3>{p.title}</h3>
+              <p>{p.desc}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCERS -->
+  <section class="producers">
+    <div class="producers-bg">
+      <img
+        src="https://placehold.co/1400x600/1a2e0a/2d5016?text=Coffee+Plantation"
+        alt="Coffee plantation"
+        class="producers-img"
+      />
+      <div class="producers-overlay"></div>
+    </div>
+    <div class="container-site producers-content">
+      <span class="section-label" style="color: rgba(245,240,232,0.6)">Producers</span>
+      <h2 class="producers-heading">We Are Producers For Local Markets</h2>
+      <p class="producers-text">
+        Coffee, a beloved beverage enjoyed worldwide, is much more than just a morning pick-me-up.
+        Originating from the beans of the Coffea plant, coffee is prepared in various ways, from the
+        intense espresso shots to smooth, creamy lattes. Beyond its delicious taste, coffee is celebrated
+        for its stimulating effects and its role in Uganda's agricultural economy and local communities.
+      </p>
+    </div>
+  </section>
+
+  <!-- RECENT WORKS -->
+  <section class="works">
+    <div class="container-site">
+      <span class="section-label">Recent Works</span>
+      <h2 class="works-heading">Our Recent Works</h2>
+      <p class="works-sub">
+        The current major development initiative is the Organic Products Market at Abaita Ababiri and
+        Kitooro Municipality — providing physical space for organic farmers to sell their produce and
+        promoting small holder farming for sustainable development and environmental conservation.
+      </p>
+
+      <div class="works-gallery">
+        {[
+          "https://placehold.co/480x360/3d6b1f/f5f0e8?text=Organic+Market",
+          "https://placehold.co/480x560/2d5016/c8e6a0?text=Farm+Activities",
+          "https://placehold.co/480x360/6b8f47/1a2e0a?text=Community+Work",
+          "https://placehold.co/480x480/1a2e0a/6b8f47?text=Agroecology",
+          "https://placehold.co/480x360/8b6914/f5f0e8?text=Training",
+          "https://placehold.co/480x560/3d2b1f/c8e6a0?text=Field+Research",
+        ].map((src, i) => (
+          <div class={`gallery-item gallery-item-${i + 1}`}>
+            <img src={src} alt={`CERD work ${i + 1}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT CTA -->
+  <section class="contact-cta">
+    <div class="container-site cta-links">
+      <a href="tel:+256702616988" class="cta-phone">
+        <div class="cta-phone-icon">📞</div>
+        <div>
+          <strong>+256 702 616988</strong>
+          <span>From 9am to 5pm</span>
+        </div>
+      </a>
+      <a href="tel:+256782634937" class="cta-phone">
+        <div class="cta-phone-icon">📞</div>
+        <div>
+          <strong>+256 782 634937</strong>
+          <span>From 9am to 5pm</span>
+        </div>
+      </a>
+      <p class="cta-label">Our office is open from Monday to Friday</p>
+    </div>
+  </section>
+
+  <!-- PARTNERS -->
+  <section class="partners">
+    <div class="container-site">
+      <span class="section-label">Collaborations and Partnerships</span>
+      <div class="partners-logos">
+        {[1,2,3,4,5].map(i => (
+          <div class="partner-logo">
+            <img
+              src={`https://placehold.co/140x60/e8e0d0/6b8f47?text=Partner+${i}`}
+              alt={`Partner ${i}`}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATIONS PREVIEW -->
+  <section class="pubs-preview">
+    <div class="container-site">
+      <span class="section-label">Publications &amp; Presentations</span>
+      <h2 class="pubs-heading">Research Papers &amp; Conferences</h2>
+      <p class="pubs-sub">
+        Research papers published, conferences attended, and outreach activities during the period.
+      </p>
+
+      <div class="pubs-grid">
+        {[
+          { date: "Nov 6, 2025", title: "Seeds of Transformation: Highlights from the Kisumu Community of Practice Gathering", slug: "seeds-of-transformation" },
+          { date: "Aug 2, 2023", title: "When a Good Policy Goes Bad: Namanji S.", slug: "when-a-good-policy-goes-bad" },
+          { date: "Mar 15, 2022", title: "Monitoring Environmental Policy Process: Namanji, S., Francis, C., Ssekyewa, C., Lieblein G.", slug: "monitoring-environmental-policy-process" },
+          { date: "Feb 28, 2022", title: "Oil palm intercropping in Uganda — an assessment of farmer practices and suggestion of alternatives", slug: "oil-palm-intercropping-in-uganda" },
+        ].map(pub => (
+          <a href={`/publications/${pub.slug}`} class="pub-card">
+            <div class="pub-card-img">
+              <img src="https://placehold.co/480x240/3d6b1f/f5f0e8?text=Publication" alt={pub.title} />
+            </div>
+            <div class="pub-card-body">
+              <time class="pub-date">{pub.date}</time>
+              <h3 class="pub-title">{pub.title}</h3>
+              <span class="pub-arrow">Read →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="pubs-more">
+        <a href="/publications" class="btn-primary">See All Publications</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA BANNER -->
+  <section class="bottom-cta">
+    <div class="container-site">
+      <h2 class="bottom-cta-text">
+        CERD UG creates impact by promoting Agroecology farming to protect the environment,
+        support local communities, and improve livelihoods through training, sustainable practices,
+        and quality Agroecology products.
+      </h2>
+      <a href="/contact" class="btn-outline">Contact Us</a>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 5rem;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(26, 46, 10, 0.85) 0%,
+      rgba(45, 80, 22, 0.5) 60%,
+      rgba(26, 46, 10, 0.3) 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(107, 143, 71, 0.25);
+    border: 1px solid rgba(138, 175, 96, 0.4);
+    padding: 0.4rem 1rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(4px);
+  }
+
+  .hero-badge .section-label {
+    color: #c8e6a0;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: #c8e6a0;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: rgba(245, 240, 232, 0.8);
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-location {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(245, 240, 232, 0.1);
+    border: 1px solid rgba(245, 240, 232, 0.2);
+    color: rgba(245, 240, 232, 0.8);
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s;
+  }
+
+  .hero-location:hover {
+    background: rgba(245, 240, 232, 0.2);
+  }
+
+  /* ── MISSION ── */
+  .mission {
+    padding: 7rem 0;
+    background: var(--color-cream);
+  }
+
+  .mission-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .mission-image {
+    position: relative;
+  }
+
+  .mission-photo {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+  }
+
+  .mission-image-tag {
+    position: absolute;
+    bottom: -1.5rem;
+    right: -1.5rem;
+    background: var(--color-forest);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .mission-heading {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--color-forest-dark);
+    margin: 0.75rem 0 1.5rem;
+    line-height: 1.2;
+  }
+
+  .mission-text {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #5a4a3a;
+    margin-bottom: 1rem;
+  }
+
+  .mission-pillars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 2rem 0;
+  }
+
+  .mission-pillar {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: var(--color-mist);
+    border-left: 3px solid var(--color-sage);
+  }
+
+  .pillar-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .mission-pillar p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-bark);
+    margin: 0;
+  }
+
+  /* ── VISION ── */
+  .vision {
+    background: var(--color-forest);
+    padding: 5rem 0;
+  }
+
+  .vision-quote {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-style: italic;
+    color: white;
+    line-height: 1.4;
+    max-width: 800px;
+    margin: 1rem 0 0;
+    border: none;
+    padding: 0;
+  }
+
+  /* ── IMPACT ── */
+  .impact {
+    padding: 7rem 0;
+    background: var(--color-cream-dark);
+  }
+
+  .impact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .impact-heading {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-forest-dark);
+    margin: 0.75rem 0 1rem;
+    line-height: 1.2;
+  }
+
+  .impact-sub {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #5a4a3a;
+    margin-bottom: 2rem;
+  }
+
+  .video-thumb {
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+
+  .video-thumb img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .video-thumb:hover img {
+    transform: scale(1.03);
+  }
+
+  .play-btn {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(45, 80, 22, 0.5);
+    transition: background 0.2s;
+  }
+
+  .play-btn > svg {
+    width: 56px;
+    height: 56px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    padding: 12px;
+    backdrop-filter: blur(4px);
+  }
+
+  .video-thumb:hover .play-btn {
+    background: rgba(45, 80, 22, 0.65);
+  }
+
+  .ngosource-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border: 1px solid var(--color-cream-dark);
+    text-decoration: none;
+    margin-top: 1.5rem;
+    transition: border-color 0.2s;
+  }
+
+  .ngosource-badge:hover {
+    border-color: var(--color-sage);
+  }
+
+  .ngosource-badge img {
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .ngosource-badge p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-forest);
+    margin: 0;
+  }
+
+  /* ── PRINCIPLES ── */
+  .principles {
+    padding: 7rem 0;
+    background: var(--color-cream);
+  }
+
+  .principles-heading {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-forest-dark);
+    margin: 0.75rem 0 3rem;
+  }
+
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .principle-card {
+    background: white;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .principle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(45, 80, 22, 0.12);
+  }
+
+  .principle-img-wrap img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+  }
+
+  .principle-body {
+    padding: 1.25rem;
+  }
+
+  .principle-body h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-forest);
+    margin-bottom: 0.5rem;
+  }
+
+  .principle-body p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #5a4a3a;
+    margin: 0;
+  }
+
+  /* ── PRODUCERS ── */
+  .producers {
+    position: relative;
+    padding: 8rem 0;
+    overflow: hidden;
+  }
+
+  .producers-bg {
+    position: absolute;
+    inset: 0;
+  }
+
+  .producers-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .producers-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(26, 46, 10, 0.82);
+  }
+
+  .producers-content {
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+  }
+
+  .producers-heading {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    color: white;
+    font-weight: 700;
+    margin: 0.75rem 0 1.5rem;
+  }
+
+  .producers-text {
+    color: rgba(245, 240, 232, 0.8);
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  /* ── RECENT WORKS ── */
+  .works {
+    padding: 7rem 0;
+    background: var(--color-mist);
+  }
+
+  .works-heading {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-forest-dark);
+    margin: 0.75rem 0 1rem;
+  }
+
+  .works-sub {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #5a4a3a;
+    max-width: 640px;
+    margin-bottom: 3rem;
+  }
+
+  .works-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 220px;
+    gap: 0.75rem;
+  }
+
+  .gallery-item {
+    overflow: hidden;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.05);
+  }
+
+  .gallery-item-2,
+  .gallery-item-6 {
+    grid-row: span 2;
+  }
+
+  /* ── CONTACT CTA ── */
+  .contact-cta {
+    background: var(--color-forest-dark);
+    padding: 3rem 0;
+  }
+
+  .cta-links {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .cta-phone {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: white;
+    transition: opacity 0.2s;
+  }
+
+  .cta-phone:hover {
+    opacity: 0.8;
+  }
+
+  .cta-phone-icon {
+    font-size: 1.5rem;
+  }
+
+  .cta-phone strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .cta-phone span {
+    font-size: 0.75rem;
+    color: rgba(245, 240, 232, 0.5);
+  }
+
+  .cta-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-sage-light);
+    margin: 0 0 0 auto;
+  }
+
+  /* ── PARTNERS ── */
+  .partners {
+    padding: 5rem 0;
+    background: var(--color-cream-dark);
+  }
+
+  .partners-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .partner-logo img {
+    height: 50px;
+    object-fit: contain;
+    filter: grayscale(30%);
+    transition: filter 0.2s;
+  }
+
+  .partner-logo:hover img {
+    filter: grayscale(0%);
+  }
+
+  /* ── PUBLICATIONS PREVIEW ── */
+  .pubs-preview {
+    padding: 7rem 0;
+    background: var(--color-cream);
+  }
+
+  .pubs-heading {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-forest-dark);
+    margin: 0.75rem 0 0.5rem;
+  }
+
+  .pubs-sub {
+    font-size: 0.95rem;
+    color: #5a4a3a;
+    margin-bottom: 3rem;
+  }
+
+  .pubs-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .pub-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .pub-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(45, 80, 22, 0.1);
+  }
+
+  .pub-card-img img {
+    width: 100%;
+    aspect-ratio: 2/1;
+    object-fit: cover;
+    display: block;
+  }
+
+  .pub-card-body {
+    padding: 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pub-date {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-sage);
+    margin-bottom: 0.5rem;
+  }
+
+  .pub-title {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-forest-dark);
+    line-height: 1.4;
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+
+  .pub-arrow {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-sage);
+    letter-spacing: 0.05em;
+  }
+
+  .pubs-more {
+    text-align: center;
+  }
+
+  /* ── BOTTOM CTA ── */
+  .bottom-cta {
+    background: var(--color-forest);
+    padding: 6rem 0;
+    text-align: center;
+  }
+
+  .bottom-cta-text {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    color: white;
+    line-height: 1.5;
+    max-width: 800px;
+    margin: 0 auto 2.5rem;
+    font-weight: 600;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .principles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .pubs-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .mission-grid,
+    .impact-inner {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+    .mission-image-tag {
+      right: 0;
+      bottom: -1rem;
+    }
+    .works-gallery {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .gallery-item-2,
+    .gallery-item-6 {
+      grid-row: span 1;
+    }
+    .cta-label {
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .principles-grid,
+    .pubs-grid {
+      grid-template-columns: 1fr;
+    }
+    .works-gallery {
+      grid-template-columns: 1fr;
+    }
+    .hero-actions {
+      flex-direction: column;
+    }
+    .hero-location {
+      display: none;
+    }
+    .cta-links {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+    .cta-label {
+      margin: 0;
+    }
+    .partners-logos {
+      gap: 1.5rem;
+    }
+  }
+</style>
