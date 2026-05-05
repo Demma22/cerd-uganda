@@ -1,49 +1,58 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import fs from 'fs';
+import path from 'path';
 
-// Sample publications data - this will be replaced with data from your API
-const publications = [
-  {
-    id: 1,
-    title: "Seeds of Transformation: Highlights from the Kisumu Community of Practice Gathering",
-    date: "Nov 6, 2025",
-    type: "Report",
-    file: "/documents/seeds-of-transformation.pdf",
-    abstract: "A comprehensive report on community-led agroecological transformation in East Africa."
-  },
-  {
-    id: 2,
-    title: "When a Good Policy Goes Bad: Policy Implementation Challenges in Ugandan Agriculture",
-    date: "Aug 2, 2023",
-    type: "Policy Paper",
-    file: "/documents/when-policy-goes-bad.pdf",
-    abstract: "Analysis of agricultural policy implementation gaps and recommendations."
-  },
-  {
-    id: 3,
-    title: "Monitoring Environmental Policy Process: A Systems Approach",
-    date: "Mar 15, 2022",
-    type: "Research Paper",
-    file: "/documents/monitoring-policy-process.pdf",
-    abstract: "Namanji, S., Francis, C., Ssekyewa, C., Lieblein G."
-  },
-  {
-    id: 4,
-    title: "Oil palm intercropping in Uganda — an assessment of farmer practices and suggestion of alternatives",
-    date: "Feb 28, 2022",
-    type: "Research Paper",
-    file: "/documents/oil-palm-intercropping.pdf",
-    abstract: "Evaluating intercropping systems and proposing sustainable alternatives."
-  },
-  {
-    id: 5,
-    title: "Agroecology as a Pathway to Food Security in Uganda",
-    date: "Oct 10, 2021",
-    type: "Policy Brief",
-    file: "/documents/agroecology-food-security.pdf",
-    abstract: "Policy recommendations for scaling agroecological practices."
+// Load publications from documents folder
+const documentsDir = path.join(process.cwd(), 'public', 'documents');
+let publications = [];
+
+try {
+  // Read PDF files from documents folder
+  if (fs.existsSync(documentsDir)) {
+    const files = fs.readdirSync(documentsDir);
+    
+    // Try to read metadata from JSON file if it exists
+    let metadata = {};
+    const metadataPath = path.join(documentsDir, 'publications-metadata.json');
+    if (fs.existsSync(metadataPath)) {
+      const metaContent = fs.readFileSync(metadataPath, 'utf-8');
+      metadata = JSON.parse(metaContent);
+    }
+    
+    publications = files
+      .filter(file => file.endsWith('.pdf'))
+      .map((file, index) => {
+        const baseName = file.replace('.pdf', '');
+        const meta = metadata[baseName] || {};
+        
+        // Try to extract date from file modified time
+        let fileDate = meta.date || '';
+        if (!fileDate) {
+          const stats = fs.statSync(path.join(documentsDir, file));
+          fileDate = stats.mtime.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+          });
+        }
+        
+        return {
+          id: index,
+          title: meta.title || baseName.replace(/-/g, ' '),
+          date: fileDate,
+          type: meta.type || 'Publication',
+          file: `/documents/${file}`,
+          abstract: meta.abstract || 'Download this publication to read more.'
+        };
+      });
   }
-];
+} catch (error) {
+  console.error('Error loading publications:', error);
+}
+
+// Sort by date (newest first)
+publications.sort((a, b) => new Date(b.date) - new Date(a.date));
 ---
 
 <BaseLayout title="Publications" description="Research papers, reports, and publications from CERD-UG">
@@ -59,10 +68,10 @@ const publications = [
   <section class="publications-list">
     <div class="container-site">
       <div class="filters">
-        <button class="filter-btn active">All</button>
-        <button class="filter-btn">Research Papers</button>
-        <button class="filter-btn">Policy Briefs</button>
-        <button class="filter-btn">Reports</button>
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Research Paper">Research Papers</button>
+        <button class="filter-btn" data-filter="Policy Brief">Policy Briefs</button>
+        <button class="filter-btn" data-filter="Report">Reports</button>
       </div>
 
       <div class="publications-grid" id="publicationsGrid">
@@ -73,8 +82,8 @@ const publications = [
             <p class="pub-abstract">{pub.abstract}</p>
             <div class="pub-footer">
               <time class="pub-date">{pub.date}</time>
-              <a href={pub.file} class="download-link" download>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <a href={pub.file} class="download-link" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="7 10 12 15 17 10" />
                   <line x1="12" y1="15" x2="12" y2="3" />
@@ -84,14 +93,22 @@ const publications = [
             </div>
           </div>
         ))}
+        
+        {publications.length === 0 && (
+          <div class="empty-state">
+            <p>No publications uploaded yet.</p>
+            <p class="empty-hint">Add PDF files to the <code>public/documents/</code> folder.</p>
+          </div>
+        )}
       </div>
     </div>
   </section>
 
   <style>
+    /* Hero Section with extra top padding for navbar */
     .publications-hero {
       background: linear-gradient(135deg, var(--color-forest) 0%, var(--color-forest-dark) 100%);
-      padding: 4rem 0;
+      padding: 8rem 0 4rem;
       text-align: center;
     }
 
@@ -101,20 +118,25 @@ const publications = [
       color: white;
       margin-top: 0.5rem;
       margin-bottom: 1rem;
+      font-family: var(--font-display);
     }
 
     .page-subtitle {
       font-size: 1rem;
-      color: rgba(245, 240, 232, 0.8);
+      color: rgba(245, 240, 232, 0.85);
       max-width: 600px;
       margin: 0 auto;
+      line-height: 1.6;
     }
 
+    /* Publications List Section */
     .publications-list {
-      padding: 4rem 0;
+      padding: 4rem 0 6rem;
       background: var(--color-cream);
+      min-height: 60vh;
     }
 
+    /* Filters */
     .filters {
       display: flex;
       gap: 1rem;
@@ -124,82 +146,107 @@ const publications = [
     }
 
     .filter-btn {
-      padding: 0.5rem 1.25rem;
+      padding: 0.6rem 1.5rem;
       background: white;
       border: 1px solid var(--color-sage);
       color: var(--color-forest);
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
       border-radius: 2rem;
     }
 
-    .filter-btn.active,
     .filter-btn:hover {
-      background: var(--color-forest);
+      background: var(--color-sage);
       color: white;
+      border-color: var(--color-sage);
     }
 
+    .filter-btn.active {
+      background: var(--color-forest);
+      color: white;
+      border-color: var(--color-forest);
+    }
+
+    /* Publications Grid */
     .publications-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 2rem;
     }
 
+    /* Publication Card */
     .publication-card {
       background: white;
-      padding: 1.5rem;
       border-radius: 0.75rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     .publication-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -12px rgba(45, 80, 22, 0.15);
     }
 
+    /* Publication Type Badge */
     .pub-type {
       display: inline-block;
       font-size: 0.7rem;
       font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--color-sage);
       background: var(--color-mist);
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
+      padding: 0.3rem 0.9rem;
+      border-radius: 2rem;
       margin-bottom: 1rem;
+      align-self: flex-start;
     }
 
+    /* Title */
     .pub-title {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: var(--color-forest-dark);
       line-height: 1.4;
+      color: var(--color-forest-dark);
       margin-bottom: 0.75rem;
+      font-family: var(--font-display);
     }
 
+    /* Abstract */
     .pub-abstract {
       font-size: 0.85rem;
-      color: #5a4a3a;
       line-height: 1.6;
-      margin-bottom: 1rem;
+      color: var(--color-bark);
+      margin-bottom: 1.25rem;
+      flex: 1;
     }
 
+    /* Footer */
     .pub-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid #eee;
       padding-top: 0.75rem;
+      border-top: 1px solid rgba(107, 143, 71, 0.2);
+      margin-top: auto;
     }
 
     .pub-date {
       font-size: 0.7rem;
+      font-weight: 500;
       color: #999;
+      letter-spacing: 0.02em;
     }
 
+    /* Download Link */
     .download-link {
       display: inline-flex;
       align-items: center;
@@ -208,10 +255,104 @@ const publications = [
       font-weight: 600;
       color: var(--color-forest);
       text-decoration: none;
+      transition: color 0.2s ease;
     }
 
     .download-link:hover {
+      color: var(--color-sage);
       text-decoration: underline;
     }
+
+    .download-link svg {
+      transition: transform 0.2s ease;
+    }
+
+    .download-link:hover svg {
+      transform: translateY(2px);
+    }
+
+    /* Empty State */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 0.75rem;
+    }
+
+    .empty-state p {
+      color: var(--color-bark);
+      font-size: 1rem;
+    }
+
+    .empty-hint {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 0.5rem;
+    }
+
+    .empty-hint code {
+      background: var(--color-mist);
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .publications-hero {
+        padding: 6rem 0 3rem;
+      }
+      
+      .publications-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .filters {
+        gap: 0.75rem;
+      }
+      
+      .filter-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .publications-hero {
+        padding: 5rem 0 2.5rem;
+      }
+      
+      .publication-card {
+        padding: 1.25rem;
+      }
+    }
   </style>
+
+  <script>
+    // Filter functionality
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.publication-card');
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filterValue = btn.dataset.filter;
+        
+        // Update active button
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Filter cards
+        cards.forEach(card => {
+          const cardType = card.dataset.type;
+          if (filterValue === 'all' || cardType === filterValue) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
 </BaseLayout>

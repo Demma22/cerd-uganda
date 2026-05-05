@@ -16,9 +16,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </div>
   </section>
 
-  <!-- CURRENT FOCUS + STATS -->
+  <!-- CURRENT FOCUS SECTION (without stat cards) -->
   <section class="focus">
-    <div class="container-site focus-grid">
+    <div class="container-site">
       <div class="focus-text">
         <span class="section-label">Our Current Focus</span>
         <h2>From 2020 to 2024, CERD-UG operated nationally in Uganda</h2>
@@ -31,35 +31,39 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           These efforts led to notable achievements in conservation and local development.
         </p>
       </div>
-      <div class="focus-stats">
-        <div class="stat-card">
-          <span class="stat-number">6</span>
-          <span class="stat-label">Years in Business</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-number">6 yrs</span>
-          <span class="stat-label">of Impact & Influence</span>
-        </div>
+    </div>
+  </section>
+
+  <!-- STATS BANNER (new format) -->
+  <section class="stats-banner">
+    <div class="container-site stats-container">
+      <div class="stat-item">
+        <span class="stat-number-large">6</span>
+        <span class="stat-label-large">Years in Business</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number-large">6 yrs</span>
+        <span class="stat-label-large">of Impact & Influence</span>
       </div>
     </div>
   </section>
 
-  <!-- VISION / MISSION BANNER -->
+  <!-- VISION / MISSION BANNER (with background) -->
   <section class="vision-banner">
-    <div class="container-site">
-      <div class="vision-card">
-        <p class="vision-quote">
-          CERD-UG aims to co-create an ecosystems and systems thinking approach in research, education and community engagement.
-        </p>
-        <p class="vision-goal">
-          Our goal is to apply our extensive experience in working with the agro-ecosystem to bring about development policy change,
-          improve people's livelihoods, and contribute to achieving food and nutrition security.
-        </p>
-      </div>
+    <div class="vision-overlay"></div>
+    <div class="container-site vision-card">
+      <p class="vision-quote">
+        CERD-UG aims to co-create an ecosystems and systems thinking approach in research, education and community engagement.
+      </p>
+      <p class="vision-goal">
+        Our goal is to apply our extensive experience in working with the agro-ecosystem to bring about development policy change,
+        improve people's livelihoods, and contribute to achieving food and nutrition security.
+      </p>
     </div>
   </section>
 
-  <!-- TEAM SECTION -->
+  <!-- TEAM SECTION (4 columns) -->
   <section class="team">
     <div class="container-site">
       <div class="team-header">
@@ -73,15 +77,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
       <div class="team-grid">
         <div class="team-card">
-          <img src="https://placehold.co/400x500/2d5016/f5f0e8?text=Sarah+Namanji" alt="Dr. Sarah Namanji" />
-          <div class="team-info">
-            <h3>Dr. Sarah Namanji</h3>
-            <p class="team-role">Executive Director</p>
-            <p class="team-bio">Agro-ecology researcher with focus on policy change and food systems transformation.</p>
-          </div>
-        </div>
-        <div class="team-card">
-          <img src="https://placehold.co/400x500/3d6b1f/f5f0e8?text=Charles+Ssekyewa" alt="Prof. Charles Ssekyewa" />
+          <img src="/images/about/profCharles.jpeg" alt="Prof. Charles Ssekyewa" />
           <div class="team-info">
             <h3>Prof. Charles Ssekyewa</h3>
             <p class="team-role">Research Director</p>
@@ -89,11 +85,59 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           </div>
         </div>
         <div class="team-card">
-          <img src="https://placehold.co/400x500/6b8f47/f5f0e8?text=Geir+Lieblein" alt="Dr. Geir Lieblein" />
+          <img src="/images/about/DrStella.jpeg" alt="Dr. Stella" />
           <div class="team-info">
-            <h3>Dr. Geir Lieblein</h3>
-            <p class="team-role">Advisory Board Chair</p>
-            <p class="team-bio">Professor of Agro-ecology, Norwegian University of Life Sciences.</p>
+            <h3>Dr. Stella</h3>
+            <p class="team-role">Programs Director</p>
+            <p class="team-bio">Leading community engagement and farmer training initiatives.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="/images/about/MsConnie.avif" alt="Ms. Connie" />
+          <div class="team-info">
+            <h3>Ms. Connie</h3>
+            <p class="team-role">Communications Lead</p>
+            <p class="team-bio">Manages outreach, publications, and stakeholder engagement.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="/images/about/DrFred.avif" alt="Dr. Fred" />
+          <div class="team-info">
+            <h3>Dr. Fred</h3>
+            <p class="team-role">Senior Researcher</p>
+            <p class="team-bio">Expert in ecosystem conservation and environmental policy.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="/images/about/Kirabo.jpeg" alt="Kirabo" />
+          <div class="team-info">
+            <h3>Kirabo</h3>
+            <p class="team-role">Youth Program Coordinator</p>
+            <p class="team-bio">Engages young people in agroecology and environmental education.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="/images/about/David.avif" alt="David Kirabo" />
+          <div class="team-info">
+            <h3>David Kirabo</h3>
+            <p class="team-role">Operations Manager</p>
+            <p class="team-bio">Oversees field operations and partnership coordination.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="/images/about/tracy.webp" alt="Tracy" />
+          <div class="team-info">
+            <h3>Tracy</h3>
+            <p class="team-role">Monitoring & Evaluation</p>
+            <p class="team-bio">Tracks impact metrics and ensures program quality.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <img src="/images/about/Vincent.avif" alt="Vincent" />
+          <div class="team-info">
+            <h3>Vincent</h3>
+            <p class="team-role">Field Coordinator</p>
+            <p class="team-bio">Leads farmer training programs and agroecology demonstrations.</p>
           </div>
         </div>
       </div>
@@ -105,44 +149,58 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <div class="container-site">
       <div class="programs-grid">
         <div class="program-card school">
-          <div class="program-icon">🌱</div>
-          <h3>School Children & Youth</h3>
-          <p>
-            We involve school children in Agroecological farming and understanding their environment.
-            Young school children are taught to appreciate and respect nature, knowing that every component
-            of the ecosystem affects and benefits the other for overall sustainability.
-          </p>
+          <div class="program-img">
+            <img src="/images/about/InvolveChildren.jpg" alt="School children in agroecological farming" />
+          </div>
+          <div class="program-content">
+            <h3>School Children & Youth</h3>
+            <p>
+              We involve school children in Agroecological farming and understanding their environment.
+              Young school children are taught to appreciate and respect nature, knowing that every component
+              of the ecosystem affects and benefits the other for overall sustainability.
+            </p>
+          </div>
         </div>
         <div class="program-card policy">
-          <div class="program-icon">📋</div>
-          <h3>Policy & Systems Thinking</h3>
-          <p>
-            CERD-UG influences policymakers to engage in participatory and systems thinking approaches
-            in development planning and management. We offer sustainable development values to communities
-            in Uganda and the African Region, especially women and youth.
-          </p>
+          <div class="program-img">
+            <img src="/images/about/conference1.avif" alt="Policy and systems thinking" />
+          </div>
+          <div class="program-content">
+            <h3>Policy & Systems Thinking</h3>
+            <p>
+              CERD-UG influences policymakers to engage in participatory and systems thinking approaches
+              in development planning and management. We offer sustainable development values to communities
+              in Uganda and the African Region, especially women and youth.
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PARTNERS / COLLABORATIONS -->
-  <section class="partners">
+  <!-- GALLERY SECTION (organized like index page) -->
+  <section class="gallery">
     <div class="container-site">
-      <span class="section-label">Collaborations</span>
-      <h2>Our Partners & Supporters</h2>
-      <div class="partners-grid">
-        <div class="partner-logo">
-          <img src="https://placehold.co/160x80/ffffff/2d5016?text=SLU" alt="Swedish University of Agricultural Sciences" />
+      <span class="section-label">Our Activities</span>
+      <h2>Conferences & Community Engagement</h2>
+      <div class="gallery-grid">
+        <div class="gallery-item gallery-item-1">
+          <img src="/images/about/conf2.avif" alt="Conference presentation" />
         </div>
-        <div class="partner-logo">
-          <img src="https://placehold.co/160x80/ffffff/2d5016?text=Sida" alt="Sida" />
+        <div class="gallery-item gallery-item-2">
+          <img src="/images/about/conf3.avif" alt="Community gathering" />
         </div>
-        <div class="partner-logo">
-          <img src="https://placehold.co/160x80/ffffff/2d5016?text=NGOsource" alt="NGOsource" />
+        <div class="gallery-item gallery-item-3">
+          <img src="/images/about/children1.avif" alt="Children learning" />
         </div>
-        <div class="partner-logo">
-          <img src="https://placehold.co/160x80/ffffff/2d5016?text=Local+Farmers" alt="Local Farmers Networks" />
+        <div class="gallery-item gallery-item-4">
+          <img src="/images/about/speech.avif" alt="Keynote speech" />
+        </div>
+        <div class="gallery-item gallery-item-5">
+          <img src="/images/about/Children2.jpeg" alt="School children activity" />
+        </div>
+        <div class="gallery-item gallery-item-6">
+          <img src="/images/about/conference1.avif" alt="International conference" />
         </div>
       </div>
     </div>
@@ -165,7 +223,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     /* Hero / Journey Section */
     .about-hero {
       background: linear-gradient(135deg, var(--color-forest) 0%, var(--color-forest-dark) 100%);
-      padding: 5rem 0 4rem;
+      padding: 8rem 0 4rem;
       text-align: center;
     }
 
@@ -191,11 +249,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       background: var(--color-cream);
     }
 
-    .focus-grid {
-      display: grid;
-      grid-template-columns: 1fr 0.8fr;
-      gap: 4rem;
-      align-items: center;
+    .focus-text {
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
     }
 
     .focus-text h2 {
@@ -216,63 +273,92 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       color: var(--color-sage);
     }
 
-    .focus-stats {
+    /* Stats Banner (new format) */
+    .stats-banner {
+      background: var(--color-mist);
+      padding: 3rem 0;
+      border-top: 1px solid rgba(107, 143, 71, 0.2);
+      border-bottom: 1px solid rgba(107, 143, 71, 0.2);
+    }
+
+    .stats-container {
       display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
+      justify-content: center;
+      align-items: center;
+      gap: 4rem;
+      flex-wrap: wrap;
     }
 
-    .stat-card {
-      background: white;
-      padding: 2rem;
+    .stat-item {
       text-align: center;
-      border-radius: 0.75rem;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
     }
 
-    .stat-number {
+    .stat-number-large {
       display: block;
-      font-size: 2.5rem;
+      font-size: 3.5rem;
       font-weight: 700;
       color: var(--color-forest);
       font-family: var(--font-display);
+      line-height: 1;
     }
 
-    .stat-label {
-      font-size: 0.85rem;
-      letter-spacing: 0.05em;
+    .stat-label-large {
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--color-sage);
     }
 
-    /* Vision Banner */
+    .stat-divider {
+      width: 2px;
+      height: 50px;
+      background: var(--color-sage);
+      opacity: 0.3;
+    }
+
+    /* Vision Banner (with background image) */
     .vision-banner {
-      background: var(--color-mist);
-      padding: 4rem 0;
+      position: relative;
+      background-image: url('/images/about/conf3.avif');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      padding: 6rem 0;
+      text-align: center;
+    }
+
+    .vision-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(26, 46, 10, 0.85);
     }
 
     .vision-card {
+      position: relative;
+      z-index: 2;
       max-width: 800px;
       margin: 0 auto;
-      text-align: center;
     }
 
     .vision-quote {
       font-size: clamp(1.25rem, 2.5vw, 1.75rem);
       font-family: var(--font-display);
       font-style: italic;
-      color: var(--color-forest-dark);
+      color: white;
       line-height: 1.4;
       margin-bottom: 1.5rem;
     }
 
     .vision-goal {
       font-size: 1rem;
-      color: var(--color-bark);
+      color: rgba(245, 240, 232, 0.9);
       line-height: 1.7;
     }
 
-    /* Team Section */
+    /* Team Section (4 columns) */
     .team {
       padding: 5rem 0;
       background: var(--color-cream);
@@ -298,7 +384,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     .team-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 2rem;
     }
 
@@ -317,38 +403,39 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     .team-card img {
       width: 100%;
-      aspect-ratio: 4/5;
+      aspect-ratio: 1/1;
       object-fit: cover;
     }
 
     .team-info {
-      padding: 1.5rem;
+      padding: 1.25rem;
     }
 
     .team-info h3 {
-      font-size: 1.25rem;
+      font-size: 1rem;
+      font-weight: 700;
       color: var(--color-forest);
       margin-bottom: 0.25rem;
     }
 
     .team-role {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--color-sage);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
 
     .team-bio {
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       line-height: 1.5;
       color: var(--color-bark);
     }
 
-    /* Programs Section */
+    /* Programs Section with images */
     .programs {
-      padding: 4rem 0;
+      padding: 5rem 0;
       background: var(--color-mist);
     }
 
@@ -359,18 +446,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
 
     .program-card {
-      padding: 2rem;
-      border-radius: 0.75rem;
       background: white;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .program-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+    .program-img img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+
+    .program-content {
+      padding: 1.5rem;
     }
 
     .program-card h3 {
       font-size: 1.25rem;
+      font-weight: 700;
       color: var(--color-forest);
       margin-bottom: 0.75rem;
     }
@@ -381,37 +475,44 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       color: var(--color-bark);
     }
 
-    /* Partners Section */
-    .partners {
-      padding: 4rem 0;
+    /* Gallery Section (organized like index page) */
+    .gallery {
+      padding: 5rem 0;
       background: var(--color-cream);
-      text-align: center;
     }
 
-    .partners h2 {
-      font-size: 1.75rem;
+    .gallery h2 {
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
       margin: 0.75rem 0 2rem;
       color: var(--color-forest-dark);
     }
 
-    .partners-grid {
-      display: flex;
-      justify-content: center;
-      gap: 3rem;
-      flex-wrap: wrap;
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 220px;
+      gap: 0.75rem;
     }
 
-    .partner-logo img {
-      height: 60px;
-      object-fit: contain;
-      filter: grayscale(20%);
-      opacity: 0.8;
-      transition: all 0.3s ease;
+    .gallery-item {
+      overflow: hidden;
+      border-radius: 0.5rem;
     }
 
-    .partner-logo:hover img {
-      filter: grayscale(0%);
-      opacity: 1;
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .gallery-item-2,
+    .gallery-item-5 {
+      grid-row: span 2;
     }
 
     /* Bottom CTA */
@@ -434,34 +535,43 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
 
     /* Responsive */
-    @media (max-width: 768px) {
-      .focus-grid {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-      }
-
+    @media (max-width: 1024px) {
       .team-grid {
-        grid-template-columns: 1fr;
-        max-width: 400px;
-        margin: 0 auto;
+        grid-template-columns: repeat(2, 1fr);
       }
-
-      .programs-grid {
-        grid-template-columns: 1fr;
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
-
-      .focus-stats {
-        flex-direction: row;
-      }
-
-      .stat-card {
-        flex: 1;
+      .gallery-item-2,
+      .gallery-item-5 {
+        grid-row: span 1;
       }
     }
 
-    @media (max-width: 540px) {
-      .focus-stats {
+    @media (max-width: 768px) {
+      .programs-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-container {
+        gap: 2rem;
+      }
+      .stat-divider {
+        display: none;
+      }
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .team-grid {
+        grid-template-columns: 1fr;
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      .stats-container {
         flex-direction: column;
+        gap: 1rem;
       }
     }
   </style>

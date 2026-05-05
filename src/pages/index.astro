@@ -1,5 +1,32 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import fs from 'fs';
+import path from 'path';
+
+// Load real publications from documents folder
+const documentsDir = path.join(process.cwd(), 'public', 'documents');
+let publications = [];
+
+try {
+  if (fs.existsSync(documentsDir)) {
+    const files = fs.readdirSync(documentsDir);
+    publications = files
+      .filter(file => file.endsWith('.pdf'))
+      .map((file, index) => ({
+        id: index,
+        title: file.replace('.pdf', '').replace(/-/g, ' '),
+        date: "Coming Soon",
+        slug: file.replace('.pdf', ''),
+        file: `/documents/${file}`,
+        type: "Publication"
+      }));
+  }
+} catch (error) {
+  console.error('Error loading publications:', error);
+}
+
+// Display only first 4 publications on homepage
+const recentPublications = publications.slice(0, 4);
 ---
 
 <BaseLayout title="Home" description="CERD-UG promotes an ecosystems and systems thinking approach in research, education and community engagement in Uganda.">
@@ -8,7 +35,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <section class="hero">
     <div class="hero-bg">
       <img
-        src="https://placehold.co/1400x800/2d5016/6b8f47?text=Agroecology+in+Uganda"
+        src="/images/home/herobg.jpeg"
         alt="CERD Uganda field work"
         class="hero-img"
       />
@@ -49,7 +76,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <div class="container-site mission-grid">
       <div class="mission-image">
         <img
-          src="https://placehold.co/480x620/3d6b1f/f5f0e8?text=Our+CEO"
+          src="/images/home/ceos.jpeg"
           alt="CERD-UG CEO"
           class="mission-photo"
         />
@@ -119,9 +146,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
 
       <div class="impact-video">
-        <a href="https://youtu.be/vTRxLLMVqHQ" target="_blank" rel="noopener" class="video-thumb">
+        <a href="https://www.youtube.com/watch?v=vTRxLLMVqHQ" target="_blank" rel="noopener" class="video-thumb">
           <img
-            src="https://placehold.co/580x400/1a2e0a/6b8f47?text=▶+Watch+Our+Work"
+            src="/images/home/fruits.avif"
             alt="CERD Uganda in action"
           />
           <div class="play-btn">
@@ -142,29 +169,52 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </div>
   </section>
 
-  <!-- PRINCIPLES -->
+  <!-- PRINCIPLES / WHAT WE STAND FOR -->
   <section class="principles">
     <div class="container-site">
       <span class="section-label">Our Principles</span>
       <h2 class="principles-heading">What We Stand For</h2>
 
       <div class="principles-grid">
-        {[
-          { title: "Biodiversity", img: "https://placehold.co/420x280/3d6b1f/f5f0e8?text=Biodiversity", desc: "Preserving the rich variety of plant, animal, and microbial life that sustains healthy ecosystems." },
-          { title: "Ecological Balance", img: "https://placehold.co/420x280/2d5016/c8e6a0?text=Ecological+Balance", desc: "Maintaining the natural equilibrium of ecosystems to ensure long-term environmental health." },
-          { title: "Animal Welfare", img: "https://placehold.co/420x280/6b8f47/f5f0e8?text=Animal+Welfare", desc: "Ensuring humane and ethical treatment of animals in all farming and research activities." },
-          { title: "Sustainability", img: "https://placehold.co/420x280/1a2e0a/8aaf60?text=Sustainability", desc: "Developing practices that meet today's needs without compromising future generations." },
-        ].map(p => (
-          <article class="principle-card">
-            <div class="principle-img-wrap">
-              <img src={p.img} alt={p.title} />
-            </div>
-            <div class="principle-body">
-              <h3>{p.title}</h3>
-              <p>{p.desc}</p>
-            </div>
-          </article>
-        ))}
+        <article class="principle-card">
+          <div class="principle-img-wrap">
+            <img src="/images/home/veg.avif" alt="Biodiversity" />
+          </div>
+          <div class="principle-body">
+            <h3>Biodiversity</h3>
+            <p>Preserving the rich variety of plant, animal, and microbial life that sustains healthy ecosystems.</p>
+          </div>
+        </article>
+
+        <article class="principle-card">
+          <div class="principle-img-wrap">
+            <img src="/images/home/fruits.avif" alt="Ecological Balance" />
+          </div>
+          <div class="principle-body">
+            <h3>Ecological Balance</h3>
+            <p>Maintaining the natural equilibrium of ecosystems to ensure long-term environmental health.</p>
+          </div>
+        </article>
+
+        <article class="principle-card">
+          <div class="principle-img-wrap">
+            <img src="/images/home/goats.webp" alt="Animal Welfare" />
+          </div>
+          <div class="principle-body">
+            <h3>Animal Welfare</h3>
+            <p>Ensuring humane and ethical treatment of animals in all farming and research activities.</p>
+          </div>
+        </article>
+
+        <article class="principle-card">
+          <div class="principle-img-wrap">
+            <img src="/images/home/fruit2.avif" alt="Sustainability" />
+          </div>
+          <div class="principle-body">
+            <h3>Sustainability</h3>
+            <p>Developing practices that meet today's needs without compromising future generations.</p>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -173,7 +223,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   <section class="producers">
     <div class="producers-bg">
       <img
-        src="https://placehold.co/1400x600/1a2e0a/2d5016?text=Coffee+Plantation"
+        src="/images/home/coffee.avif"
         alt="Coffee plantation"
         class="producers-img"
       />
@@ -191,7 +241,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     </div>
   </section>
 
-  <!-- RECENT WORKS -->
+  <!-- RECENT WORKS GALLERY -->
   <section class="works">
     <div class="container-site">
       <span class="section-label">Recent Works</span>
@@ -203,18 +253,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </p>
 
       <div class="works-gallery">
-        {[
-          "https://placehold.co/480x360/3d6b1f/f5f0e8?text=Organic+Market",
-          "https://placehold.co/480x560/2d5016/c8e6a0?text=Farm+Activities",
-          "https://placehold.co/480x360/6b8f47/1a2e0a?text=Community+Work",
-          "https://placehold.co/480x480/1a2e0a/6b8f47?text=Agroecology",
-          "https://placehold.co/480x360/8b6914/f5f0e8?text=Training",
-          "https://placehold.co/480x560/3d2b1f/c8e6a0?text=Field+Research",
-        ].map((src, i) => (
-          <div class={`gallery-item gallery-item-${i + 1}`}>
-            <img src={src} alt={`CERD work ${i + 1}`} />
-          </div>
-        ))}
+        <div class="gallery-item gallery-item-1">
+          <img src="/images/home/fruits1.avif" alt="Organic Market" />
+        </div>
+        <div class="gallery-item gallery-item-2">
+          <img src="/images/home/duck.avif" alt="Farm Activities" />
+        </div>
+        <div class="gallery-item gallery-item-3">
+          <img src="/images/home/veg.avif" alt="Community Work" />
+        </div>
+        <div class="gallery-item gallery-item-4">
+          <img src="/images/home/fruit2.avif" alt="Agroecology" />
+        </div>
+        <div class="gallery-item gallery-item-5">
+          <img src="/images/home/fruits.avif" alt="Training" />
+        </div>
       </div>
     </div>
   </section>
@@ -245,19 +298,26 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <div class="container-site">
       <span class="section-label">Collaborations and Partnerships</span>
       <div class="partners-logos">
-        {[1,2,3,4,5].map(i => (
-          <div class="partner-logo">
-            <img
-              src={`https://placehold.co/140x60/e8e0d0/6b8f47?text=Partner+${i}`}
-              alt={`Partner ${i}`}
-            />
-          </div>
-        ))}
+        <div class="partner-logo">
+          <img src="/images/partners/3C.avif" alt="3C Partner" />
+        </div>
+        <div class="partner-logo">
+          <img src="/images/partners/BLI.avif" alt="BLI Partner" />
+        </div>
+        <div class="partner-logo">
+          <img src="/images/partners/eoa.avif" alt="EOA Partner" />
+        </div>
+        <div class="partner-logo">
+          <img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" />
+        </div>
+        <div class="partner-logo">
+          <img src="/images/partners/nogamu.avif" alt="Nogamu Partner" />
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- PUBLICATIONS PREVIEW -->
+  <!-- PUBLICATIONS PREVIEW (REAL PDFs FROM DOCUMENTS FOLDER) -->
   <section class="pubs-preview">
     <div class="container-site">
       <span class="section-label">Publications &amp; Presentations</span>
@@ -267,23 +327,24 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </p>
 
       <div class="pubs-grid">
-        {[
-          { date: "Nov 6, 2025", title: "Seeds of Transformation: Highlights from the Kisumu Community of Practice Gathering", slug: "seeds-of-transformation" },
-          { date: "Aug 2, 2023", title: "When a Good Policy Goes Bad: Namanji S.", slug: "when-a-good-policy-goes-bad" },
-          { date: "Mar 15, 2022", title: "Monitoring Environmental Policy Process: Namanji, S., Francis, C., Ssekyewa, C., Lieblein G.", slug: "monitoring-environmental-policy-process" },
-          { date: "Feb 28, 2022", title: "Oil palm intercropping in Uganda — an assessment of farmer practices and suggestion of alternatives", slug: "oil-palm-intercropping-in-uganda" },
-        ].map(pub => (
-          <a href={`/publications/${pub.slug}`} class="pub-card">
+        {recentPublications.map(pub => (
+          <a href={pub.file} class="pub-card" target="_blank" rel="noopener">
             <div class="pub-card-img">
-              <img src="https://placehold.co/480x240/3d6b1f/f5f0e8?text=Publication" alt={pub.title} />
+              <img src="/images/home/fruits1.avif" alt={pub.title} />
             </div>
             <div class="pub-card-body">
               <time class="pub-date">{pub.date}</time>
               <h3 class="pub-title">{pub.title}</h3>
-              <span class="pub-arrow">Read →</span>
+              <span class="pub-arrow">Download PDF →</span>
             </div>
           </a>
         ))}
+        
+        {recentPublications.length === 0 && (
+          <div class="pub-card" style="grid-column: span 4; text-align: center; padding: 2rem;">
+            <p>No publications uploaded yet. Add PDFs to the <code>public/documents/</code> folder.</p>
+          </div>
+        )}
       </div>
 
       <div class="pubs-more">
