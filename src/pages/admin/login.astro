@@ -17,7 +17,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <button type="submit" class="btn-primary">Login</button>
         </form>
         
-        <!-- Show error if present -->
         {Astro.url.searchParams.has('error') && (
           <div class="error">Invalid password</div>
         )}
@@ -32,6 +31,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       align-items: center;
       justify-content: center;
       background: var(--color-mist);
+      padding-top: 4rem;
     }
 
     .login-card {
@@ -69,9 +69,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
     .error {
       margin-top: 1rem;
-      padding: 0.5rem;
-      background: #fee;
-      color: #c00;
+      padding: 0.75rem;
+      background: #fee2e2;
+      color: #991b1b;
       border-radius: 0.5rem;
       font-size: 0.875rem;
     }

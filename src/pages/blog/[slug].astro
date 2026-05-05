@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import fs from 'fs';
+import path from 'path';
+
+// Get the slug from the URL
+const { slug } = Astro.params;
+
+// Load all blogs to find the matching one
+const BLOG_FILE = path.join(process.cwd(), 'src', 'data', 'blogs.json');
+let blog = null;
+
+if (fs.existsSync(BLOG_FILE)) {
+  const data = fs.readFileSync(BLOG_FILE, 'utf-8');
+  const blogs = JSON.parse(data);
+  blog = blogs.find(b => b.slug === slug);
+}
+
+if (!blog) {
+  return Astro.redirect('/blog');
+}
+---
+
+<BaseLayout title={blog.title} description={blog.abstract}>
+  <article class="blog-post">
+    <div class="container-site">
+      <div class="blog-header">
+        <span class="section-label">Blog Post</span>
+        <h1 class="blog-title">{blog.title}</h1>
+        <time class="blog-date">{blog.date}</time>
+      </div>
+      
+      {blog.image && (
+        <div class="blog-featured-image">
+          <img src={blog.image} alt={blog.title} />
+        </div>
+      )}
+      
+      <div class="blog-content">
+        <div class="blog-abstract">
+          <p>{blog.abstract}</p>
+        </div>
+        <div class="blog-body">
+          <p>{blog.content}</p>
+        </div>
+      </div>
+      
+      <div class="blog-back">
+        <a href="/blog" class="btn-outline">← Back to Blog</a>
+      </div>
+    </div>
+  </article>
+
+  <style>
+    .blog-post {
+      padding: 8rem 0 4rem;
+      background: var(--color-cream);
+    }
+
+    .blog-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .blog-title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: var(--color-forest-dark);
+      margin: 1rem 0;
+      font-family: var(--font-display);
+    }
+
+    .blog-date {
+      font-size: 0.85rem;
+      color: var(--color-sage);
+    }
+
+    .blog-featured-image {
+      max-width: 800px;
+      margin: 2rem auto;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    .blog-featured-image img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+
+    .blog-content {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 2.5rem;
+      border-radius: 0.75rem;
+    }
+
+    .blog-abstract {
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--color-sage);
+      border-left: 3px solid var(--color-sage);
+      padding-left: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .blog-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--color-bark);
+    }
+
+    .blog-body p {
+      margin-bottom: 1rem;
+    }
+
+    .blog-back {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .blog-post {
+        padding: 6rem 0 3rem;
+      }
+      .blog-content {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</BaseLayout>
