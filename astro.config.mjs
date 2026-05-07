@@ -3,9 +3,8 @@ import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel';
 
 export default defineConfig({
+  site: 'https://cerd-uganda.vercel.app',
   output: 'server',
-  adapter: vercel({
-    runtime: 'nodejs20.x'
-  }),
+  adapter: vercel(),
   integrations: [tailwind()]
 });

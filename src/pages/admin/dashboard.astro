@@ -371,9 +371,13 @@ if (!session || session.value !== 'authenticated') {
       let html = '';
       for (const p of allPublications) {
         html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
-        html += '<td style="padding: 1rem;">' + escapeHtml(p.title) + '<\/td>';
-        html += '<td style="padding: 1rem;">' + p.date + '<\/td>';
-        html += '<td style="padding: 1rem;"><a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem;">View<\/a><button onclick="deletePublication(\'' + escapeHtml(p.fileName) + '\')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete<\/button><\/td>';
+        html += '<td style="padding: 1rem; font-weight: 500;">' + escapeHtml(p.title) + '<\/td>';
+        html += '<td style="padding: 1rem; color: #6b7280;">' + p.date + '<\/td>';
+        html += '<td style="padding: 1rem; white-space: nowrap;">';
+        html += '<a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem;">View<\/a>';
+        html += '<button onclick="openRenameModal(\'' + escapeHtml(p.fileName) + '\', \'' + escapeHtml(p.title) + '\')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem; cursor: pointer;">Rename<\/button>';
+        html += '<button onclick="deletePublication(\'' + escapeHtml(p.fileName) + '\')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer;">Delete<\/button>';
+        html += '<\/td>';
         html += '<\/tr>';
       }
       tbody.innerHTML = html;
@@ -383,6 +387,39 @@ if (!session || session.value !== 'authenticated') {
       if (confirm('Delete this publication?')) {
         await fetch('/api/publications?fileName=' + encodeURIComponent(fileName), { method: 'DELETE' });
         loadPublications();
+      }
+    }
+
+    window.openRenameModal = function(fileName, currentTitle) {
+      document.getElementById('renameFileName').value = fileName;
+      document.getElementById('renameTitleInput').value = currentTitle;
+      document.getElementById('renameModal').style.display = 'flex';
+      setTimeout(function() { document.getElementById('renameTitleInput').focus(); }, 100);
+    }
+
+    window.closeRenameModal = function() {
+      document.getElementById('renameModal').style.display = 'none';
+    }
+
+    window.saveRename = async function() {
+      const fileName = document.getElementById('renameFileName').value;
+      const newTitle = document.getElementById('renameTitleInput').value.trim();
+      if (!newTitle) { alert('Please enter a title.'); return; }
+      const btn = document.getElementById('saveRenameBtn');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+      const res = await fetch('/api/publications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName: fileName, title: newTitle })
+      });
+      btn.textContent = 'Save';
+      btn.disabled = false;
+      if (res.ok) {
+        closeRenameModal();
+        loadPublications();
+      } else {
+        alert('Failed to rename. Please try again.');
       }
     }
 
@@ -834,4 +871,21 @@ if (!session || session.value !== 'authenticated') {
       activateSection(initialSection);
     });
   </script>
+  <!-- Rename Publication Modal -->
+  <div id="renameModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 0.75rem; width: 90%; max-width: 480px; padding: 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <h3 style="color: #1a2e0a; margin-bottom: 0.5rem;">Rename Publication</h3>
+      <p style="color: #6b7280; font-size: 0.85rem; margin-bottom: 1.5rem;">This changes the display name only — the PDF file is not affected.</p>
+      <input type="hidden" id="renameFileName" />
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #374151; margin-bottom: 0.4rem;">Display Title</label>
+        <input type="text" id="renameTitleInput" style="width: 100%; padding: 0.65rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.95rem; box-sizing: border-box;" onkeydown="if(event.key==='Enter') saveRename()" />
+      </div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button onclick="closeRenameModal()" style="background: #e5e7eb; color: #374151; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+        <button id="saveRenameBtn" onclick="saveRename()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.9rem;">Save</button>
+      </div>
+    </div>
+  </div>
+
 </BaseLayout>

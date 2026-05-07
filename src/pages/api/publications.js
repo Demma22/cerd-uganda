@@ -4,49 +4,49 @@ import fs from 'fs';
 import path from 'path';
 
 const DOCUMENTS_DIR = path.join(process.cwd(), 'public', 'documents');
-const METADATA_FILE = path.join(DOCUMENTS_DIR, 'publications-metadata.json');
+const TITLES_FILE = path.join(process.cwd(), 'src', 'data', 'publication-titles.json');
 
 // Ensure documents directory exists
 if (!fs.existsSync(DOCUMENTS_DIR)) {
   fs.mkdirSync(DOCUMENTS_DIR, { recursive: true });
 }
 
-// Initialize metadata file if it doesn't exist
-if (!fs.existsSync(METADATA_FILE)) {
-  fs.writeFileSync(METADATA_FILE, JSON.stringify({}));
+// Ensure data directory exists
+const dataDir = path.join(process.cwd(), 'src', 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
 }
 
-// Helper function to clean filename for display (fallback)
+// Load custom titles (fileName -> displayTitle)
+function getTitles() {
+  if (!fs.existsSync(TITLES_FILE)) return {};
+  return JSON.parse(fs.readFileSync(TITLES_FILE, 'utf-8'));
+}
+
+function saveTitles(titles) {
+  fs.writeFileSync(TITLES_FILE, JSON.stringify(titles, null, 2));
+}
+
+// Helper function to clean filename into a readable title
 function cleanFileName(name) {
   let cleaned = name.replace(/^\d+-/, '');
   return cleaned.replace('.pdf', '').replace(/-/g, ' ');
 }
 
-// Get metadata
-function getMetadata() {
-  const data = fs.readFileSync(METADATA_FILE, 'utf-8');
-  return JSON.parse(data);
-}
-
-// Save metadata
-function saveMetadata(metadata) {
-  fs.writeFileSync(METADATA_FILE, JSON.stringify(metadata, null, 2));
-}
-
-// Get all publications from documents folder with metadata
+// Get all publications from documents folder
 function getPublications() {
   const files = fs.readdirSync(DOCUMENTS_DIR);
   const pdfFiles = files.filter(file => file.endsWith('.pdf'));
-  const metadata = getMetadata();
-  
+  const titles = getTitles();
+
   return pdfFiles.map((file, index) => {
     const stats = fs.statSync(path.join(DOCUMENTS_DIR, file));
-    const baseName = file.replace('.pdf', '');
-    const meta = metadata[baseName] || {};
-    
+    // Use custom title if set, otherwise derive from filename
+    const displayTitle = titles[file] || cleanFileName(file);
+
     return {
       id: index,
-      title: meta.title || cleanFileName(file),
+      title: displayTitle,
       fileName: file,
       file: `/documents/${file}`,
       date: stats.mtime.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
@@ -64,62 +64,47 @@ export async function GET() {
 export async function POST({ request }) {
   const formData = await request.formData();
   const file = formData.get('file');
-  
+
   if (!file || file.size === 0) {
     return new Response(JSON.stringify({ error: 'No file uploaded' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-  
-  // Check if file is PDF
+
   if (!file.name.endsWith('.pdf')) {
     return new Response(JSON.stringify({ error: 'Only PDF files are allowed' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-  
-  // Clean the original filename (remove special chars, spaces become dashes)
+
   const cleanOriginal = file.name.replace('.pdf', '').replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
   const fileName = `${cleanOriginal}.pdf`;
   const filePath = path.join(DOCUMENTS_DIR, fileName);
-  
-  // Save PDF file
+
   const buffer = await file.arrayBuffer();
   fs.writeFileSync(filePath, Buffer.from(buffer));
-  
+
   return new Response(JSON.stringify({ success: true, fileName: fileName }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
-// UPDATE publication title (and other metadata)
-export async function PUT({ request }) {
-  const formData = await request.formData();
-  const fileName = formData.get('fileName');
-  const title = formData.get('title');
-  
-  if (!fileName) {
-    return new Response(JSON.stringify({ error: 'No file name provided' }), {
+export async function PATCH({ request }) {
+  const { fileName, title } = await request.json();
+
+  if (!fileName || !title) {
+    return new Response(JSON.stringify({ error: 'fileName and title are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-  
-  const metadata = getMetadata();
-  const baseName = fileName.replace('.pdf', '');
-  
-  if (!metadata[baseName]) {
-    metadata[baseName] = {};
-  }
-  
-  if (title) {
-    metadata[baseName].title = title;
-  }
-  
-  saveMetadata(metadata);
-  
+
+  const titles = getTitles();
+  titles[fileName] = title.trim();
+  saveTitles(titles);
+
   return new Response(JSON.stringify({ success: true }), {
     headers: { 'Content-Type': 'application/json' }
   });
@@ -127,26 +112,26 @@ export async function PUT({ request }) {
 
 export async function DELETE({ url }) {
   const fileName = url.searchParams.get('fileName');
-  
+
   if (!fileName) {
     return new Response(JSON.stringify({ error: 'No file name provided' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-  
-  // Delete metadata entry
-  const metadata = getMetadata();
-  const baseName = fileName.replace('.pdf', '');
-  delete metadata[baseName];
-  saveMetadata(metadata);
-  
-  // Delete the PDF file
+
   const filePath = path.join(DOCUMENTS_DIR, fileName);
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
   }
-  
+
+  // Also remove custom title if it exists
+  const titles = getTitles();
+  if (titles[fileName]) {
+    delete titles[fileName];
+    saveTitles(titles);
+  }
+
   return new Response(JSON.stringify({ success: true }), {
     headers: { 'Content-Type': 'application/json' }
   });
