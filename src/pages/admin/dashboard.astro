@@ -265,22 +265,29 @@ if (!session || session.value !== 'authenticated') {
     }
 
     // Navigation between sections
+    function activateSection(section) {
+      document.querySelectorAll('.nav-btn').forEach(function(b) {
+        b.style.background = 'transparent';
+        b.style.color = 'rgba(255,255,255,0.8)';
+      });
+      var activeBtn = document.querySelector('.nav-btn[data-section="' + section + '"]');
+      if (activeBtn) {
+        activeBtn.style.background = '#6b8f47';
+        activeBtn.style.color = 'white';
+      }
+      document.querySelectorAll('.admin-section').forEach(function(s) { s.style.display = 'none'; });
+      var target = document.getElementById(section + '-section');
+      if (target) target.style.display = 'block';
+      if (section === 'messages') loadMessages();
+      if (section === 'team') loadTeam();
+      if (section === 'gallery') loadGallery();
+      if (section === 'content') loadPageContentEditor();
+      location.hash = section;
+    }
+
     document.querySelectorAll('.nav-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        const section = btn.dataset.section;
-        document.querySelectorAll('.nav-btn').forEach(function(b) {
-          b.style.background = 'transparent';
-          b.style.color = 'rgba(255,255,255,0.8)';
-        });
-        btn.style.background = '#6b8f47';
-        btn.style.color = 'white';
-        document.querySelectorAll('.admin-section').forEach(function(s) { s.style.display = 'none'; });
-        const target = document.getElementById(section + '-section');
-        if (target) target.style.display = 'block';
-        if (section === 'messages') loadMessages();
-        if (section === 'team') loadTeam();
-        if (section === 'gallery') loadGallery();
-        if (section === 'content') loadPageContentEditor();
+        activateSection(btn.dataset.section);
       });
     });
 
@@ -812,17 +819,19 @@ if (!session || session.value !== 'authenticated') {
       });
     }
 
-    // Initialize on page load
-    loadPublications();
-    loadBlogs();
-    loadTeam();
-    loadGallery();
-    loadMessages();
+    // Initialize on page load - wrapped in DOMContentLoaded to guarantee DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPublications();
+      loadBlogs();
+      loadTeam();
+      loadGallery();
+      loadMessages();
 
-    // Restore active tab from URL hash on load
-    var initialSection = (location.hash || '').replace('#', '') || 'messages';
-    var validSections = ['messages', 'publications', 'blogs', 'team', 'gallery', 'content'];
-    if (!validSections.includes(initialSection)) initialSection = 'messages';
-    activateSection(initialSection);
+      // Restore the active tab from the URL hash
+      var validSections = ['messages', 'publications', 'blogs', 'team', 'gallery', 'content'];
+      var hash = location.hash.replace('#', '');
+      var initialSection = validSections.includes(hash) ? hash : 'messages';
+      activateSection(initialSection);
+    });
   </script>
 </BaseLayout>
