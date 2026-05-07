@@ -9,7 +9,7 @@ if (!session || session.value !== 'authenticated') {
 ---
 
 <BaseLayout title="Admin Dashboard">
-  <div style="display: flex; min-height: 100vh; background: #f5f0e8; padding-top: 80px;">
+  <div style="display: flex; min-height: 100vh; background: #ffffff; padding-top: 80px;">
     <!-- Sidebar -->
     <div style="width: 260px; background: #1a2e0a; color: white; padding: 2rem 1rem; position: fixed; height: 100vh; overflow-y: auto; top: 0;">
       <h2 style="font-size: 1.1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.2);">CERD-UG Admin</h2>
@@ -20,6 +20,8 @@ if (!session || session.value !== 'authenticated') {
         </button>
         <button class="nav-btn" data-section="publications" style="background: transparent; color: rgba(255,255,255,0.8); padding: 0.75rem 1rem; text-align: left; cursor: pointer; border: none; border-radius: 0.5rem; font-size: 0.9rem;">Publications</button>
         <button class="nav-btn" data-section="blogs" style="background: transparent; color: rgba(255,255,255,0.8); padding: 0.75rem 1rem; text-align: left; cursor: pointer; border: none; border-radius: 0.5rem; font-size: 0.9rem;">Blog Posts</button>
+        <button class="nav-btn" data-section="team" style="background: transparent; color: rgba(255,255,255,0.8); padding: 0.75rem 1rem; text-align: left; cursor: pointer; border: none; border-radius: 0.5rem; font-size: 0.9rem;">Team Members</button>
+        <button class="nav-btn" data-section="gallery" style="background: transparent; color: rgba(255,255,255,0.8); padding: 0.75rem 1rem; text-align: left; cursor: pointer; border: none; border-radius: 0.5rem; font-size: 0.9rem;">Gallery Images</button>
         <button class="nav-btn" data-section="content" style="background: transparent; color: rgba(255,255,255,0.8); padding: 0.75rem 1rem; text-align: left; cursor: pointer; border: none; border-radius: 0.5rem; font-size: 0.9rem;">Page Content</button>
         <a href="/api/logout" style="display: block; color: rgba(255,255,255,0.6); text-decoration: none; padding: 0.75rem 1rem; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2);">Logout</a>
       </nav>
@@ -28,499 +30,415 @@ if (!session || session.value !== 'authenticated') {
     <!-- Main Content -->
     <div style="flex: 1; margin-left: 260px; padding: 2rem;">
       
-      <!-- ========== MESSAGES SECTION ========== -->
+      <!-- MESSAGES SECTION -->
       <div id="messages-section" class="admin-section" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <h2 style="font-size: 1.5rem; color: #1a2e0a; margin: 0;">Contact Messages</h2>
-          <div style="display: flex; gap: 0.5rem;">
-            <button onclick="markAllAsRead()" style="background: #6b8f47; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.8rem;">Mark All as Read</button>
-          </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.5rem; color: #1a2e0a;">Contact Messages</h2>
+          <button onclick="markAllAsRead()" style="background: #6b8f47; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Mark All as Read</button>
         </div>
-
-        <!-- Search Bar -->
         <div style="margin-bottom: 1.5rem;">
-          <input type="text" id="messageSearchInput" placeholder="Search messages by name, email, or message..." 
-            style="width: 100%; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 0.5rem; font-size: 0.85rem;" 
-            onkeyup="filterMessages()" />
+          <input type="text" id="messageSearchInput" placeholder="Search messages..." style="width: 100%; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 0.5rem;" onkeyup="filterMessages()" />
         </div>
-
-        <!-- Messages Table -->
         <div style="background: white; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;">
           <table style="width: 100%; border-collapse: collapse;">
             <thead style="background: #2d5016;">
-              <tr>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Status</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Name / Email</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Message</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Date</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Actions</th>
-              </tr>
+              <tr><th style="padding: 1rem; text-align: left; color: white;">Status</th><th style="padding: 1rem; text-align: left; color: white;">Name / Email</th><th style="padding: 1rem; text-align: left; color: white;">Message</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr>
             </thead>
-            <tbody id="messagesList">
-              <tr>
-                <td colspan="5" style="padding: 2rem; text-align: center; color: #999;">Loading messages...</td>
-              </tr>
-            </tbody>
+            <tbody id="messagesList"><tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">Loading messages...</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== PUBLICATIONS SECTION ========== -->
+      <!-- PUBLICATIONS SECTION -->
       <div id="publications-section" class="admin-section" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <h2 style="font-size: 1.5rem; color: #1a2e0a; margin: 0;">Manage Publications</h2>
-          <button onclick="toggleUploadForm()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.85rem; font-weight: 600;">+ Upload PDF</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.5rem; color: #1a2e0a;">Manage Publications</h2>
+          <button onclick="toggleUploadForm()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">+ Upload PDF</button>
         </div>
-
         <div style="margin-bottom: 1.5rem;">
-          <input type="text" id="pubSearchInput" placeholder="Search publications by title..." 
-            style="width: 100%; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 0.5rem; font-size: 0.85rem;" 
-            onkeyup="filterPublications()" />
+          <input type="text" id="pubSearchInput" placeholder="Search publications..." style="width: 100%; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 0.5rem;" onkeyup="filterPublications()" />
         </div>
-
         <div id="uploadForm" style="display: none; background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid #ddd;">
-          <h3 style="margin-bottom: 1rem; color: #2d5016;">Upload New Publication (PDF only)</h3>
+          <h3>Upload New Publication (PDF only)</h3>
           <form id="publicationForm" enctype="multipart/form-data">
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.85rem;">Select PDF File *</label>
-              <input type="file" name="file" accept=".pdf" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
-            </div>
-            <div style="display: flex; gap: 1rem;">
-              <button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Upload</button>
-              <button type="button" onclick="toggleUploadForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button>
-            </div>
+            <div style="margin-bottom: 1rem;"><label>Select PDF File *</label><input type="file" name="file" accept=".pdf" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Upload</button><button type="button" onclick="toggleUploadForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
           </form>
           <div id="uploadStatus" style="margin-top: 1rem;"></div>
         </div>
-
         <div style="background: white; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;">
           <table style="width: 100%; border-collapse: collapse;">
-            <thead style="background: #2d5016;">
-              <tr>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Title</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Date Uploaded</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="publicationsList">
-              <tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">Loading publications...</td></tr>
-            </tbody>
+            <thead style="background: #2d5016;"><tr><th style="padding: 1rem; text-align: left; color: white;">Title</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr></thead>
+            <tbody id="publicationsList"><tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">Loading publications...</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== BLOG POSTS SECTION ========== -->
+      <!-- BLOG POSTS SECTION -->
       <div id="blogs-section" class="admin-section" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <h2 style="font-size: 1.5rem; color: #1a2e0a; margin: 0;">Manage Blog Posts</h2>
-          <button onclick="toggleBlogForm()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.85rem; font-weight: 600;">+ Add Blog Post</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.5rem; color: #1a2e0a;">Manage Blog Posts</h2>
+          <button onclick="toggleBlogForm()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">+ Add Blog Post</button>
         </div>
-
         <div style="margin-bottom: 1.5rem;">
-          <input type="text" id="blogSearchInput" placeholder="Search blog posts by title..." 
-            style="width: 100%; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 0.5rem; font-size: 0.85rem;" 
-            onkeyup="filterBlogs()" />
+          <input type="text" id="blogSearchInput" placeholder="Search blog posts..." style="width: 100%; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 0.5rem;" onkeyup="filterBlogs()" />
         </div>
-
         <div id="blogForm" style="display: none; background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid #ddd;">
-          <h3 style="margin-bottom: 1rem; color: #2d5016;">Add New Blog Post</h3>
+          <h3>Add New Blog Post</h3>
+          <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem;"><strong>Tip:</strong> You can paste from Word or use HTML tags: &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;</div>
           <form id="blogFormSubmit" enctype="multipart/form-data">
+            <div style="margin-bottom: 1rem;"><label>Title *</label><input type="text" name="title" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="margin-bottom: 1rem;"><label>Featured Image</label><input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="margin-bottom: 1rem;"><label>Abstract / Summary</label><textarea name="abstract" rows="2" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea></div>
             <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.85rem;">Title *</label>
-              <input type="text" name="title" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
+              <div style="margin-bottom: 0.5rem; display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                <button type="button" onclick="insertFormatting('b')" style="background: #f0f0f0; border: 1px solid #ddd; padding: 0.3rem 0.6rem; border-radius: 0.25rem;">Bold</button>
+                <button type="button" onclick="insertFormatting('i')" style="background: #f0f0f0; border: 1px solid #ddd; padding: 0.3rem 0.6rem; border-radius: 0.25rem;">Italic</button>
+                <button type="button" onclick="insertFormatting('ul')" style="background: #f0f0f0; border: 1px solid #ddd; padding: 0.3rem 0.6rem; border-radius: 0.25rem;">Bullet List</button>
+              </div>
+              <textarea id="blogContent" name="content" rows="12" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: monospace;"></textarea>
             </div>
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.85rem;">Featured Image (Optional)</label>
-              <input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
-            </div>
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.85rem;">Abstract / Summary (Optional)</label>
-              <textarea name="abstract" rows="2" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea>
-            </div>
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.85rem;">Content (Full Blog Post) *</label>
-              <textarea name="content" rows="8" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea>
-            </div>
-            <div style="display: flex; gap: 1rem;">
-              <button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Publish</button>
-              <button type="button" onclick="toggleBlogForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button>
-            </div>
+            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Publish</button><button type="button" onclick="toggleBlogForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
           </form>
-          <div id="blogStatus" style="margin-top: 1rem;"></div>
+          <div id="blogStatus"></div>
         </div>
-
         <div style="background: white; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;">
           <table style="width: 100%; border-collapse: collapse;">
-            <thead style="background: #2d5016;">
-              <tr>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Title</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Date</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Image</th>
-                <th style="padding: 1rem; text-align: left; color: white; font-weight: 600;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="blogsList">
-              <tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">Loading blog posts...</td></tr>
-            </tbody>
+            <thead style="background: #2d5016;"><tr><th style="padding: 1rem; text-align: left; color: white;">Title</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Image</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr></thead>
+            <tbody id="blogsList"><tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">Loading blog posts...</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ========== PAGE CONTENT SECTION ========== -->
-      <div id="content-section" class="admin-section" style="display: none;">
-        <div style="margin-bottom: 1.5rem;">
-          <h2 style="font-size: 1.5rem; color: #1a2e0a;">Edit Page Content</h2>
+      <!-- TEAM MEMBERS SECTION -->
+      <div id="team-section" class="admin-section" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.5rem; color: #1a2e0a;">Manage Team Members</h2>
+          <button onclick="toggleTeamForm()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">+ Add Team Member</button>
         </div>
-        <div style="background: white; border-radius: 0.75rem; padding: 1.5rem;">
-          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem; flex-wrap: wrap;">
-            <button class="page-tab active" data-page="homepage" style="background: #f0fdf4; color: #2d5016; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Homepage</button>
-            <button class="page-tab" data-page="about" style="background: transparent; color: #666; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">About Us</button>
-            <button class="page-tab" data-page="settings" style="background: transparent; color: #666; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Site Settings</button>
-          </div>
-
-          <div id="homepage-editor" class="editor-pane">
-            <div style="margin-bottom: 1.5rem;">
-              <h3 style="color: #2d5016; margin-bottom: 1rem;">Hero Section</h3>
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Badge</label>
-                <input type="text" id="hero_badge" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
-              </div>
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Title</label>
-                <input type="text" id="hero_title" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
-              </div>
-              <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Subtitle</label>
-                <textarea id="hero_subtitle" rows="3" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div id="about-editor" class="editor-pane" style="display: none;">
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Journey Story</label>
-              <textarea id="about_journey" rows="4" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea>
-            </div>
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Current Focus</label>
-              <textarea id="about_focus" rows="4" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea>
-            </div>
-          </div>
-
-          <div id="settings-editor" class="editor-pane" style="display: none;">
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Site Name</label>
-              <input type="text" id="siteName" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
-            </div>
-            <div style="margin-bottom: 1rem;">
-              <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Footer Text</label>
-              <input type="text" id="footerText" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
-            </div>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee;">
-            <button onclick="saveAllContent()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save All Changes</button>
-            <div id="contentStatus"></div>
-          </div>
+        <div id="teamForm" style="display: none; background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid #ddd;">
+          <h3>Add New Team Member</h3>
+          <form id="teamFormSubmit" enctype="multipart/form-data">
+            <div style="margin-bottom: 1rem;"><label>Name *</label><input type="text" name="name" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="margin-bottom: 1rem;"><label>Role *</label><input type="text" name="role" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="margin-bottom: 1rem;"><label>Bio</label><textarea name="bio" rows="3" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea></div>
+            <div style="margin-bottom: 1rem;"><label>Profile Image</label><input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Add Member</button><button type="button" onclick="toggleTeamForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
+          </form>
+          <div id="teamStatus"></div>
+        </div>
+        <div style="background: white; border-radius: 0.75rem; overflow-x: auto; border: 1px solid #e5e7eb;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background: #2d5016;"><tr><th style="padding: 1rem; text-align: left; color: white;">Image</th><th style="padding: 1rem; text-align: left; color: white;">Name</th><th style="padding: 1rem; text-align: left; color: white;">Role</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr></thead>
+            <tbody id="teamList"><tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">Loading team members...</td></tr></tbody>
+          </table>
         </div>
       </div>
+
+      <!-- GALLERY SECTION -->
+      <div id="gallery-section" class="admin-section" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.5rem; color: #1a2e0a;">Manage Gallery Images</h2>
+          <button onclick="toggleGalleryForm()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">+ Add Image</button>
+        </div>
+        <div id="galleryForm" style="display: none; background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid #ddd;">
+          <h3>Add New Gallery Image</h3>
+          <form id="galleryFormSubmit" enctype="multipart/form-data">
+            <div style="margin-bottom: 1rem;"><label>Image File *</label><input type="file" name="image" accept="image/*" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="margin-bottom: 1rem;"><label>Alt Text</label><input type="text" name="alt" placeholder="Describe the image" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Add Image</button><button type="button" onclick="toggleGalleryForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
+          </form>
+          <div id="galleryStatus"></div>
+        </div>
+        <div id="galleryGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;"><div style="padding: 2rem; text-align: center; color: #999;">Loading gallery images...</div></div>
+      </div>
+
+      <!-- PAGE CONTENT SECTION -->
+      <div id="content-section" class="admin-section" style="display: none;">
+        <h2 style="font-size: 1.5rem; color: #1a2e0a; margin-bottom: 1.5rem;">Edit Page Content</h2>
+        <div id="pageContentEditor"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Edit Team Modal -->
+  <div id="editTeamModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 0.75rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 2rem;">
+      <h3>Edit Team Member</h3>
+      <form id="editTeamForm" enctype="multipart/form-data">
+        <input type="hidden" name="id" id="edit_team_id" />
+        <div style="margin-bottom: 1rem;"><label>Name *</label><input type="text" name="name" id="edit_team_name" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+        <div style="margin-bottom: 1rem;"><label>Role *</label><input type="text" name="role" id="edit_team_role" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+        <div style="margin-bottom: 1rem;"><label>Bio</label><textarea name="bio" id="edit_team_bio" rows="3" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea></div>
+        <div style="margin-bottom: 1rem;">
+          <div id="edit_team_current_image" style="margin-bottom: 0.5rem;"></div>
+          <label>Upload New Image</label><input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
+          <input type="hidden" name="existingImage" id="edit_team_existing_image" />
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;"><button type="button" onclick="closeEditTeamModal()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save Changes</button></div>
+      </form>
     </div>
   </div>
 
   <!-- Edit Blog Modal -->
   <div id="editBlogModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 0.75rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 2rem;">
-      <h3 style="color: #2d5016; margin-bottom: 1rem;">Edit Blog Post</h3>
+    <div style="background: white; border-radius: 0.75rem; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; padding: 2rem;">
+      <h3>Edit Blog Post</h3>
       <form id="editBlogForm" enctype="multipart/form-data">
         <input type="hidden" name="id" id="edit_blog_id" />
+        <div style="margin-bottom: 1rem;"><label>Title *</label><input type="text" name="title" id="edit_blog_title" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+        <div style="margin-bottom: 1rem;"><label>Abstract</label><textarea name="abstract" id="edit_blog_abstract" rows="2" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea></div>
+        <div style="margin-bottom: 1rem;"><label>Content</label><textarea name="content" id="edit_blog_content" rows="12" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: monospace;"></textarea></div>
         <div style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Title *</label>
-          <input type="text" name="title" id="edit_blog_title" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
-        </div>
-        <div style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Current Image</label>
           <div id="edit_blog_current_image" style="margin-bottom: 0.5rem;"></div>
-          <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Upload New Image (Optional)</label>
-          <input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
+          <label>Upload New Image</label><input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
           <input type="hidden" name="existingImage" id="edit_blog_existing_image" />
         </div>
-        <div style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Abstract / Summary</label>
-          <textarea name="abstract" id="edit_blog_abstract" rows="2" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea>
-        </div>
-        <div style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Content *</label>
-          <textarea name="content" id="edit_blog_content" rows="8" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea>
-        </div>
-        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-          <button type="button" onclick="closeEditModal()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button>
-          <button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save Changes</button>
-        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;"><button type="button" onclick="closeEditModal()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save Changes</button></div>
       </form>
     </div>
   </div>
 
-  <script>
+  <style is:global>
+    .field-group { margin-bottom: 1.25rem; }
+    .field-group label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.85rem; color: #374151; }
+    .field-group input[type="text"],
+    .field-group input[type="email"],
+    .field-group textarea {
+      display: block;
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: #111827;
+      background: #fff;
+      box-sizing: border-box;
+      line-height: 1.5;
+    }
+    .field-group input[type="text"]:focus,
+    .field-group input[type="email"]:focus,
+    .field-group textarea:focus {
+      outline: none;
+      border-color: #2d5016;
+      box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.15);
+    }
+    .tab-pane { display: block; }
+    .tab-btn { padding: 0.5rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-right: 0.5rem; font-size: 0.85rem; }
+  </style>
+
+  <script is:inline>
     let allPublications = [];
     let allBlogs = [];
     let allMessages = [];
-    let unreadCount = 0;
+    let allTeam = [];
+    let allGallery = [];
 
-    // ========== SECTION NAVIGATION ==========
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        if (m === '"') return '&quot;';
+        if (m === "'") return '&#39;';
+        return m;
+      });
+    }
+
+    // Rich text formatting
+    function insertFormatting(type) {
+      const textarea = document.getElementById('blogContent');
+      if (!textarea) return;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selected = textarea.value.substring(start, end);
+      let insert = '';
+      if (type === 'b') insert = '<b>' + (selected || 'bold text') + '<\/b>';
+      else if (type === 'i') insert = '<i>' + (selected || 'italic text') + '<\/i>';
+      else if (type === 'ul') insert = '\n<ul>\n  <li>' + (selected || 'list item') + '<\/li>\n<\/ul>\n';
+      else return;
+      textarea.value = textarea.value.substring(0, start) + insert + textarea.value.substring(end);
+      textarea.focus();
+    }
+
+    // Navigation between sections
+    document.querySelectorAll('.nav-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
         const section = btn.dataset.section;
-        document.querySelectorAll('.nav-btn').forEach(b => {
+        document.querySelectorAll('.nav-btn').forEach(function(b) {
           b.style.background = 'transparent';
           b.style.color = 'rgba(255,255,255,0.8)';
         });
         btn.style.background = '#6b8f47';
         btn.style.color = 'white';
-        
-        document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
-        document.getElementById(`${section}-section`).style.display = 'block';
-        
-        if (section === 'messages') {
-          loadMessages();
-        }
+        document.querySelectorAll('.admin-section').forEach(function(s) { s.style.display = 'none'; });
+        const target = document.getElementById(section + '-section');
+        if (target) target.style.display = 'block';
+        if (section === 'messages') loadMessages();
+        if (section === 'team') loadTeam();
+        if (section === 'gallery') loadGallery();
+        if (section === 'content') loadPageContentEditor();
       });
     });
 
-    // ========== MESSAGES FUNCTIONS ==========
+    // ========== MESSAGES ==========
     async function loadMessages() {
-      const response = await fetch('/api/contact');
-      allMessages = await response.json();
-      updateUnreadCount();
-      renderMessagesTable(allMessages);
-    }
-
-    function updateUnreadCount() {
-      unreadCount = allMessages.filter(m => !m.read).length;
+      const res = await fetch('/api/contact');
+      allMessages = await res.json();
+      const unreadCount = allMessages.filter(function(m) { return !m.read; }).length;
       const badge = document.getElementById('unreadBadge');
       if (badge) {
         badge.textContent = unreadCount;
-        if (unreadCount > 0) {
-          badge.style.display = 'inline-block';
-        } else {
-          badge.style.display = 'none';
-        }
+        badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
       }
-    }
-
-    function renderMessagesTable(messages) {
       const tbody = document.getElementById('messagesList');
-      
-      if (messages.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">No messages yet.</td></tr>';
+      if (allMessages.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">No messages.<\/td><\/tr>';
         return;
       }
-      
-      tbody.innerHTML = messages.map(msg => `
-        <tr style="border-bottom: 1px solid #e5e7eb; ${!msg.read ? 'background: #f0fdf4;' : ''}">
-          <td style="padding: 1rem;">
-            ${!msg.read ? '<span style="background: #dc2626; color: white; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-size: 0.7rem;">New</span>' : '<span style="color: #999; font-size: 0.7rem;">Read</span>'}
-           </td>
-          <td style="padding: 1rem;">
-            <strong>${escapeHtml(msg.name)}</strong><br />
-            <span style="font-size: 0.8rem; color: #666;">${escapeHtml(msg.email)}</span><br />
-            ${msg.phone ? `<span style="font-size: 0.75rem; color: #999;">${escapeHtml(msg.phone)}</span>` : ''}
-           </td>
-          <td style="padding: 1rem;">
-            <div style="max-width: 300px;">${escapeHtml(msg.message.substring(0, 150))}${msg.message.length > 150 ? '...' : ''}</div>
-           </td>
-          <td style="padding: 1rem; color: #6b7280; font-size: 0.8rem;">${msg.date}</td>
-          <td style="padding: 1rem;">
-            ${!msg.read ? `<button onclick="markAsRead(${msg.id})" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; margin-right: 0.5rem;">Mark Read</button>` : ''}
-            <button onclick="viewMessage(${msg.id})" style="background: #3b82f6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; margin-right: 0.5rem;">View</button>
-            <button onclick="deleteMessage(${msg.id})" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer;">Delete</button>
-           </td>
-         </tr>
-      `).join('');
+      let html = '';
+      for (const m of allMessages) {
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;' + (!m.read ? 'background: #f0fdf4;' : '') + '">';
+        html += '<td style="padding: 1rem;">' + (!m.read ? '<span style="background: #dc2626; color: white; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-size: 0.7rem;">New<\/span>' : '<span style="color: #999;">Read<\/span>') + '<\/td>';
+        html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '<\/strong><br><span style="font-size: 0.8rem; color: #666;">' + escapeHtml(m.email) + '<\/span><\/td>';
+        html += '<td style="padding: 1rem;">' + escapeHtml(m.message.substring(0, 150)) + (m.message.length > 150 ? '...' : '') + '<\/td>';
+        html += '<td style="padding: 1rem; color: #6b7280;">' + m.date + '<\/td>';
+        html += '<td style="padding: 1rem;"><button onclick="markAsRead(' + m.id + ')" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; margin-right: 0.5rem;">Mark Read<\/button><button onclick="deleteMessage(' + m.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem;">Delete<\/button><\/td>';
+        html += '<\/tr>';
+      }
+      tbody.innerHTML = html;
     }
 
     window.markAsRead = async function(id) {
-      await fetch('/api/contact', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
+      await fetch('/api/contact', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) });
       loadMessages();
     }
 
     window.markAllAsRead = async function() {
-      for (const msg of allMessages.filter(m => !m.read)) {
-        await fetch('/api/contact', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: msg.id })
-        });
+      for (const m of allMessages.filter(function(m) { return !m.read; })) {
+        await fetch('/api/contact', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: m.id }) });
       }
       loadMessages();
     }
 
-    window.viewMessage = function(id) {
-      const msg = allMessages.find(m => m.id === id);
-      if (msg) {
-        alert(`From: ${msg.name}\nEmail: ${msg.email}\nPhone: ${msg.phone || 'Not provided'}\n\nMessage:\n${msg.message}`);
-      }
-    }
-
     window.deleteMessage = async function(id) {
       if (confirm('Delete this message?')) {
-        await fetch(`/api/contact?id=${id}`, { method: 'DELETE' });
+        await fetch('/api/contact?id=' + id, { method: 'DELETE' });
         loadMessages();
       }
     }
 
     window.filterMessages = function() {
-      const searchTerm = document.getElementById('messageSearchInput').value.toLowerCase();
-      const filtered = allMessages.filter(msg => 
-        msg.name.toLowerCase().includes(searchTerm) || 
-        msg.email.toLowerCase().includes(searchTerm) || 
-        msg.message.toLowerCase().includes(searchTerm)
-      );
-      renderMessagesTable(filtered);
-    }
-
-    // ========== PAGE TABS ==========
-    document.querySelectorAll('.page-tab').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const page = btn.dataset.page;
-        document.querySelectorAll('.page-tab').forEach(b => {
-          b.style.background = 'transparent';
-          b.style.color = '#666';
-        });
-        btn.style.background = '#f0fdf4';
-        btn.style.color = '#2d5016';
-        
-        document.querySelectorAll('.editor-pane').forEach(p => p.style.display = 'none');
-        document.getElementById(`${page}-editor`).style.display = 'block';
-      });
-    });
-
-    // ========== TOGGLE FUNCTIONS ==========
-    function toggleUploadForm() {
-      const form = document.getElementById('uploadForm');
-      form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function toggleBlogForm() {
-      const form = document.getElementById('blogForm');
-      form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // ========== PUBLICATIONS SEARCH ==========
-    window.filterPublications = function() {
-      const searchTerm = document.getElementById('pubSearchInput').value.toLowerCase();
-      const filtered = allPublications.filter(pub => pub.title.toLowerCase().includes(searchTerm));
-      renderPublicationsTable(filtered);
-    }
-
-    window.filterBlogs = function() {
-      const searchTerm = document.getElementById('blogSearchInput').value.toLowerCase();
-      const filtered = allBlogs.filter(blog => blog.title.toLowerCase().includes(searchTerm));
-      renderBlogsTable(filtered);
-    }
-
-    // ========== RENDER FUNCTIONS ==========
-    function renderPublicationsTable(publications) {
-      const tbody = document.getElementById('publicationsList');
-      if (publications.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">No publications found.</td></tr>';
+      const term = document.getElementById('messageSearchInput').value.toLowerCase();
+      const filtered = allMessages.filter(function(m) { return m.name.toLowerCase().includes(term) || m.email.toLowerCase().includes(term) || m.message.toLowerCase().includes(term); });
+      const tbody = document.getElementById('messagesList');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">No messages found.<\/td><\/tr>';
         return;
       }
-      tbody.innerHTML = publications.map(pub => `
-        <tr style="border-bottom: 1px solid #e5e7eb;">
-          <td style="padding: 1rem;">${escapeHtml(pub.title)}</td>
-          <td style="padding: 1rem; color: #6b7280;">${pub.date}</td>
-          <td style="padding: 1rem;">
-            <a href="${pub.file}" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; font-size: 0.75rem; margin-right: 0.5rem;">View PDF</a>
-            <button onclick="deletePublication('${pub.fileName}')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer;">Delete</button>
-           </td>
-         </tr>
-      `).join('');
-    }
-
-    function renderBlogsTable(blogs) {
-      const tbody = document.getElementById('blogsList');
-      if (blogs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No blog posts found.</td></tr>';
-        return;
+      let html = '';
+      for (const m of filtered) {
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;' + (!m.read ? 'background: #f0fdf4;' : '') + '">';
+        html += '<td style="padding: 1rem;">' + (!m.read ? '<span style="background: #dc2626; color: white; padding: 0.2rem 0.5rem; border-radius: 0.25rem;">New<\/span>' : 'Read') + '<\/td>';
+        html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '<\/strong><br>' + escapeHtml(m.email) + '<\/td>';
+        html += '<td style="padding: 1rem;">' + escapeHtml(m.message.substring(0, 150)) + '<\/td>';
+        html += '<td style="padding: 1rem;">' + m.date + '<\/td>';
+        html += '<td style="padding: 1rem;"><button onclick="markAsRead(' + m.id + ')" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Mark Read<\/button><button onclick="deleteMessage(' + m.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete<\/button><\/td>';
+        html += '<\/tr>';
       }
-      tbody.innerHTML = blogs.map(blog => `
-        <tr style="border-bottom: 1px solid #e5e7eb;">
-          <td style="padding: 1rem;">
-            ${escapeHtml(blog.title)}
-            <div style="font-size: 0.75rem; color: #666;">${escapeHtml(blog.abstract?.substring(0, 80) || '')}...</div>
-           </td>
-          <td style="padding: 1rem; color: #6b7280;">${blog.date}</td>
-          <td style="padding: 1rem;">
-            ${blog.image ? `<img src="${blog.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" />` : '<span style="color: #999;">No image</span>'}
-           </td>
-          <td style="padding: 1rem;">
-            <a href="/blog/${blog.slug}" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; font-size: 0.75rem; margin-right: 0.5rem;">View</a>
-            <button onclick="editBlog(${blog.id})" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; margin-right: 0.5rem;">Edit</button>
-            <button onclick="deleteBlog(${blog.id})" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer;">Delete</button>
-           </td>
-         </tr>
-      `).join('');
+      tbody.innerHTML = html;
     }
 
-    // ========== LOAD PUBLICATIONS ==========
+    // ========== PUBLICATIONS ==========
     async function loadPublications() {
-      const response = await fetch('/api/publications');
-      allPublications = await response.json();
-      renderPublicationsTable(allPublications);
+      const res = await fetch('/api/publications');
+      allPublications = await res.json();
+      const tbody = document.getElementById('publicationsList');
+      if (allPublications.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">No publications.<\/td><\/tr>';
+        return;
+      }
+      let html = '';
+      for (const p of allPublications) {
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
+        html += '<td style="padding: 1rem;">' + escapeHtml(p.title) + '<\/td>';
+        html += '<td style="padding: 1rem;">' + p.date + '<\/td>';
+        html += '<td style="padding: 1rem;"><a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem;">View<\/a><button onclick="deletePublication(\'' + escapeHtml(p.fileName) + '\')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete<\/button><\/td>';
+        html += '<\/tr>';
+      }
+      tbody.innerHTML = html;
     }
 
     window.deletePublication = async function(fileName) {
       if (confirm('Delete this publication?')) {
-        await fetch(`/api/publications?fileName=${encodeURIComponent(fileName)}`, { method: 'DELETE' });
+        await fetch('/api/publications?fileName=' + encodeURIComponent(fileName), { method: 'DELETE' });
         loadPublications();
       }
     }
 
-    document.getElementById('publicationForm')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const response = await fetch('/api/publications', { method: 'POST', body: formData });
-      if (response.ok) {
-        alert('Publication added successfully!');
-        e.target.reset();
-        document.getElementById('uploadForm').style.display = 'none';
-        loadPublications();
+    window.filterPublications = function() {
+      const term = document.getElementById('pubSearchInput').value.toLowerCase();
+      const filtered = allPublications.filter(function(p) { return p.title.toLowerCase().includes(term); });
+      const tbody = document.getElementById('publicationsList');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">No publications found.<\/td><\/tr>';
+        return;
       }
-    });
+      let html = '';
+      for (const p of filtered) {
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 1rem;">' + escapeHtml(p.title) + '<\/td><td style="padding: 1rem;">' + p.date + '<\/td><td style="padding: 1rem;"><a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem;">View<\/a><button onclick="deletePublication(\'' + escapeHtml(p.fileName) + '\')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete<\/button><\/td><\/tr>';
+      }
+      tbody.innerHTML = html;
+    }
 
-    // ========== LOAD BLOGS ==========
+    // ========== BLOGS ==========
     async function loadBlogs() {
-      const response = await fetch('/api/blogs');
-      allBlogs = await response.json();
-      renderBlogsTable(allBlogs);
+      const res = await fetch('/api/blogs');
+      allBlogs = await res.json();
+      const tbody = document.getElementById('blogsList');
+      if (allBlogs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No blog posts.<\/td><\/tr>';
+        return;
+      }
+      let html = '';
+      for (const b of allBlogs) {
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
+        html += '<td style="padding: 1rem;">' + escapeHtml(b.title) + '<div style="font-size: 0.75rem; color: #666;">' + escapeHtml((b.abstract || '').substring(0, 80)) + '...<\/div><\/td>';
+        html += '<td style="padding: 1rem;">' + b.date + '<\/td>';
+        html += '<td style="padding: 1rem;">' + (b.image ? '<img src="' + b.image + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" \/>' : 'No image') + '<\/td>';
+        html += '<td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem;">View<\/a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem;">Edit<\/button><button onclick="deleteBlog(' + b.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete<\/button><\/td>';
+        html += '<\/tr>';
+      }
+      tbody.innerHTML = html;
     }
 
     window.deleteBlog = async function(id) {
       if (confirm('Delete this blog post?')) {
-        await fetch(`/api/blogs?id=${id}`, { method: 'DELETE' });
+        await fetch('/api/blogs?id=' + id, { method: 'DELETE' });
         loadBlogs();
       }
     }
 
-    document.getElementById('blogFormSubmit')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const response = await fetch('/api/blogs', { method: 'POST', body: formData });
-      if (response.ok) {
-        alert('Blog post published successfully!');
-        e.target.reset();
-        document.getElementById('blogForm').style.display = 'none';
-        loadBlogs();
+    window.filterBlogs = function() {
+      const term = document.getElementById('blogSearchInput').value.toLowerCase();
+      const filtered = allBlogs.filter(function(b) { return b.title.toLowerCase().includes(term); });
+      const tbody = document.getElementById('blogsList');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No blog posts found.<\/td><\/tr>';
+        return;
       }
-    });
+      let html = '';
+      for (const b of filtered) {
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 1rem;">' + escapeHtml(b.title) + '<div style="font-size: 0.75rem; color: #666;">' + escapeHtml((b.abstract || '').substring(0, 80)) + '...<\/div><\/td><td style="padding: 1rem;">' + b.date + '<\/td><td style="padding: 1rem;">' + (b.image ? '<img src="' + b.image + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" \/>' : 'No image') + '<\/td><td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem;">View<\/a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Edit<\/button><button onclick="deleteBlog(' + b.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete<\/button><\/td><\/tr>';
+      }
+      tbody.innerHTML = html;
+    }
 
-    // ========== EDIT BLOG ==========
     window.editBlog = function(id) {
-      const blog = allBlogs.find(b => b.id === id);
+      const blog = allBlogs.find(function(b) { return b.id === id; });
       if (!blog) return;
       document.getElementById('edit_blog_id').value = blog.id;
       document.getElementById('edit_blog_title').value = blog.title;
@@ -528,69 +446,383 @@ if (!session || session.value !== 'authenticated') {
       document.getElementById('edit_blog_content').value = blog.content;
       document.getElementById('edit_blog_existing_image').value = blog.image || '';
       const imgDiv = document.getElementById('edit_blog_current_image');
-      imgDiv.innerHTML = blog.image ? `<img src="${blog.image}" style="max-width: 100px; border-radius: 0.375rem;" />` : '<span style="color: #999;">No image</span>';
+      if (imgDiv) imgDiv.innerHTML = blog.image ? '<img src="' + blog.image + '" style="max-width: 100px; border-radius: 0.375rem;" \/>' : 'No image';
       document.getElementById('editBlogModal').style.display = 'flex';
-    }
+    };
 
     window.closeEditModal = function() {
       document.getElementById('editBlogModal').style.display = 'none';
+    };
+
+    // ========== TEAM ==========
+    async function loadTeam() {
+      const res = await fetch('/api/team');
+      allTeam = await res.json();
+      const tbody = document.getElementById('teamList');
+      if (allTeam.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No team members.<\/td><\/tr>';
+        return;
+      }
+      let html = '';
+      for (const m of allTeam) {
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
+        html += '<td style="padding: 1rem;">' + (m.image ? '<img src="' + m.image + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" \/>' : 'No image') + '<\/td>';
+        html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '<\/strong><\/td>';
+        html += '<td style="padding: 1rem;">' + escapeHtml(m.role) + '<\/td>';
+        html += '<td style="padding: 1rem;"><button onclick="editTeam(' + m.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem;">Edit<\/button><button onclick="deleteTeam(' + m.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete<\/button><\/td>';
+        html += '<\/tr>';
+      }
+      tbody.innerHTML = html;
     }
 
-    document.getElementById('editBlogForm')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const response = await fetch('/api/blogs', { method: 'PUT', body: formData });
-      if (response.ok) {
-        alert('Blog updated successfully!');
-        closeEditModal();
-        loadBlogs();
-      }
-    });
-
-    // ========== CONTENT EDITING ==========
-    async function loadContent() {
-      const response = await fetch('/api/content');
-      const content = await response.json();
-      if (content.homepage?.hero) {
-        document.getElementById('hero_badge').value = content.homepage.hero.badge || '';
-        document.getElementById('hero_title').value = content.homepage.hero.title || '';
-        document.getElementById('hero_subtitle').value = content.homepage.hero.subtitle || '';
-      }
-      if (content.about) {
-        document.getElementById('about_journey').value = content.about.journey || '';
-        document.getElementById('about_focus').value = content.about.focus || '';
-      }
-      if (content.siteSettings) {
-        document.getElementById('siteName').value = content.siteSettings.siteName || '';
-        document.getElementById('footerText').value = content.siteSettings.footerText || '';
+    window.deleteTeam = async function(id) {
+      if (confirm('Delete this team member?')) {
+        await fetch('/api/team?id=' + id, { method: 'DELETE' });
+        loadTeam();
       }
     }
 
-    window.saveAllContent = async function() {
-      await fetch('/api/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ page: 'homepage', section: 'hero', field: 'badge', value: document.getElementById('hero_badge').value })
+    window.editTeam = function(id) {
+      const member = allTeam.find(function(m) { return m.id === id; });
+      if (!member) return;
+      document.getElementById('edit_team_id').value = member.id;
+      document.getElementById('edit_team_name').value = member.name;
+      document.getElementById('edit_team_role').value = member.role;
+      document.getElementById('edit_team_bio').value = member.bio || '';
+      document.getElementById('edit_team_existing_image').value = member.image || '';
+      const imgDiv = document.getElementById('edit_team_current_image');
+      imgDiv.innerHTML = member.image ? '<img src="' + member.image + '" style="max-width: 100px; border-radius: 0.375rem;" \/>' : 'No image';
+      document.getElementById('editTeamModal').style.display = 'flex';
+    }
+
+    window.closeEditTeamModal = function() {
+      document.getElementById('editTeamModal').style.display = 'none';
+    }
+
+    // ========== GALLERY ==========
+    async function loadGallery() {
+      const res = await fetch('/api/gallery');
+      allGallery = await res.json();
+      const container = document.getElementById('galleryGrid');
+      if (allGallery.length === 0) {
+        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">No gallery images.<\/div>';
+        return;
+      }
+      let html = '';
+      for (const img of allGallery) {
+        html += '<div style="background: white; border-radius: 0.5rem; overflow: hidden; border: 1px solid #e5e7eb;">';
+        html += '<img src="' + img.image + '" style="width: 100%; aspect-ratio: 1; object-fit: cover;" \/>';
+        html += '<div style="padding: 0.5rem;">';
+        html += '<p style="font-size: 0.75rem; color: #666; margin-bottom: 0.5rem;">' + escapeHtml(img.alt) + '<\/p>';
+        html += '<button onclick="deleteGalleryImage(' + img.id + ')" style="background: #dc2626; color: white; padding: 0.25rem 0.5rem; border: none; border-radius: 0.25rem; width: 100%; cursor: pointer;">Delete<\/button>';
+        html += '<\/div><\/div>';
+      }
+      container.innerHTML = html;
+    }
+
+    window.deleteGalleryImage = async function(id) {
+      if (confirm('Delete this image?')) {
+        await fetch('/api/gallery?id=' + id, { method: 'DELETE' });
+        loadGallery();
+      }
+    }
+
+    // ========== FORM SUBMISSIONS ==========
+    const pubForm = document.getElementById('publicationForm');
+    if (pubForm) {
+      pubForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const res = await fetch('/api/publications', { method: 'POST', body: fd });
+        if (res.ok) {
+          alert('Publication added successfully!');
+          e.target.reset();
+          document.getElementById('uploadForm').style.display = 'none';
+          loadPublications();
+        }
       });
-      alert('Content saved!');
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
+    const blogSubmit = document.getElementById('blogFormSubmit');
+    if (blogSubmit) {
+      blogSubmit.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const res = await fetch('/api/blogs', { method: 'POST', body: fd });
+        if (res.ok) {
+          alert('Blog post published successfully!');
+          e.target.reset();
+          document.getElementById('blogForm').style.display = 'none';
+          loadBlogs();
+        }
       });
     }
 
-    // Initialize
-    loadPublications();
-    loadBlogs();
-    loadContent();
-    
+    const teamSubmit = document.getElementById('teamFormSubmit');
+    if (teamSubmit) {
+      teamSubmit.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const res = await fetch('/api/team', { method: 'POST', body: fd });
+        if (res.ok) {
+          alert('Team member added successfully!');
+          e.target.reset();
+          document.getElementById('teamForm').style.display = 'none';
+          loadTeam();
+        }
+      });
+    }
+
+    const editTeamForm = document.getElementById('editTeamForm');
+    if (editTeamForm) {
+      editTeamForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const res = await fetch('/api/team', { method: 'PUT', body: fd });
+        if (res.ok) {
+          alert('Team member updated successfully!');
+          closeEditTeamModal();
+          loadTeam();
+        }
+      });
+    }
+
+    const gallerySubmit = document.getElementById('galleryFormSubmit');
+    if (gallerySubmit) {
+      gallerySubmit.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const res = await fetch('/api/gallery', { method: 'POST', body: fd });
+        if (res.ok) {
+          alert('Image added successfully!');
+          e.target.reset();
+          document.getElementById('galleryForm').style.display = 'none';
+          loadGallery();
+        }
+      });
+    }
+
+    const editBlogForm = document.getElementById('editBlogForm');
+    if (editBlogForm) {
+      editBlogForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const res = await fetch('/api/blogs', { method: 'PUT', body: fd });
+        if (res.ok) {
+          alert('Blog updated!');
+          closeEditModal();
+          loadBlogs();
+        }
+      });
+    }
+
+    // ========== TOGGLE FUNCTIONS ==========
+    function toggleUploadForm() {
+      const f = document.getElementById('uploadForm');
+      if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+    function toggleBlogForm() {
+      const f = document.getElementById('blogForm');
+      if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+    function toggleTeamForm() {
+      const f = document.getElementById('teamForm');
+      if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+    function toggleGalleryForm() {
+      const f = document.getElementById('galleryForm');
+      if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+
     window.toggleUploadForm = toggleUploadForm;
     window.toggleBlogForm = toggleBlogForm;
+    window.toggleTeamForm = toggleTeamForm;
+    window.toggleGalleryForm = toggleGalleryForm;
+    window.insertFormatting = insertFormatting;
+
+    // ========== PAGE CONTENT EDITOR ==========
+    let contentEditorLoaded = false;
+
+    async function loadPageContentEditor() {
+      // Only build the editor once
+      if (contentEditorLoaded) return;
+      contentEditorLoaded = true;
+
+      const container = document.getElementById('pageContentEditor');
+      if (!container) return;
+
+      container.innerHTML = '<p style="color: #666; padding: 1rem;">Loading content...</p>';
+
+      const response = await fetch('/api/content');
+      const c = await response.json();
+
+      const hp = c.homepage || {};
+      const ab = c.about || {};
+      const ss = c.siteSettings || {};
+
+      function field(label, id, page, section, fieldName, value, type) {
+        if (type === 'textarea') {
+          return '<div class="field-group"><label>' + label + '<\/label><textarea id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" rows="3">' + escapeHtml(value) + '<\/textarea><\/div>';
+        }
+        return '<div class="field-group"><label>' + label + '<\/label><input type="text" id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" value="' + escapeHtml(value) + '"><\/div>';
+      }
+
+      function section(title, fields) {
+        return '<div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;"><h3 style="color: #2d5016; margin-bottom: 1rem;">' + title + '<\/h3>' + fields + '<\/div>';
+      }
+
+      let html = '<div style="background: white; border-radius: 0.75rem; padding: 1.5rem;">';
+
+      // Tab buttons
+      html += '<div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem; flex-wrap: wrap;">';
+      html += '<button class="tab-btn" data-tab="homepage" style="background: #f0fdf4; color: #2d5016;">Homepage<\/button>';
+      html += '<button class="tab-btn" data-tab="about" style="background: #e5e7eb; color: #666;">About Us<\/button>';
+      html += '<button class="tab-btn" data-tab="settings" style="background: #e5e7eb; color: #666;">Site Settings<\/button>';
+      html += '<\/div>';
+
+      // ---- HOMEPAGE TAB ----
+      html += '<div id="tab-homepage" class="tab-pane">';
+
+      html += section('Hero Section',
+        field('Badge', 'hero_badge', 'homepage', 'hero', 'badge', (hp.hero || {}).badge || '') +
+        field('Title', 'hero_title', 'homepage', 'hero', 'title', (hp.hero || {}).title || '') +
+        field('Subtitle', 'hero_subtitle', 'homepage', 'hero', 'subtitle', (hp.hero || {}).subtitle || '', 'textarea') +
+        field('Button Text', 'hero_buttonText', 'homepage', 'hero', 'buttonText', (hp.hero || {}).buttonText || '') +
+        field('Hero Image URL', 'hero_image', 'homepage', 'hero', 'image', (hp.hero || {}).image || '')
+      );
+
+      html += section('Mission & Goal Section',
+        field('Title', 'mission_title', 'homepage', 'mission', 'title', (hp.mission || {}).title || '') +
+        field('Description', 'mission_description', 'homepage', 'mission', 'description', (hp.mission || {}).description || '', 'textarea') +
+        field('Goal', 'mission_goal', 'homepage', 'mission', 'goal', (hp.mission || {}).goal || '', 'textarea')
+      );
+
+      html += section('Vision Section',
+        field('Vision Quote', 'vision_quote', 'homepage', 'vision', 'quote', (hp.vision || {}).quote || '', 'textarea')
+      );
+
+      html += section('Impact Section',
+        field('Title', 'impact_title', 'homepage', 'impact', 'title', (hp.impact || {}).title || '') +
+        field('Description', 'impact_description', 'homepage', 'impact', 'description', (hp.impact || {}).description || '', 'textarea') +
+        field('Vision Statement', 'impact_vision', 'homepage', 'impact', 'vision', (hp.impact || {}).vision || '', 'textarea')
+      );
+
+      html += section('Producers Section',
+        field('Title', 'producers_title', 'homepage', 'producers', 'title', (hp.producers || {}).title || '') +
+        field('Description', 'producers_description', 'homepage', 'producers', 'description', (hp.producers || {}).description || '', 'textarea') +
+        field('Background Image URL', 'producers_image', 'homepage', 'producers', 'image', (hp.producers || {}).image || '')
+      );
+
+      html += section('Recent Works Section',
+        field('Title', 'recentWorks_title', 'homepage', 'recentWorks', 'title', (hp.recentWorks || {}).title || '') +
+        field('Subtitle', 'recentWorks_subtitle', 'homepage', 'recentWorks', 'subtitle', (hp.recentWorks || {}).subtitle || '', 'textarea')
+      );
+
+      html += section('Bottom Call to Action',
+        field('Text', 'bottomCta_text', 'homepage', 'bottomCta', 'text', (hp.bottomCta || {}).text || '', 'textarea') +
+        field('Button Text', 'bottomCta_buttonText', 'homepage', 'bottomCta', 'buttonText', (hp.bottomCta || {}).buttonText || '') +
+        field('Button Link', 'bottomCta_buttonLink', 'homepage', 'bottomCta', 'buttonLink', (hp.bottomCta || {}).buttonLink || '')
+      );
+
+      html += '<\/div>';
+
+      // ---- ABOUT TAB ----
+      html += '<div id="tab-about" class="tab-pane" style="display: none;">';
+
+      html += section('Hero Section',
+        field('Title', 'about_hero_title', 'about', 'hero', 'title', (ab.hero || {}).title || '') +
+        field('Description', 'about_hero_description', 'about', 'hero', 'description', (ab.hero || {}).description || '', 'textarea')
+      );
+
+      html += section('Current Focus Section',
+        field('Title', 'about_focus_title', 'about', 'focus', 'title', (ab.focus || {}).title || '') +
+        field('Description', 'about_focus_description', 'about', 'focus', 'description', (ab.focus || {}).description || '', 'textarea') +
+        field('Highlight', 'about_focus_highlight', 'about', 'focus', 'highlight', (ab.focus || {}).highlight || '')
+      );
+
+      html += section('Mission Quote Section',
+        field('Quote', 'about_mission_quote', 'about', 'mission', 'quote', (ab.mission || {}).quote || '', 'textarea') +
+        field('Goal Statement', 'about_mission_goal', 'about', 'mission', 'goal', (ab.mission || {}).goal || '', 'textarea')
+      );
+
+      html += section('Bottom Call to Action',
+        field('Text', 'about_bottomCta_text', 'about', 'bottomCta', 'text', (ab.bottomCta || {}).text || '', 'textarea') +
+        field('Button Text', 'about_bottomCta_buttonText', 'about', 'bottomCta', 'buttonText', (ab.bottomCta || {}).buttonText || '') +
+        field('Button Link', 'about_bottomCta_buttonLink', 'about', 'bottomCta', 'buttonLink', (ab.bottomCta || {}).buttonLink || '')
+      );
+
+      html += '<\/div>';
+
+      // ---- SETTINGS TAB ----
+      html += '<div id="tab-settings" class="tab-pane" style="display: none;">';
+      html += '<div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem;">';
+      html += field('Site Name', 'siteName', 'siteSettings', 'full', 'siteName', ss.siteName || '');
+      html += field('Footer Text', 'footerText', 'siteSettings', 'full', 'footerText', ss.footerText || '');
+      html += '<\/div><\/div>';
+
+      // Save button
+      html += '<div style="margin-top: 1.5rem; text-align: right;">';
+      html += '<button id="saveContentBtn" style="background: #2d5016; color: white; padding: 0.6rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 1rem;">Save All Changes<\/button>';
+      html += '<div id="contentStatus" style="margin-top: 1rem;"><\/div>';
+      html += '<\/div><\/div>';
+
+      container.innerHTML = html;
+
+      // Tab switching
+      container.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const tab = btn.dataset.tab;
+          container.querySelectorAll('.tab-btn').forEach(function(b) {
+            b.style.background = '#e5e7eb';
+            b.style.color = '#666';
+          });
+          btn.style.background = '#f0fdf4';
+          btn.style.color = '#2d5016';
+          container.querySelectorAll('.tab-pane').forEach(function(pane) {
+            pane.style.display = 'none';
+          });
+          const activePane = document.getElementById('tab-' + tab);
+          if (activePane) activePane.style.display = 'block';
+        });
+      });
+
+      // Save button
+      document.getElementById('saveContentBtn').addEventListener('click', async function() {
+        const btn = document.getElementById('saveContentBtn');
+        btn.textContent = 'Saving...';
+        btn.disabled = true;
+        const fields = container.querySelectorAll('.content-field');
+        for (const f of fields) {
+          await fetch('/api/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              page: f.dataset.page,
+              section: f.dataset.section,
+              field: f.dataset.field,
+              value: f.value
+            })
+          });
+        }
+        btn.textContent = 'Save All Changes';
+        btn.disabled = false;
+        const statusDiv = document.getElementById('contentStatus');
+        statusDiv.innerHTML = '<span style="color: green; font-weight: 600;">All content saved successfully!<\/span>';
+        setTimeout(function() { statusDiv.innerHTML = ''; }, 3000);
+      });
+    }
+
+    // Initialize on page load
+    loadPublications();
+    loadBlogs();
+    loadTeam();
+    loadGallery();
+    loadMessages();
+
+    // Restore active tab from URL hash on load
+    var initialSection = (location.hash || '').replace('#', '') || 'messages';
+    var validSections = ['messages', 'publications', 'blogs', 'team', 'gallery', 'content'];
+    if (!validSections.includes(initialSection)) initialSection = 'messages';
+    activateSection(initialSection);
   </script>
 </BaseLayout>

@@ -1,0 +1,324 @@
+---
+// Page Content Editor Component
+// This component handles all page content editing without affecting other dashboard sections
+
+const { content } = Astro.props;
+---
+
+<div id="pageContentEditorContainer">
+  <div style="background: white; border-radius: 0.75rem; padding: 1.5rem;">
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem; flex-wrap: wrap;">
+      <button class="page-tab active" data-page="homepage" style="background: #f0fdf4; color: #2d5016; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Homepage</button>
+      <button class="page-tab" data-page="about" style="background: transparent; color: #666; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">About Us</button>
+      <button class="page-tab" data-page="settings" style="background: transparent; color: #666; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Site Settings</button>
+    </div>
+
+    <!-- HOMEPAGE EDITOR -->
+    <div id="homepage-editor" class="editor-pane">
+      <!-- Hero Section -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Hero Section</h3>
+        <div class="form-group"><label>Badge</label><input type="text" id="hero_badge" class="content-field" data-page="homepage" data-section="hero" data-field="badge" /></div>
+        <div class="form-group"><label>Title</label><input type="text" id="hero_title" class="content-field" data-page="homepage" data-section="hero" data-field="title" /></div>
+        <div class="form-group"><label>Subtitle</label><textarea id="hero_subtitle" class="content-field" data-page="homepage" data-section="hero" data-field="subtitle" rows="3"></textarea></div>
+        <div class="form-group"><label>Button Text</label><input type="text" id="hero_buttonText" class="content-field" data-page="homepage" data-section="hero" data-field="buttonText" /></div>
+        <div class="form-group"><label>Hero Image URL</label><input type="text" id="hero_image" class="content-field" data-page="homepage" data-section="hero" data-field="image" /></div>
+      </div>
+
+      <!-- Mission Section -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Mission & Goal Section</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="mission_title" class="content-field" data-page="homepage" data-section="mission" data-field="title" /></div>
+        <div class="form-group"><label>Description</label><textarea id="mission_description" class="content-field" data-page="homepage" data-section="mission" data-field="description" rows="4"></textarea></div>
+        <div class="form-group"><label>Goal</label><textarea id="mission_goal" class="content-field" data-page="homepage" data-section="mission" data-field="goal" rows="4"></textarea></div>
+      </div>
+
+      <!-- Vision Section -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Vision Section</h3>
+        <div class="form-group"><label>Vision Quote</label><textarea id="vision_quote" class="content-field" data-page="homepage" data-section="vision" data-field="quote" rows="3"></textarea></div>
+      </div>
+
+      <!-- Impact Section -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Impact Section</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="impact_title" class="content-field" data-page="homepage" data-section="impact" data-field="title" /></div>
+        <div class="form-group"><label>Description</label><textarea id="impact_description" class="content-field" data-page="homepage" data-section="impact" data-field="description" rows="4"></textarea></div>
+        <div class="form-group"><label>Vision Statement</label><textarea id="impact_vision" class="content-field" data-page="homepage" data-section="impact" data-field="vision" rows="3"></textarea></div>
+      </div>
+
+      <!-- Producers Section -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Producers Section</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="producers_title" class="content-field" data-page="homepage" data-section="producers" data-field="title" /></div>
+        <div class="form-group"><label>Description</label><textarea id="producers_description" class="content-field" data-page="homepage" data-section="producers" data-field="description" rows="5"></textarea></div>
+        <div class="form-group"><label>Background Image URL</label><input type="text" id="producers_image" class="content-field" data-page="homepage" data-section="producers" data-field="image" /></div>
+      </div>
+
+      <!-- Recent Works Section -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Recent Works Section</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="recentWorks_title" class="content-field" data-page="homepage" data-section="recentWorks" data-field="title" /></div>
+        <div class="form-group"><label>Subtitle</label><textarea id="recentWorks_subtitle" class="content-field" data-page="homepage" data-section="recentWorks" data-field="subtitle" rows="3"></textarea></div>
+      </div>
+
+      <!-- Bottom CTA -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Bottom Call to Action</h3>
+        <div class="form-group"><label>Text</label><textarea id="bottomCta_text" class="content-field" data-page="homepage" data-section="bottomCta" data-field="text" rows="3"></textarea></div>
+        <div class="form-group"><label>Button Text</label><input type="text" id="bottomCta_buttonText" class="content-field" data-page="homepage" data-section="bottomCta" data-field="buttonText" /></div>
+        <div class="form-group"><label>Button Link</label><input type="text" id="bottomCta_buttonLink" class="content-field" data-page="homepage" data-section="bottomCta" data-field="buttonLink" /></div>
+      </div>
+    </div>
+
+    <!-- ABOUT PAGE EDITOR -->
+    <div id="about-editor" class="editor-pane" style="display: none;">
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Hero Section</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="about_hero_title" class="content-field" data-page="about" data-section="hero" data-field="title" /></div>
+        <div class="form-group"><label>Description</label><textarea id="about_hero_description" class="content-field" data-page="about" data-section="hero" data-field="description" rows="3"></textarea></div>
+      </div>
+
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Current Focus Section</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="about_focus_title" class="content-field" data-page="about" data-section="focus" data-field="title" /></div>
+        <div class="form-group"><label>Description</label><textarea id="about_focus_description" class="content-field" data-page="about" data-section="focus" data-field="description" rows="4"></textarea></div>
+        <div class="form-group"><label>Highlight</label><input type="text" id="about_focus_highlight" class="content-field" data-page="about" data-section="focus" data-field="highlight" /></div>
+      </div>
+
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Mission Quote Section</h3>
+        <div class="form-group"><label>Quote</label><textarea id="about_mission_quote" class="content-field" data-page="about" data-section="mission" data-field="quote" rows="3"></textarea></div>
+        <div class="form-group"><label>Goal Statement</label><textarea id="about_mission_goal" class="content-field" data-page="about" data-section="mission" data-field="goal" rows="3"></textarea></div>
+      </div>
+
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Bottom Call to Action</h3>
+        <div class="form-group"><label>Text</label><textarea id="about_bottomCta_text" class="content-field" data-page="about" data-section="bottomCta" data-field="text" rows="3"></textarea></div>
+        <div class="form-group"><label>Button Text</label><input type="text" id="about_bottomCta_buttonText" class="content-field" data-page="about" data-section="bottomCta" data-field="buttonText" /></div>
+        <div class="form-group"><label>Button Link</label><input type="text" id="about_bottomCta_buttonLink" class="content-field" data-page="about" data-section="bottomCta" data-field="buttonLink" /></div>
+      </div>
+    </div>
+
+    <!-- SITE SETTINGS EDITOR -->
+    <div id="settings-editor" class="editor-pane" style="display: none;">
+      <div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Site Settings</h3>
+        <div class="form-group"><label>Site Name</label><input type="text" id="siteName" class="content-field" data-page="siteSettings" data-section="full" data-field="siteName" /></div>
+        <div class="form-group"><label>Footer Text</label><input type="text" id="footerText" class="content-field" data-page="siteSettings" data-section="full" data-field="footerText" /></div>
+        <div class="form-group"><label>Contact Email</label><input type="email" id="contactEmail" class="content-field" data-page="siteSettings" data-section="full" data-field="contactEmail" /></div>
+        <div class="form-group"><label>Primary Phone</label><input type="text" id="contactPhone" class="content-field" data-page="siteSettings" data-section="full" data-field="contactPhone" /></div>
+        <div class="form-group"><label>Secondary Phone</label><input type="text" id="contactPhone2" class="content-field" data-page="siteSettings" data-section="full" data-field="contactPhone2" /></div>
+        <div class="form-group"><label>Address</label><textarea id="address" class="content-field" data-page="siteSettings" data-section="full" data-field="address" rows="2"></textarea></div>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: right;">
+      <button onclick="savePageContent()" style="background: #2d5016; color: white; padding: 0.6rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save All Changes</button>
+      <div id="contentStatus" style="margin-top: 1rem;"></div>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  #pageContentEditorContainer .form-group {
+    margin-bottom: 1.25rem;
+  }
+  #pageContentEditorContainer .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    font-size: 0.85rem;
+    color: #374151;
+  }
+  #pageContentEditorContainer .form-group input[type="text"],
+  #pageContentEditorContainer .form-group input[type="email"],
+  #pageContentEditorContainer .form-group textarea {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: #111827;
+    background: #fff;
+    box-sizing: border-box;
+    line-height: 1.5;
+  }
+  #pageContentEditorContainer .form-group input[type="text"]:focus,
+  #pageContentEditorContainer .form-group input[type="email"]:focus,
+  #pageContentEditorContainer .form-group textarea:focus {
+    outline: none;
+    border-color: #2d5016;
+    box-shadow: 0 0 0 2px rgba(45, 80, 22, 0.15);
+  }
+  #pageContentEditorContainer .editor-pane { display: none; }
+  #pageContentEditorContainer .editor-pane.active { display: block; }
+  #pageContentEditorContainer .page-tab {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  #pageContentEditorContainer .page-tab.active { background: #f0fdf4; color: #2d5016; }
+  #pageContentEditorContainer .page-tab:not(.active) { background: #e5e7eb; color: #1a2e0a; }
+</style>
+
+<script>
+  // Load content into the editor
+  async function loadContentIntoEditor() {
+    const res = await fetch('/api/content');
+    const c = await res.json();
+    
+    // Homepage fields
+    if (c.homepage) {
+      if (c.homepage.hero) {
+        const heroBadge = document.getElementById('hero_badge');
+        if (heroBadge) heroBadge.value = c.homepage.hero.badge || '';
+        const heroTitle = document.getElementById('hero_title');
+        if (heroTitle) heroTitle.value = c.homepage.hero.title || '';
+        const heroSubtitle = document.getElementById('hero_subtitle');
+        if (heroSubtitle) heroSubtitle.value = c.homepage.hero.subtitle || '';
+        const heroButtonText = document.getElementById('hero_buttonText');
+        if (heroButtonText) heroButtonText.value = c.homepage.hero.buttonText || '';
+        const heroImage = document.getElementById('hero_image');
+        if (heroImage) heroImage.value = c.homepage.hero.image || '';
+      }
+      if (c.homepage.mission) {
+        const missionTitle = document.getElementById('mission_title');
+        if (missionTitle) missionTitle.value = c.homepage.mission.title || '';
+        const missionDesc = document.getElementById('mission_description');
+        if (missionDesc) missionDesc.value = c.homepage.mission.description || '';
+        const missionGoal = document.getElementById('mission_goal');
+        if (missionGoal) missionGoal.value = c.homepage.mission.goal || '';
+      }
+      if (c.homepage.vision) {
+        const visionQuote = document.getElementById('vision_quote');
+        if (visionQuote) visionQuote.value = c.homepage.vision.quote || '';
+      }
+      if (c.homepage.impact) {
+        const impactTitle = document.getElementById('impact_title');
+        if (impactTitle) impactTitle.value = c.homepage.impact.title || '';
+        const impactDesc = document.getElementById('impact_description');
+        if (impactDesc) impactDesc.value = c.homepage.impact.description || '';
+        const impactVision = document.getElementById('impact_vision');
+        if (impactVision) impactVision.value = c.homepage.impact.vision || '';
+      }
+      if (c.homepage.producers) {
+        const producersTitle = document.getElementById('producers_title');
+        if (producersTitle) producersTitle.value = c.homepage.producers.title || '';
+        const producersDesc = document.getElementById('producers_description');
+        if (producersDesc) producersDesc.value = c.homepage.producers.description || '';
+        const producersImage = document.getElementById('producers_image');
+        if (producersImage) producersImage.value = c.homepage.producers.image || '';
+      }
+      if (c.homepage.recentWorks) {
+        const recentTitle = document.getElementById('recentWorks_title');
+        if (recentTitle) recentTitle.value = c.homepage.recentWorks.title || '';
+        const recentSubtitle = document.getElementById('recentWorks_subtitle');
+        if (recentSubtitle) recentSubtitle.value = c.homepage.recentWorks.subtitle || '';
+      }
+      if (c.homepage.bottomCta) {
+        const bottomText = document.getElementById('bottomCta_text');
+        if (bottomText) bottomText.value = c.homepage.bottomCta.text || '';
+        const bottomButtonText = document.getElementById('bottomCta_buttonText');
+        if (bottomButtonText) bottomButtonText.value = c.homepage.bottomCta.buttonText || '';
+        const bottomButtonLink = document.getElementById('bottomCta_buttonLink');
+        if (bottomButtonLink) bottomButtonLink.value = c.homepage.bottomCta.buttonLink || '';
+      }
+    }
+    
+    // About page fields
+    if (c.about) {
+      if (c.about.hero) {
+        const aboutTitle = document.getElementById('about_hero_title');
+        if (aboutTitle) aboutTitle.value = c.about.hero.title || '';
+        const aboutDesc = document.getElementById('about_hero_description');
+        if (aboutDesc) aboutDesc.value = c.about.hero.description || '';
+      }
+      if (c.about.focus) {
+        const focusTitle = document.getElementById('about_focus_title');
+        if (focusTitle) focusTitle.value = c.about.focus.title || '';
+        const focusDesc = document.getElementById('about_focus_description');
+        if (focusDesc) focusDesc.value = c.about.focus.description || '';
+        const focusHighlight = document.getElementById('about_focus_highlight');
+        if (focusHighlight) focusHighlight.value = c.about.focus.highlight || '';
+      }
+      if (c.about.mission) {
+        const missionQuote = document.getElementById('about_mission_quote');
+        if (missionQuote) missionQuote.value = c.about.mission.quote || '';
+        const missionGoal = document.getElementById('about_mission_goal');
+        if (missionGoal) missionGoal.value = c.about.mission.goal || '';
+      }
+      if (c.about.bottomCta) {
+        const bottomText = document.getElementById('about_bottomCta_text');
+        if (bottomText) bottomText.value = c.about.bottomCta.text || '';
+        const bottomButtonText = document.getElementById('about_bottomCta_buttonText');
+        if (bottomButtonText) bottomButtonText.value = c.about.bottomCta.buttonText || '';
+        const bottomButtonLink = document.getElementById('about_bottomCta_buttonLink');
+        if (bottomButtonLink) bottomButtonLink.value = c.about.bottomCta.buttonLink || '';
+      }
+    }
+    
+    // Site Settings
+    if (c.siteSettings) {
+      const siteName = document.getElementById('siteName');
+      if (siteName) siteName.value = c.siteSettings.siteName || '';
+      const footerText = document.getElementById('footerText');
+      if (footerText) footerText.value = c.siteSettings.footerText || '';
+      const contactEmail = document.getElementById('contactEmail');
+      if (contactEmail) contactEmail.value = c.siteSettings.contactEmail || '';
+      const contactPhone = document.getElementById('contactPhone');
+      if (contactPhone) contactPhone.value = c.siteSettings.contactPhone || '';
+      const contactPhone2 = document.getElementById('contactPhone2');
+      if (contactPhone2) contactPhone2.value = c.siteSettings.contactPhone2 || '';
+      const address = document.getElementById('address');
+      if (address) address.value = c.siteSettings.address || '';
+    }
+  }
+
+  // Save all content
+  window.savePageContent = async function() {
+    const fields = document.querySelectorAll('.content-field');
+    for (const field of fields) {
+      await fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          page: field.dataset.page, 
+          section: field.dataset.section, 
+          field: field.dataset.field, 
+          value: field.value 
+        })
+      });
+    }
+    const statusDiv = document.getElementById('contentStatus');
+    statusDiv.innerHTML = '<span style="color: green;">All content saved successfully!</span>';
+    setTimeout(() => { statusDiv.innerHTML = ''; }, 3000);
+  }
+
+  // Tab navigation
+  document.querySelectorAll('.page-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const page = btn.dataset.page;
+      document.querySelectorAll('.page-tab').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '#e5e7eb';
+        b.style.color = '#1a2e0a';
+      });
+      btn.classList.add('active');
+      btn.style.background = '#f0fdf4';
+      btn.style.color = '#2d5016';
+      document.querySelectorAll('.editor-pane').forEach(p => p.classList.remove('active'));
+      const pane = document.getElementById(page + '-editor');
+      if (pane) pane.classList.add('active');
+    });
+  });
+
+  // Load content when component loads
+  loadContentIntoEditor();
+</script>

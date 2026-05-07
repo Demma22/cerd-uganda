@@ -3,31 +3,51 @@ export const prerender = false;
 import fs from 'fs';
 import path from 'path';
 
-const CONTENT_FILE = path.join(process.cwd(), 'src/data/content.json');
+const CONTENT_FILE = path.join(process.cwd(), 'src', 'data', 'content.json');
+const dataDir = path.join(process.cwd(), 'src', 'data');
 
-// Read content from file
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+if (!fs.existsSync(CONTENT_FILE)) {
+  const defaultContent = {
+    homepage: {
+      hero: { badge: "5+ years of impact", title: "Center for Ecosystems Research & Development", subtitle: "CERD-UG is a Non Profit Organization which aims to promote an ecosystems and systems thinking approach..." },
+      mission: { title: "Building a Sustainable Agro-Ecosystem", description: "", goal: "" },
+      vision: { quote: "A sustainable agro-ecosystem in which every aspect of development is in harmony and complements each other." },
+      impact: { title: "Changing lives together through sustainable farming", description: "", vision: "" },
+      principles: { title: "What We Stand For", items: [] },
+      producers: { title: "We Are Producers For Local Markets", description: "", image: "" },
+      recentWorks: { title: "Our Recent Works", subtitle: "" },
+      bottomCta: { text: "", buttonText: "Contact Us", buttonLink: "/contact" }
+    },
+    about: {
+      hero: { title: "How our Journey Began", description: "" },
+      focus: { title: "", description: "", highlight: "" },
+      stats: [],
+      mission: { quote: "", goal: "" },
+      programs: [],
+      gallery: { title: "Conferences & Community Engagement", images: [] },
+      bottomCta: { text: "", buttonText: "Work With Us", buttonLink: "/contact" }
+    },
+    siteSettings: {
+      siteName: "CERD-UG",
+      footerText: "Center for Ecosystems Research and Development Uganda"
+    }
+  };
+  fs.writeFileSync(CONTENT_FILE, JSON.stringify(defaultContent, null, 2));
+}
+
 function getContent() {
-  try {
-    const data = fs.readFileSync(CONTENT_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading content file:', error);
-    return {};
-  }
+  const data = fs.readFileSync(CONTENT_FILE, 'utf-8');
+  return JSON.parse(data);
 }
 
-// Save content to file
 function saveContent(content) {
-  try {
-    fs.writeFileSync(CONTENT_FILE, JSON.stringify(content, null, 2));
-    return true;
-  } catch (error) {
-    console.error('Error saving content:', error);
-    return false;
-  }
+  fs.writeFileSync(CONTENT_FILE, JSON.stringify(content, null, 2));
 }
 
-// GET: Fetch all content
 export async function GET() {
   const content = getContent();
   return new Response(JSON.stringify(content), {
@@ -35,33 +55,26 @@ export async function GET() {
   });
 }
 
-// POST: Update specific content
 export async function POST({ request }) {
-  const { page, section, field, value } = await request.json();
+  const { page, section, field, value, index } = await request.json();
   
   const content = getContent();
   
-  // Navigate to the correct field
-  if (!content[page]) content[page] = {};
-  if (!content[page][section]) content[page][section] = {};
-  
-  content[page][section][field] = value;
-  
-  const saved = saveContent(content);
-  
-  if (saved) {
-    return new Response(JSON.stringify({ success: true, content: content[page][section] }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+  if (index !== undefined && content[page] && content[page][section] && Array.isArray(content[page][section])) {
+    content[page][section][index][field] = value;
   } else {
-    return new Response(JSON.stringify({ success: false, error: 'Failed to save' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    if (!content[page]) content[page] = {};
+    if (!content[page][section]) content[page][section] = {};
+    content[page][section][field] = value;
   }
+  
+  saveContent(content);
+  
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
 
-// PUT: Update entire section
 export async function PUT({ request }) {
   const { page, section, data } = await request.json();
   
@@ -69,17 +82,9 @@ export async function PUT({ request }) {
   
   if (!content[page]) content[page] = {};
   content[page][section] = data;
+  saveContent(content);
   
-  const saved = saveContent(content);
-  
-  if (saved) {
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-  } else {
-    return new Response(JSON.stringify({ success: false }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+  return new Response(JSON.stringify({ success: true }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
