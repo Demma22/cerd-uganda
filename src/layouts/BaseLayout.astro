@@ -31,7 +31,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href={canonicalURL} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/logo/cerd.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -41,10 +41,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <title>{title} | CERD-UG</title>
   </head>
   <body>
-    <Navbar />
+    <Navbar logo="/logo/cerd.png" />
     <main>
       <slot />
     </main>
-    <Footer />
+    <Footer logo="/logo/cerd.png" />
   </body>
 </html>
