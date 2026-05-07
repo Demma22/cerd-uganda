@@ -21,10 +21,6 @@
     {
       "src": "/documents/(.*)",
       "dest": "/documents/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/"
     }
   ]
 }
