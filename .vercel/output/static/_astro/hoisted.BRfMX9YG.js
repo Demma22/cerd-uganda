@@ -1,1 +1,0 @@
-import"./hoisted.F0qhrZ3G.js";const t=document.getElementById("searchInput"),n=document.querySelectorAll(".publication-card");function s(){const l=t.value.toLowerCase();n.forEach(e=>{e.getAttribute("data-title").toLowerCase().includes(l)?e.style.display="flex":e.style.display="none"})}t&&t.addEventListener("keyup",s);

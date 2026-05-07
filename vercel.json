@@ -11,16 +11,8 @@
       "dest": "/_astro/$1"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
-    },
-    {
-      "src": "/documents/(.*)",
-      "dest": "/documents/$1"
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }

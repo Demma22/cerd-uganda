@@ -1,1 +1,0 @@
-const e=document.getElementById("navbar"),n=document.getElementById("mobileMenuBtn"),t=document.getElementById("mobileNav");window.addEventListener("scroll",()=>{window.scrollY>20?e?.classList.add("scrolled"):e?.classList.remove("scrolled")});n?.addEventListener("click",()=>{t?.classList.toggle("open")});
