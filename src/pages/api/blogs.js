@@ -62,18 +62,19 @@ export async function POST({ request }) {
     imageUrl = await saveImage(imageFile);
   }
   
+  // Preserve HTML formatting from rich text editor
   const newBlog = {
     id: Date.now(),
     title,
-    content,
-    abstract: abstract || content.substring(0, 150),
+    content: content,
+    abstract: abstract || content.replace(/<[^>]*>/g, '').substring(0, 150),
     image: imageUrl,
     date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
     slug: slug,
     category: 'blog'
   };
   
-  blogs.push(newBlog);
+  blogs.unshift(newBlog);
   saveBlogs(blogs);
   
   return new Response(JSON.stringify({ success: true, blog: newBlog }), {
@@ -111,8 +112,8 @@ export async function PUT({ request }) {
   blogs[blogIndex] = {
     ...blogs[blogIndex],
     title,
-    content,
-    abstract: abstract || content.substring(0, 150),
+    content: content,
+    abstract: abstract || content.replace(/<[^>]*>/g, '').substring(0, 150),
     image: imageUrl,
     slug
   };
