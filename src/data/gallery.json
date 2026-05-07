@@ -22,5 +22,11 @@
     "image": "/images/gallery/1778142098834-goats.webp",
     "alt": "goats",
     "order": 4
+  },
+  {
+    "id": 1778143415200,
+    "image": "/images/gallery/1778143415199-fruit2.avif",
+    "alt": "Gallery image",
+    "order": 5
   }
 ]
