@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "image": "/images/home/fruits1.avif",
+    "alt": "Organic Market",
+    "order": 1
+  },
+  {
+    "id": 2,
+    "image": "/images/home/duck.avif",
+    "alt": "Farm Activities",
+    "order": 2
+  },
+  {
+    "id": 1778136335146,
+    "image": "/images/gallery/1778136335145-veg.avif",
+    "alt": "Vegetables",
+    "order": 3
+  },
+  {
+    "id": 1778142098835,
+    "image": "/images/gallery/1778142098834-goats.webp",
+    "alt": "goats",
+    "order": 4
+  },
+  {
+    "id": 1778143415200,
+    "image": "/images/gallery/1778143415199-fruit2.avif",
+    "alt": "Gallery image",
+    "order": 5
+  }
+]
