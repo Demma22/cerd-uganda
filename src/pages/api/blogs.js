@@ -1,47 +1,32 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '../../lib/supabase.js';
 
-const BLOG_FILE = path.join(process.cwd(), 'src', 'data', 'blogs.json');
-const IMAGES_DIR = path.join(process.cwd(), 'public', 'images', 'blog');
-const dataDir = path.join(process.cwd(), 'src', 'data');
-
-// Ensure directories exist
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-if (!fs.existsSync(IMAGES_DIR)) {
-  fs.mkdirSync(IMAGES_DIR, { recursive: true });
+// Helper function to generate slug
+function generateSlug(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
-if (!fs.existsSync(BLOG_FILE)) {
-  fs.writeFileSync(BLOG_FILE, JSON.stringify([]));
-}
-
-function getBlogs() {
-  const data = fs.readFileSync(BLOG_FILE, 'utf-8');
-  return JSON.parse(data);
-}
-
-function saveBlogs(blogs) {
-  fs.writeFileSync(BLOG_FILE, JSON.stringify(blogs, null, 2));
-}
-
-async function saveImage(file) {
-  const timestamp = Date.now();
-  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-');
-  const fileName = `${timestamp}-${safeName}`;
-  const filePath = path.join(IMAGES_DIR, fileName);
-  
-  const buffer = await file.arrayBuffer();
-  fs.writeFileSync(filePath, Buffer.from(buffer));
-  
-  return `/images/blog/${fileName}`;
+// Helper function to clean abstract (remove HTML tags)
+function cleanAbstract(content, abstract) {
+  if (abstract) return abstract;
+  return content.replace(/<[^>]*>/g, '').substring(0, 150);
 }
 
 export async function GET() {
-  const blogs = getBlogs();
+  const { data: blogs, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching blogs:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   return new Response(JSON.stringify(blogs), {
     headers: { 'Content-Type': 'application/json' }
   });
@@ -54,30 +39,56 @@ export async function POST({ request }) {
   const abstract = formData.get('abstract');
   const imageFile = formData.get('image');
   
-  const blogs = getBlogs();
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  
+  const slug = generateSlug(title);
   let imageUrl = null;
+  
+  // Upload image to Supabase Storage if provided
   if (imageFile && imageFile.size > 0) {
-    imageUrl = await saveImage(imageFile);
+    const timestamp = Date.now();
+    const safeName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '-');
+    const fileName = `${timestamp}-${safeName}`;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('blog-images')
+      .upload(fileName, imageFile, {
+        cacheControl: '3600',
+        upsert: false
+      });
+    
+    if (uploadError) {
+      console.error('Image upload error:', uploadError);
+    } else {
+      const { data: urlData } = supabase.storage
+        .from('blog-images')
+        .getPublicUrl(fileName);
+      imageUrl = urlData.publicUrl;
+    }
   }
   
-  // Preserve HTML formatting from rich text editor
   const newBlog = {
-    id: Date.now(),
     title,
+    slug,
     content: content,
-    abstract: abstract || content.replace(/<[^>]*>/g, '').substring(0, 150),
-    image: imageUrl,
-    date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-    slug: slug,
-    category: 'blog'
+    abstract: cleanAbstract(content, abstract),
+    image_url: imageUrl,
+    created_at: new Date(),
+    updated_at: new Date()
   };
   
-  blogs.unshift(newBlog);
-  saveBlogs(blogs);
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .insert(newBlog)
+    .select();
   
-  return new Response(JSON.stringify({ success: true, blog: newBlog }), {
+  if (error) {
+    console.error('Blog insert error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  
+  return new Response(JSON.stringify({ success: true, blog: data[0] }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
@@ -91,52 +102,90 @@ export async function PUT({ request }) {
   const imageFile = formData.get('image');
   const existingImage = formData.get('existingImage');
   
-  let blogs = getBlogs();
-  const blogIndex = blogs.findIndex(b => b.id === id);
-  
-  if (blogIndex === -1) {
-    return new Response(JSON.stringify({ error: 'Blog not found' }), { status: 404 });
-  }
-  
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const slug = generateSlug(title);
   let imageUrl = existingImage;
   
+  // Upload new image if provided
   if (imageFile && imageFile.size > 0) {
-    if (blogs[blogIndex].image) {
-      const oldImagePath = path.join(process.cwd(), 'public', blogs[blogIndex].image);
-      if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
+    // Delete old image if it exists in Supabase
+    if (existingImage) {
+      const oldFileName = existingImage.split('/').pop();
+      await supabase.storage.from('blog-images').remove([oldFileName]);
     }
-    imageUrl = await saveImage(imageFile);
+    
+    const timestamp = Date.now();
+    const safeName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '-');
+    const fileName = `${timestamp}-${safeName}`;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('blog-images')
+      .upload(fileName, imageFile);
+    
+    if (!uploadError) {
+      const { data: urlData } = supabase.storage
+        .from('blog-images')
+        .getPublicUrl(fileName);
+      imageUrl = urlData.publicUrl;
+    }
   }
   
-  blogs[blogIndex] = {
-    ...blogs[blogIndex],
+  const updateData = {
     title,
+    slug,
     content: content,
-    abstract: abstract || content.replace(/<[^>]*>/g, '').substring(0, 150),
-    image: imageUrl,
-    slug
+    abstract: cleanAbstract(content, abstract),
+    image_url: imageUrl,
+    updated_at: new Date()
   };
   
-  saveBlogs(blogs);
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .update(updateData)
+    .eq('id', id)
+    .select();
   
-  return new Response(JSON.stringify({ success: true, blog: blogs[blogIndex] }), {
+  if (error) {
+    console.error('Blog update error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  
+  return new Response(JSON.stringify({ success: true, blog: data[0] }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
 export async function DELETE({ url }) {
   const id = parseInt(url.searchParams.get('id'));
-  let blogs = getBlogs();
-  const deletedBlog = blogs.find(b => b.id === id);
   
-  if (deletedBlog && deletedBlog.image) {
-    const imagePath = path.join(process.cwd(), 'public', deletedBlog.image);
-    if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+  // First get the blog to check if it has an image
+  const { data: blog, error: fetchError } = await supabase
+    .from('blog_posts')
+    .select('image_url')
+    .eq('id', id)
+    .single();
+  
+  if (!fetchError && blog?.image_url) {
+    // Delete image from storage
+    const fileName = blog.image_url.split('/').pop();
+    await supabase.storage.from('blog-images').remove([fileName]);
   }
   
-  blogs = blogs.filter(b => b.id !== id);
-  saveBlogs(blogs);
+  // Delete the blog post
+  const { error } = await supabase
+    .from('blog_posts')
+    .delete()
+    .eq('id', id);
+  
+  if (error) {
+    console.error('Blog delete error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
   
   return new Response(JSON.stringify({ success: true }), {
     headers: { 'Content-Type': 'application/json' }
