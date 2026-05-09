@@ -1,55 +1,92 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import fs from 'fs';
-import path from 'path';
+import { supabase } from "../lib/supabase.js";
 
-// Load content from JSON
-const CONTENT_FILE = path.join(process.cwd(), 'src', 'data', 'content.json');
-let content = { homepage: {} };
+// Fetch page content from Supabase
+let pageContent = {
+  homepage: {
+    hero: {},
+    mission: {},
+    vision: {},
+    impact: {},
+    principles: {},
+    producers: {},
+    recentWorks: {},
+    bottomCta: {}
+  }
+};
 
 try {
-  if (fs.existsSync(CONTENT_FILE)) {
-    const data = fs.readFileSync(CONTENT_FILE, 'utf-8');
-    content = JSON.parse(data);
+  const { data: contentRows, error } = await supabase
+    .from('page_content')
+    .select('*');
+
+  if (!error && contentRows) {
+    // Build nested content object
+    for (const row of contentRows) {
+      const { page, section, field, value } = row;
+      if (!pageContent[page]) pageContent[page] = {};
+      if (!pageContent[page][section]) pageContent[page][section] = {};
+      
+      // Try to parse JSON values
+      try {
+        pageContent[page][section][field] = JSON.parse(value);
+      } catch {
+        pageContent[page][section][field] = value;
+      }
+    }
   }
 } catch (error) {
-  console.error('Error loading content:', error);
+  console.error('Error fetching page content:', error);
 }
 
-// Load blog posts
-const BLOG_FILE = path.join(process.cwd(), 'src', 'data', 'blogs.json');
+// Fetch blog posts
 let recentBlogs = [];
-
 try {
-  if (fs.existsSync(BLOG_FILE)) {
-    const data = fs.readFileSync(BLOG_FILE, 'utf-8');
-    const allBlogs = JSON.parse(data);
-    recentBlogs = allBlogs.slice(0, 4);
+  const { data: blogs, error: blogError } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(4);
+
+  if (!blogError && blogs) {
+    recentBlogs = blogs;
   }
 } catch (error) {
-  console.error('Error loading blogs:', error);
+  console.error('Error fetching blogs:', error);
 }
 
-// Load gallery images
-const GALLERY_FILE = path.join(process.cwd(), 'src', 'data', 'gallery.json');
+// Fetch gallery images
 let galleryImages = [];
-
 try {
-  if (fs.existsSync(GALLERY_FILE)) {
-    const data = fs.readFileSync(GALLERY_FILE, 'utf-8');
-    galleryImages = JSON.parse(data);
+  const { data: gallery, error: galleryError } = await supabase
+    .from('gallery')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!galleryError && gallery) {
+    galleryImages = gallery;
   }
 } catch (error) {
-  console.error('Error loading gallery:', error);
+  console.error('Error fetching gallery:', error);
 }
 
-const homepage = content.homepage || {};
+const homepage = pageContent.homepage || {};
 const hero = homepage.hero || {};
 const missionData = homepage.mission || {};
 const vision = homepage.vision || {};
 const impact = homepage.impact || {};
+const principles = homepage.principles || {};
 const producers = homepage.producers || {};
+const recentWorks = homepage.recentWorks || {};
 const bottomCta = homepage.bottomCta || {};
+
+// Parse principles items if they exist
+let principleItems = [];
+if (principles.items) {
+  principleItems = Array.isArray(principles.items) ? principles.items : 
+    (typeof principles.items === 'string' ? JSON.parse(principles.items) : []);
+}
 ---
 
 <BaseLayout title="Home" description="CERD-UG promotes an ecosystems and systems thinking approach in research, education and community engagement in Uganda.">
@@ -76,7 +113,7 @@ const bottomCta = homepage.bottomCta || {};
         {hero.subtitle || "CERD-UG is a Non Profit Organization which aims to promote an ecosystems and systems thinking approach in research, education and community engagement."}
       </p>
       <div class="hero-actions">
-        <a href={hero.buttonLink || "/about-us"} class="btn-primary">{hero.buttonText || "Discover Our Work"}</a>
+        <a href="#impact-section" class="btn-primary">{hero.buttonText || "Discover Our Work"}</a>
         <a href="/contact" class="btn-outline">Book a Call</a>
       </div>
     </div>
@@ -99,9 +136,6 @@ const bottomCta = homepage.bottomCta || {};
           alt="CERD-UG CEO"
           class="mission-photo"
         />
-        <div class="mission-image-tag">
-          <img src="/images/home/ngo.avif" alt="NGOsource Verified" class="ngo-logo" />
-        </div>
       </div>
 
       <div class="mission-content">
@@ -119,11 +153,11 @@ const bottomCta = homepage.bottomCta || {};
         <div class="mission-pillars">
           <div class="mission-pillar">
             <div class="pillar-icon"></div>
-            <p>We provide agriculture services and support Organic Agriculture</p>
+            <p>{missionData.pillar1 || "We provide agriculture services and support Organic Agriculture"}</p>
           </div>
           <div class="mission-pillar">
             <div class="pillar-icon"></div>
-            <p>We support small scale farmers to transition to Agroecology and transform the current food system</p>
+            <p>{missionData.pillar2 || "We support small scale farmers to transition to Agroecology and transform the current food system"}</p>
           </div>
         </div>
 
@@ -143,7 +177,7 @@ const bottomCta = homepage.bottomCta || {};
   </section>
 
   <!-- IMPACT -->
-  <section class="impact">
+  <section id="impact-section" class="impact">
     <div class="container-site impact-inner">
       <div class="impact-header">
         <span class="section-label">Our Impact</span>
@@ -169,14 +203,17 @@ const bottomCta = homepage.bottomCta || {};
             </svg>
           </div>
         </a>
+      </div>
+    </div>
+  </section>
 
-        <a href="https://www.ngosource.org" target="_blank" rel="noopener" class="ngosource-badge">
-          <img
-            src="/images/home/ngo.avif"
-            alt="NGOsource verified"
-          />
-          <p>We are a verified organization by NGOsource</p>
-        </a>
+  <!-- NGO VERIFIED SECTION - SEPARATE -->
+  <section class="ngo-verified">
+    <div class="container-site">
+      <div class="ngo-card">
+        <img src="/images/home/ngo.avif" alt="NGOsource Verified" class="ngo-verified-logo" />
+        <p>We are a verified organization by NGOsource</p>
+        <a href="https://www.ngosource.org" target="_blank" rel="noopener" class="btn-secondary">Learn More</a>
       </div>
     </div>
   </section>
@@ -185,48 +222,59 @@ const bottomCta = homepage.bottomCta || {};
   <section class="principles">
     <div class="container-site">
       <span class="section-label">Our Principles</span>
-      <h2 class="principles-heading">What We Stand For</h2>
+      <h2 class="principles-heading">{principles.title || "What We Stand For"}</h2>
 
       <div class="principles-grid">
-        <article class="principle-card">
-          <div class="principle-img-wrap">
-            <img src="/images/home/veg.avif" alt="Biodiversity" />
-          </div>
-          <div class="principle-body">
-            <h3>Biodiversity</h3>
-            <p>Preserving the rich variety of plant, animal, and microbial life that sustains healthy ecosystems.</p>
-          </div>
-        </article>
-
-        <article class="principle-card">
-          <div class="principle-img-wrap">
-            <img src="/images/home/fruits.avif" alt="Ecological Balance" />
-          </div>
-          <div class="principle-body">
-            <h3>Ecological Balance</h3>
-            <p>Maintaining the natural equilibrium of ecosystems to ensure long-term environmental health.</p>
-          </div>
-        </article>
-
-        <article class="principle-card">
-          <div class="principle-img-wrap">
-            <img src="/images/home/goats.webp" alt="Animal Welfare" />
-          </div>
-          <div class="principle-body">
-            <h3>Animal Welfare</h3>
-            <p>Ensuring humane and ethical treatment of animals in all farming and research activities.</p>
-          </div>
-        </article>
-
-        <article class="principle-card">
-          <div class="principle-img-wrap">
-            <img src="/images/home/fruit2.avif" alt="Sustainability" />
-          </div>
-          <div class="principle-body">
-            <h3>Sustainability</h3>
-            <p>Developing practices that meet today's needs without compromising future generations.</p>
-          </div>
-        </article>
+        {principleItems.length > 0 ? principleItems.map((item, idx) => (
+          <article class="principle-card" key={idx}>
+            <div class="principle-img-wrap">
+              <img src={item.image || "/images/home/veg.avif"} alt={item.title} />
+            </div>
+            <div class="principle-body">
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </div>
+          </article>
+        )) : (
+          <>
+            <article class="principle-card">
+              <div class="principle-img-wrap">
+                <img src="/images/home/veg.avif" alt="Biodiversity" />
+              </div>
+              <div class="principle-body">
+                <h3>Biodiversity</h3>
+                <p>Preserving the rich variety of plant, animal, and microbial life that sustains healthy ecosystems.</p>
+              </div>
+            </article>
+            <article class="principle-card">
+              <div class="principle-img-wrap">
+                <img src="/images/home/fruits.avif" alt="Ecological Balance" />
+              </div>
+              <div class="principle-body">
+                <h3>Ecological Balance</h3>
+                <p>Maintaining the natural equilibrium of ecosystems to ensure long-term environmental health.</p>
+              </div>
+            </article>
+            <article class="principle-card">
+              <div class="principle-img-wrap">
+                <img src="/images/home/goats.webp" alt="Animal Welfare" />
+              </div>
+              <div class="principle-body">
+                <h3>Animal Welfare</h3>
+                <p>Ensuring humane and ethical treatment of animals in all farming and research activities.</p>
+              </div>
+            </article>
+            <article class="principle-card">
+              <div class="principle-img-wrap">
+                <img src="/images/home/fruit2.avif" alt="Sustainability" />
+              </div>
+              <div class="principle-body">
+                <h3>Sustainability</h3>
+                <p>Developing practices that meet today's needs without compromising future generations.</p>
+              </div>
+            </article>
+          </>
+        )}
       </div>
     </div>
   </section>
@@ -254,17 +302,15 @@ const bottomCta = homepage.bottomCta || {};
   <section class="works">
     <div class="container-site">
       <span class="section-label">Recent Works</span>
-      <h2 class="works-heading">Our Recent Works</h2>
+      <h2 class="works-heading">{recentWorks.title || "Our Recent Works"}</h2>
       <p class="works-sub">
-        The current major development initiative is the Organic Products Market at Abaita Ababiri and
-        Kitooro Municipality — providing physical space for organic farmers to sell their produce and
-        promoting small holder farming for sustainable development and environmental conservation.
+        {recentWorks.subtitle || "The current major development initiative is the Organic Products Market at Abaita Ababiri and Kitooro Municipality — providing physical space for organic farmers to sell their produce and promoting small holder farming for sustainable development and environmental conservation."}
       </p>
 
       <div class="works-gallery">
         {galleryImages.length > 0 ? galleryImages.map((img, index) => (
           <div class={`gallery-item gallery-item-${index + 1}`}>
-            <img src={img.image} alt={img.alt} />
+            <img src={img.image_url} alt={img.alt} />
           </div>
         )) : (
           <>
@@ -292,25 +338,22 @@ const bottomCta = homepage.bottomCta || {};
     </div>
   </section>
 
-  <!-- PARTNERS -->
+  <!-- PARTNERS - SCROLLING MARQUEE -->
   <section class="partners">
     <div class="container-site">
       <span class="section-label">Collaborations and Partnerships</span>
-      <div class="partners-logos">
-        <div class="partner-logo">
-          <img src="/images/partners/3C.avif" alt="3C Partner" />
-        </div>
-        <div class="partner-logo">
-          <img src="/images/partners/BLI.avif" alt="BLI Partner" />
-        </div>
-        <div class="partner-logo">
-          <img src="/images/partners/eoa.avif" alt="EOA Partner" />
-        </div>
-        <div class="partner-logo">
-          <img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" />
-        </div>
-        <div class="partner-logo">
-          <img src="/images/partners/nogamu.avif" alt="Nogamu Partner" />
+      <div class="partners-marquee">
+        <div class="partners-track">
+          <div class="partner-logo"><img src="/images/partners/3C.avif" alt="3C Partner" /></div>
+          <div class="partner-logo"><img src="/images/partners/BLI.avif" alt="BLI Partner" /></div>
+          <div class="partner-logo"><img src="/images/partners/eoa.avif" alt="EOA Partner" /></div>
+          <div class="partner-logo"><img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" /></div>
+          <div class="partner-logo"><img src="/images/partners/nogamu.avif" alt="Nogamu Partner" /></div>
+          <div class="partner-logo"><img src="/images/partners/3C.avif" alt="3C Partner" /></div>
+          <div class="partner-logo"><img src="/images/partners/BLI.avif" alt="BLI Partner" /></div>
+          <div class="partner-logo"><img src="/images/partners/eoa.avif" alt="EOA Partner" /></div>
+          <div class="partner-logo"><img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" /></div>
+          <div class="partner-logo"><img src="/images/partners/nogamu.avif" alt="Nogamu Partner" /></div>
         </div>
       </div>
     </div>
@@ -327,10 +370,10 @@ const bottomCta = homepage.bottomCta || {};
         {recentBlogs.map(blog => (
           <a href={`/blog/${blog.slug}`} class="blog-card">
             <div class="blog-card-img">
-              <img src={blog.image || "/images/home/veg.avif"} alt={blog.title} />
+              <img src={blog.image_url || "/images/home/veg.avif"} alt={blog.title} />
             </div>
             <div class="blog-card-body">
-              <time class="blog-date">{blog.date}</time>
+              <time class="blog-date">{new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
               <h3 class="blog-title">{blog.title}</h3>
               <p class="blog-abstract">{blog.abstract}</p>
               <span class="blog-arrow">Read Article →</span>
@@ -354,9 +397,7 @@ const bottomCta = homepage.bottomCta || {};
   <!-- BOTTOM CTA BANNER -->
   <section class="bottom-cta">
     <div class="container-site">
-      <h2 class="bottom-c
-
-ta-text">
+      <h2 class="bottom-cta-text">
         {bottomCta.text || "CERD UG creates impact by promoting Agroecology farming to protect the environment, support local communities, and improve livelihoods through training, sustainable practices, and quality Agroecology products."}
       </h2>
       <a href={bottomCta.buttonLink || "/contact"} class="btn-outline">{bottomCta.buttonText || "Contact Us"}</a>
@@ -366,7 +407,6 @@ ta-text">
 </BaseLayout>
 
 <style>
-  /* Copy all your existing styles here - they remain the same */
   /* ── HERO ── */
   .hero {
     position: relative;
@@ -381,15 +421,15 @@ ta-text">
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(26, 46, 10, 0.85) 0%, rgba(45, 80, 22, 0.5) 60%, rgba(26, 46, 10, 0.3) 100%);
+    background: linear-gradient(135deg, rgba(12, 60, 1, 0.85) 0%, rgba(91, 109, 73, 0.5) 60%, rgba(12, 60, 1, 0.3) 100%);
   }
   .hero-content { position: relative; z-index: 2; max-width: 800px; }
   .hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(107, 143, 71, 0.25);
-    border: 1px solid rgba(138, 175, 96, 0.4);
+    background: rgba(162, 172, 130, 0.25);
+    border: 1px solid rgba(162, 172, 130, 0.4);
     padding: 0.4rem 1rem;
     margin-bottom: 1.5rem;
     backdrop-filter: blur(4px);
@@ -431,48 +471,40 @@ ta-text">
   .hero-location:hover { background: rgba(245, 240, 232, 0.2); }
 
   /* ── MISSION ── */
-  .mission { padding: 7rem 0; background: white; }
+  .mission { padding: 7rem 0; background: var(--color-background); }
   .mission-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 5rem; align-items: center; }
   .mission-image { position: relative; }
-  .mission-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
-  .mission-image-tag {
-    position: absolute;
-    bottom: -1.5rem;
-    right: -1.5rem;
-    background: var(--color-forest);
-    color: white;
-    padding: 0.75rem 1.25rem;
-  }
-  .ngo-logo { height: 40px; width: auto; display: block; }
+  .mission-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; border-radius: 0.75rem; }
   .mission-heading {
     font-size: clamp(1.75rem, 3.5vw, 2.5rem);
     font-weight: 700;
-    color: var(--color-forest-dark);
+    color: var(--color-primary);
     margin: 0.75rem 0 1.5rem;
     line-height: 1.2;
   }
-  .mission-text { font-size: 1rem; line-height: 1.8; color: #4a4a4a; margin-bottom: 1rem; }
+  .mission-text { font-size: 1rem; line-height: 1.8; color: var(--color-text); margin-bottom: 1rem; }
   .mission-pillars { display: flex; flex-direction: column; gap: 0.75rem; margin: 2rem 0; }
   .mission-pillar {
     display: flex;
     gap: 1rem;
     align-items: flex-start;
     padding: 1rem;
-    background: #f5f5f5;
-    border-left: 3px solid var(--color-sage);
+    background: var(--color-accent-light);
+    border-left: 3px solid var(--color-primary);
+    border-radius: 0.5rem;
   }
   .pillar-icon {
     width: 6px;
     height: 6px;
-    background: var(--color-sage);
+    background: var(--color-primary);
     border-radius: 50%;
     margin-top: 0.5rem;
     flex-shrink: 0;
   }
-  .mission-pillar p { font-size: 0.9rem; line-height: 1.6; color: #4a4a4a; margin: 0; }
+  .mission-pillar p { font-size: 0.9rem; line-height: 1.6; color: var(--color-text); margin: 0; }
 
   /* ── VISION ── */
-  .vision { background: var(--color-forest); padding: 5rem 0; }
+  .vision { background: var(--color-primary); padding: 5rem 0; text-align: center; }
   .vision-quote {
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 3vw, 2.25rem);
@@ -480,22 +512,23 @@ ta-text">
     color: white;
     line-height: 1.4;
     max-width: 800px;
-    margin: 1rem 0 0;
+    margin: 1rem auto 0;
     border: none;
     padding: 0;
+    text-align: center;
   }
 
   /* ── IMPACT ── */
-  .impact { padding: 7rem 0; background: #fafafa; }
+  .impact { padding: 7rem 0; background: var(--color-background-dark); }
   .impact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
   .impact-heading {
     font-size: clamp(1.75rem, 3vw, 2.25rem);
     font-weight: 700;
-    color: var(--color-forest-dark);
+    color: var(--color-primary);
     margin: 0.75rem 0 1rem;
     line-height: 1.2;
   }
-  .impact-sub { font-size: 0.95rem; line-height: 1.8; color: #4a4a4a; margin-bottom: 2rem; }
+  .impact-sub { font-size: 0.95rem; line-height: 1.8; color: var(--color-text); margin-bottom: 2rem; }
   .video-thumb {
     position: relative;
     display: block;
@@ -515,7 +548,7 @@ ta-text">
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(45, 80, 22, 0.5);
+    background: rgba(12, 60, 1, 0.5);
     transition: background 0.2s;
   }
   .play-btn > svg {
@@ -526,29 +559,47 @@ ta-text">
     padding: 12px;
     backdrop-filter: blur(4px);
   }
-  .video-thumb:hover .play-btn { background: rgba(45, 80, 22, 0.65); }
-  .ngosource-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.25rem;
+  .video-thumb:hover .play-btn { background: rgba(12, 60, 1, 0.65); }
+
+  /* ── NGO VERIFIED SECTION ── */
+  .ngo-verified { padding: 4rem 0; background: var(--color-accent); }
+  .ngo-card {
+    text-align: center;
+    max-width: 500px;
+    margin: 0 auto;
     background: white;
-    border: 1px solid #e0e0e0;
-    text-decoration: none;
-    margin-top: 1.5rem;
-    transition: border-color 0.2s;
-    border-radius: 0.5rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   }
-  .ngosource-badge:hover { border-color: var(--color-sage); }
-  .ngosource-badge img { height: 40px; object-fit: contain; flex-shrink: 0; }
-  .ngosource-badge p { font-size: 0.85rem; font-weight: 600; color: var(--color-forest); margin: 0; }
+  .ngo-verified-logo { height: 60px; width: auto; margin-bottom: 1rem; }
+  .ngo-card p { font-size: 1rem; color: var(--color-text); margin-bottom: 1.5rem; }
+  .btn-secondary {
+    display: inline-block;
+    background-color: var(--color-secondary);
+    color: white;
+    padding: 0.75rem 2rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    border: 2px solid var(--color-secondary);
+    border-radius: 0.375rem;
+    text-decoration: none;
+  }
+  .btn-secondary:hover {
+    background-color: transparent;
+    color: var(--color-secondary);
+  }
 
   /* ── PRINCIPLES ── */
-  .principles { padding: 7rem 0; background: white; }
+  .principles { padding: 7rem 0; background: var(--color-mist); }
   .principles-heading {
     font-size: clamp(1.75rem, 3vw, 2.25rem);
     font-weight: 700;
-    color: var(--color-forest-dark);
+    color: var(--color-primary);
     margin: 0.75rem 0 3rem;
   }
   .principles-grid {
@@ -578,10 +629,10 @@ ta-text">
     font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--color-forest);
+    color: var(--color-primary);
     margin-bottom: 0.5rem;
   }
-  .principle-body p { font-size: 0.85rem; line-height: 1.6; color: #4a4a4a; margin: 0; }
+  .principle-body p { font-size: 0.85rem; line-height: 1.6; color: var(--color-text); margin: 0; }
 
   /* ── PRODUCERS ── */
   .producers {
@@ -594,7 +645,7 @@ ta-text">
   .producers-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(26, 46, 10, 0.85);
+    background: rgba(12, 60, 1, 0.85);
   }
   .producers-content {
     position: relative;
@@ -614,17 +665,17 @@ ta-text">
   }
 
   /* ── RECENT WORKS ── */
-  .works { padding: 7rem 0; background: #f5f5f5; }
+  .works { padding: 7rem 0; background: var(--color-background); }
   .works-heading {
     font-size: clamp(1.75rem, 3vw, 2.25rem);
     font-weight: 700;
-    color: var(--color-forest-dark);
+    color: var(--color-primary);
     margin: 0.75rem 0 1rem;
   }
   .works-sub {
     font-size: 0.95rem;
     line-height: 1.8;
-    color: #4a4a4a;
+    color: var(--color-text);
     max-width: 640px;
     margin-bottom: 3rem;
   }
@@ -647,34 +698,43 @@ ta-text">
   .gallery-item:hover img { transform: scale(1.05); }
   .gallery-item-2, .gallery-item-6 { grid-row: span 2; }
 
-  /* ── PARTNERS ── */
-  .partners { padding: 5rem 0; background: white; }
-  .partners-logos {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3rem;
-    flex-wrap: wrap;
+  /* ── PARTNERS MARQUEE ── */
+  .partners { padding: 5rem 0; background: var(--color-background-dark); overflow: hidden; }
+  .partners-marquee {
+    width: 100%;
+    overflow: hidden;
     margin-top: 2rem;
+  }
+  .partners-track {
+    display: flex;
+    gap: 3rem;
+    animation: scroll 20s linear infinite;
+    width: fit-content;
+  }
+  .partners-track:hover {
+    animation-play-state: paused;
   }
   .partner-logo img {
     height: 60px;
+    width: auto;
     object-fit: contain;
-    filter: grayscale(0%);
-    opacity: 1;
     transition: opacity 0.2s;
   }
-  .partner-logo:hover img { opacity: 0.8; }
+  .partner-logo:hover img { opacity: 0.7; }
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
 
   /* ── BLOG PREVIEW ── */
-  .blog-preview { padding: 7rem 0; background: #fafafa; }
+  .blog-preview { padding: 7rem 0; background: var(--color-background); }
   .blog-heading {
     font-size: clamp(1.75rem, 3vw, 2.25rem);
     font-weight: 700;
-    color: var(--color-forest-dark);
+    color: var(--color-primary);
     margin: 0.75rem 0 0.5rem;
   }
-  .blog-sub { font-size: 0.95rem; color: #4a4a4a; margin-bottom: 3rem; max-width: 600px; }
+  .blog-sub { font-size: 0.95rem; color: var(--color-text); margin-bottom: 3rem; max-width: 600px; }
   .blog-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -710,24 +770,24 @@ ta-text">
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--color-sage);
+    color: var(--color-secondary);
     margin-bottom: 0.5rem;
   }
   .blog-title {
     font-family: var(--font-display);
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--color-forest-dark);
+    color: var(--color-primary);
     line-height: 1.4;
     margin-bottom: 0.5rem;
   }
-  .blog-abstract { font-size: 0.8rem; line-height: 1.5; color: #4a4a4a; margin-bottom: 1rem; flex: 1; }
-  .blog-arrow { font-size: 0.75rem; font-weight: 600; color: var(--color-sage); transition: color 0.2s; }
-  .blog-card:hover .blog-arrow { color: var(--color-forest); }
+  .blog-abstract { font-size: 0.8rem; line-height: 1.5; color: var(--color-text); margin-bottom: 1rem; flex: 1; }
+  .blog-arrow { font-size: 0.75rem; font-weight: 600; color: var(--color-secondary); transition: color 0.2s; }
+  .blog-card:hover .blog-arrow { color: var(--color-primary); }
   .blog-more { text-align: center; }
 
   /* ── BOTTOM CTA ── */
-  .bottom-cta { background: var(--color-forest); padding: 6rem 0; text-align: center; }
+  .bottom-cta { background: var(--color-primary); padding: 6rem 0; text-align: center; }
   .bottom-cta-text {
     font-family: var(--font-display);
     font-size: clamp(1.25rem, 2.5vw, 1.75rem);
@@ -744,7 +804,6 @@ ta-text">
   }
   @media (max-width: 768px) {
     .mission-grid, .impact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-    .mission-image-tag { right: 0; bottom: -1rem; }
     .works-gallery { grid-template-columns: repeat(2, 1fr); }
     .gallery-item-2, .gallery-item-6 { grid-row: span 1; }
     .hero-content { max-width: 100%; }
@@ -755,7 +814,7 @@ ta-text">
     .works-gallery { grid-template-columns: 1fr; }
     .hero-actions { flex-direction: column; }
     .hero-location { display: none; }
-    .partners-logos { gap: 1.5rem; }
+    .partners-track { gap: 1.5rem; }
     .partner-logo img { height: 40px; }
   }
 </style>
