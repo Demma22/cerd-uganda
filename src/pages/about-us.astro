@@ -1,41 +1,94 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import fs from 'fs';
-import path from 'path';
+import { supabase } from "../lib/supabase.js";
 
-// Load content from JSON
-const CONTENT_FILE = path.join(process.cwd(), 'src', 'data', 'content.json');
-let content = { about: {} };
+// Fetch page content from Supabase
+let pageContent = {
+  about: {
+    hero: {},
+    focus: {},
+    mission: {},
+    programs: [],
+    gallery: {},
+    bottomCta: {}
+  }
+};
 
 try {
-  if (fs.existsSync(CONTENT_FILE)) {
-    const data = fs.readFileSync(CONTENT_FILE, 'utf-8');
-    content = JSON.parse(data);
+  const { data: contentRows, error } = await supabase
+    .from('page_content')
+    .select('*')
+    .eq('page', 'about');
+
+  if (!error && contentRows) {
+    // Build nested content object
+    for (const row of contentRows) {
+      const { page, section, field, value } = row;
+      if (!pageContent[page]) pageContent[page] = {};
+      if (!pageContent[page][section]) pageContent[page][section] = {};
+      
+      // Try to parse JSON values for complex fields
+      if ((section === 'programs' && field === 'items') || 
+          (section === 'gallery' && field === 'images')) {
+        try {
+          pageContent[page][section][field] = JSON.parse(value);
+        } catch {
+          pageContent[page][section][field] = value;
+        }
+      } else {
+        pageContent[page][section][field] = value;
+      }
+    }
   }
 } catch (error) {
-  console.error('Error loading content:', error);
+  console.error('Error fetching page content:', error);
 }
 
-// Load team members from JSON
-const TEAM_FILE = path.join(process.cwd(), 'src', 'data', 'team.json');
+// Fetch team members from Supabase
 let teamMembers = [];
-
 try {
-  if (fs.existsSync(TEAM_FILE)) {
-    const data = fs.readFileSync(TEAM_FILE, 'utf-8');
-    teamMembers = JSON.parse(data);
+  const { data: team, error: teamError } = await supabase
+    .from('team_members')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (!teamError && team) {
+    teamMembers = team;
   }
 } catch (error) {
-  console.error('Error loading team:', error);
+  console.error('Error fetching team:', error);
 }
 
-const about = content.about || {};
-const journey = about.journey || {};
+const about = pageContent.about || {};
+const hero = about.hero || {};
 const focusData = about.focus || {};
 const missionQuote = about.mission || {};
-const programs = about.programs || [];
+const programsData = about.programs || {};
 const bottomCta = about.bottomCta || {};
-const stats = about.stats || [];
+const statsData = about.stats || {};
+const galleryData = about.gallery || {};
+
+// Parse programs items
+let programsList = [];
+if (programsData.items) {
+  programsList = Array.isArray(programsData.items) ? programsData.items : 
+    (typeof programsData.items === 'string' ? JSON.parse(programsData.items) : []);
+}
+
+// Parse stats items
+let statsList = [];
+if (statsData.items) {
+  statsList = Array.isArray(statsData.items) ? statsData.items : 
+    (typeof statsData.items === 'string' ? JSON.parse(statsData.items) : []);
+}
+
+// Parse gallery images
+let galleryImages = [];
+if (galleryData.images) {
+  galleryImages = Array.isArray(galleryData.images) ? galleryData.images : 
+    (typeof galleryData.images === 'string' ? JSON.parse(galleryData.images) : []);
+}
+let galleryTitle = galleryData.title || "Conferences & Community Engagement";
 ---
 
 <BaseLayout title="About Us" description="CERD-UG legally registered in 2018, focusing on ecosystem conservation, agroecology, and community engagement in Uganda.">
@@ -44,9 +97,9 @@ const stats = about.stats || [];
   <section class="about-hero">
     <div class="container-site">
       <span class="section-label">Our story</span>
-      <h1 class="about-title">{journey.title || "How our Journey Began"}</h1>
+      <h1 class="about-title">{hero.title || "How our Journey Began"}</h1>
       <p class="about-intro">
-        {journey.description || "CERD-UG was legally registered in 2018 after the Agro-ecology project in collaboration with the Swedish University of Agricultural Sciences funded by Sida."}
+        {hero.description || "CERD-UG was legally registered in 2018 after the Agro-ecology project in collaboration with the Swedish University of Agricultural Sciences funded by Sida."}
       </p>
     </div>
   </section>
@@ -70,12 +123,12 @@ const stats = about.stats || [];
   <!-- STATS BANNER -->
   <section class="stats-banner">
     <div class="container-site stats-container">
-      {stats.length > 0 ? stats.map(stat => (
-        <div class="stat-item">
+      {statsList.length > 0 ? statsList.map((stat, idx) => (
+        <div class="stat-item" key={idx}>
           <span class="stat-number-large">{stat.number}</span>
           <span class="stat-label-large">{stat.label}</span>
         </div>
-      )).join('') : (
+      )) : (
         <>
           <div class="stat-item">
             <span class="stat-number-large">6</span>
@@ -118,8 +171,8 @@ const stats = about.stats || [];
 
       <div class="team-grid">
         {teamMembers.length > 0 ? teamMembers.map(member => (
-          <div class="team-card">
-            <img src={member.image || "/images/about/placeholder.avif"} alt={member.name} />
+          <div class="team-card" key={member.id}>
+            <img src={member.image_url || "/images/about/placeholder.avif"} alt={member.name} />
             <div class="team-info">
               <h3>{member.name}</h3>
               <p class="team-role">{member.role}</p>
@@ -170,8 +223,8 @@ const stats = about.stats || [];
   <section class="programs">
     <div class="container-site">
       <div class="programs-grid">
-        {programs.length > 0 ? programs.map(program => (
-          <div class="program-card">
+        {programsList.length > 0 ? programsList.map((program, idx) => (
+          <div class="program-card" key={idx}>
             <div class="program-img">
               <img src={program.image} alt={program.title} />
             </div>
@@ -218,26 +271,34 @@ const stats = about.stats || [];
   <section class="gallery">
     <div class="container-site">
       <span class="section-label">Our Activities</span>
-      <h2>Conferences & Community Engagement</h2>
+      <h2>{galleryTitle}</h2>
       <div class="gallery-grid">
-        <div class="gallery-item gallery-item-1">
-          <img src="/images/about/conf2.avif" alt="Conference presentation" />
-        </div>
-        <div class="gallery-item gallery-item-2">
-          <img src="/images/about/conf3.avif" alt="Community gathering" />
-        </div>
-        <div class="gallery-item gallery-item-3">
-          <img src="/images/about/children1.avif" alt="Children learning" />
-        </div>
-        <div class="gallery-item gallery-item-4">
-          <img src="/images/about/speech.avif" alt="Keynote speech" />
-        </div>
-        <div class="gallery-item gallery-item-5">
-          <img src="/images/about/Children2.jpeg" alt="School children activity" />
-        </div>
-        <div class="gallery-item gallery-item-6">
-          <img src="/images/about/conference1.avif" alt="International conference" />
-        </div>
+        {galleryImages.length > 0 ? galleryImages.map((img, index) => (
+          <div class={`gallery-item gallery-item-${index + 1}`} key={index}>
+            <img src={img} alt="Gallery image" />
+          </div>
+        )) : (
+          <>
+            <div class="gallery-item gallery-item-1">
+              <img src="/images/about/conf2.avif" alt="Conference presentation" />
+            </div>
+            <div class="gallery-item gallery-item-2">
+              <img src="/images/about/conf3.avif" alt="Community gathering" />
+            </div>
+            <div class="gallery-item gallery-item-3">
+              <img src="/images/about/children1.avif" alt="Children learning" />
+            </div>
+            <div class="gallery-item gallery-item-4">
+              <img src="/images/about/speech.avif" alt="Keynote speech" />
+            </div>
+            <div class="gallery-item gallery-item-5">
+              <img src="/images/about/Children2.jpeg" alt="School children activity" />
+            </div>
+            <div class="gallery-item gallery-item-6">
+              <img src="/images/about/conference1.avif" alt="International conference" />
+            </div>
+          </>
+        )}
       </div>
     </div>
   </section>
@@ -255,7 +316,7 @@ const stats = about.stats || [];
   </section>
 
   <style>
-    /* Copy all your existing About page styles here */
+    /* Hero / Journey Section */
     .about-hero {
       background: linear-gradient(135deg, var(--color-forest) 0%, var(--color-forest-dark) 100%);
       padding: 8rem 0 4rem;
