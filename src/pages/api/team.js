@@ -1,46 +1,21 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
-
-const TEAM_FILE = path.join(process.cwd(), 'src', 'data', 'team.json');
-const IMAGES_DIR = path.join(process.cwd(), 'public', 'images', 'team');
-const dataDir = path.join(process.cwd(), 'src', 'data');
-
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-if (!fs.existsSync(IMAGES_DIR)) {
-  fs.mkdirSync(IMAGES_DIR, { recursive: true });
-}
-
-if (!fs.existsSync(TEAM_FILE)) {
-  fs.writeFileSync(TEAM_FILE, JSON.stringify([]));
-}
-
-function getTeam() {
-  const data = fs.readFileSync(TEAM_FILE, 'utf-8');
-  return JSON.parse(data);
-}
-
-function saveTeam(team) {
-  fs.writeFileSync(TEAM_FILE, JSON.stringify(team, null, 2));
-}
-
-async function saveImage(file) {
-  const timestamp = Date.now();
-  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-');
-  const fileName = `${timestamp}-${safeName}`;
-  const filePath = path.join(IMAGES_DIR, fileName);
-  
-  const buffer = await file.arrayBuffer();
-  fs.writeFileSync(filePath, Buffer.from(buffer));
-  
-  return `/images/team/${fileName}`;
-}
+import { supabase } from '../../lib/supabase.js';
 
 export async function GET() {
-  const team = getTeam();
+  const { data: team, error } = await supabase
+    .from('team_members')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching team members:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   return new Response(JSON.stringify(team), {
     headers: { 'Content-Type': 'application/json' }
   });
@@ -54,24 +29,65 @@ export async function POST({ request }) {
   const imageFile = formData.get('image');
   
   let imageUrl = null;
+  
   if (imageFile && imageFile.size > 0) {
-    imageUrl = await saveImage(imageFile);
+    const timestamp = Date.now();
+    const safeName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '-');
+    const fileName = `${timestamp}-${safeName}`;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('team-images')
+      .upload(fileName, imageFile, {
+        cacheControl: '3600',
+        upsert: false
+      });
+    
+    if (uploadError) {
+      console.error('Image upload error:', uploadError);
+      return new Response(JSON.stringify({ error: uploadError.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const { data: urlData } = supabase.storage
+      .from('team-images')
+      .getPublicUrl(fileName);
+    
+    imageUrl = urlData.publicUrl;
   }
   
-  const team = getTeam();
+  const { data: currentTeam, error: orderError } = await supabase
+    .from('team_members')
+    .select('order')
+    .order('order', { ascending: false })
+    .limit(1);
+  
+  const nextOrder = currentTeam && currentTeam.length > 0 ? currentTeam[0].order + 1 : 1;
+  
   const newMember = {
-    id: Date.now(),
     name,
     role,
-    bio,
-    image: imageUrl,
-    order: team.length + 1
+    bio: bio || '',
+    image_url: imageUrl,
+    order: nextOrder,
+    created_at: new Date().toISOString()
   };
   
-  team.push(newMember);
-  saveTeam(team);
+  const { data, error } = await supabase
+    .from('team_members')
+    .insert(newMember)
+    .select();
   
-  return new Response(JSON.stringify({ success: true, member: newMember }), {
+  if (error) {
+    console.error('Team insert error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  
+  return new Response(JSON.stringify({ success: true, member: data[0] }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
@@ -85,52 +101,102 @@ export async function PUT({ request }) {
   const imageFile = formData.get('image');
   const existingImage = formData.get('existingImage');
   
-  let team = getTeam();
-  const memberIndex = team.findIndex(m => m.id === id);
-  
-  if (memberIndex === -1) {
-    return new Response(JSON.stringify({ error: 'Member not found' }), { status: 404 });
-  }
-  
   let imageUrl = existingImage;
   
   if (imageFile && imageFile.size > 0) {
-    if (team[memberIndex].image) {
-      const oldImagePath = path.join(process.cwd(), 'public', team[memberIndex].image);
-      if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
+    if (existingImage) {
+      const oldFileName = existingImage.split('/').pop();
+      await supabase.storage.from('team-images').remove([oldFileName]);
     }
-    imageUrl = await saveImage(imageFile);
+    
+    const timestamp = Date.now();
+    const safeName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '-');
+    const fileName = `${timestamp}-${safeName}`;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('team-images')
+      .upload(fileName, imageFile);
+    
+    if (uploadError) {
+      console.error('Image upload error:', uploadError);
+      return new Response(JSON.stringify({ error: uploadError.message }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const { data: urlData } = supabase.storage
+      .from('team-images')
+      .getPublicUrl(fileName);
+    imageUrl = urlData.publicUrl;
   }
   
-  team[memberIndex] = {
-    ...team[memberIndex],
+  const updateData = {
     name,
     role,
-    bio,
-    image: imageUrl
+    bio: bio || '',
+    image_url: imageUrl
   };
   
-  saveTeam(team);
+  const { data, error } = await supabase
+    .from('team_members')
+    .update(updateData)
+    .eq('id', id)
+    .select();
   
-  return new Response(JSON.stringify({ success: true, member: team[memberIndex] }), {
+  if (error) {
+    console.error('Team update error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  
+  return new Response(JSON.stringify({ success: true, member: data[0] }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
 export async function DELETE({ url }) {
   const id = parseInt(url.searchParams.get('id'));
-  let team = getTeam();
-  const deletedMember = team.find(m => m.id === id);
   
-  if (deletedMember && deletedMember.image) {
-    const imagePath = path.join(process.cwd(), 'public', deletedMember.image);
-    if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+  const { data: member, error: fetchError } = await supabase
+    .from('team_members')
+    .select('image_url, order')
+    .eq('id', id)
+    .single();
+  
+  if (!fetchError && member?.image_url) {
+    const fileName = member.image_url.split('/').pop();
+    await supabase.storage.from('team-images').remove([fileName]);
   }
   
-  team = team.filter(m => m.id !== id);
-  // Reorder remaining members
-  team = team.map((member, index) => ({ ...member, order: index + 1 }));
-  saveTeam(team);
+  const { error } = await supabase
+    .from('team_members')
+    .delete()
+    .eq('id', id);
+  
+  if (error) {
+    console.error('Team delete error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  
+  const { data: remainingTeam } = await supabase
+    .from('team_members')
+    .select('id')
+    .order('order', { ascending: true });
+  
+  if (remainingTeam && remainingTeam.length > 0) {
+    for (let i = 0; i < remainingTeam.length; i++) {
+      await supabase
+        .from('team_members')
+        .update({ order: i + 1 })
+        .eq('id', remainingTeam[i].id);
+    }
+  }
   
   return new Response(JSON.stringify({ success: true }), {
     headers: { 'Content-Type': 'application/json' }

@@ -1,46 +1,21 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
-
-const GALLERY_FILE = path.join(process.cwd(), 'src', 'data', 'gallery.json');
-const IMAGES_DIR = path.join(process.cwd(), 'public', 'images', 'gallery');
-const dataDir = path.join(process.cwd(), 'src', 'data');
-
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-if (!fs.existsSync(IMAGES_DIR)) {
-  fs.mkdirSync(IMAGES_DIR, { recursive: true });
-}
-
-if (!fs.existsSync(GALLERY_FILE)) {
-  fs.writeFileSync(GALLERY_FILE, JSON.stringify([]));
-}
-
-function getGallery() {
-  const data = fs.readFileSync(GALLERY_FILE, 'utf-8');
-  return JSON.parse(data);
-}
-
-function saveGallery(gallery) {
-  fs.writeFileSync(GALLERY_FILE, JSON.stringify(gallery, null, 2));
-}
-
-async function saveImage(file) {
-  const timestamp = Date.now();
-  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-');
-  const fileName = `${timestamp}-${safeName}`;
-  const filePath = path.join(IMAGES_DIR, fileName);
-  
-  const buffer = await file.arrayBuffer();
-  fs.writeFileSync(filePath, Buffer.from(buffer));
-  
-  return `/images/gallery/${fileName}`;
-}
+import { supabase } from '../../lib/supabase.js';
 
 export async function GET() {
-  const gallery = getGallery();
+  const { data: gallery, error } = await supabase
+    .from('gallery')
+    .select('*')
+    .order('order', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching gallery:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   return new Response(JSON.stringify(gallery), {
     headers: { 'Content-Type': 'application/json' }
   });
@@ -50,24 +25,68 @@ export async function POST({ request }) {
   const formData = await request.formData();
   const alt = formData.get('alt');
   const imageFile = formData.get('image');
-  
+
   if (!imageFile || imageFile.size === 0) {
-    return new Response(JSON.stringify({ error: 'Image required' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'Image required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-  
-  const imageUrl = await saveImage(imageFile);
-  const gallery = getGallery();
+
+  // Upload image to Supabase Storage
+  const timestamp = Date.now();
+  const safeName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '-');
+  const fileName = `${timestamp}-${safeName}`;
+
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('gallery')
+    .upload(fileName, imageFile, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (uploadError) {
+    console.error('Image upload error:', uploadError);
+    return new Response(JSON.stringify({ error: uploadError.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const { data: urlData } = supabase.storage
+    .from('gallery')
+    .getPublicUrl(fileName);
+
+  // Get current max order
+  const { data: currentGallery, error: orderError } = await supabase
+    .from('gallery')
+    .select('order')
+    .order('order', { ascending: false })
+    .limit(1);
+
+  const nextOrder = currentGallery && currentGallery.length > 0 ? currentGallery[0].order + 1 : 1;
+
   const newImage = {
-    id: Date.now(),
-    image: imageUrl,
+    image_url: urlData.publicUrl,
     alt: alt || 'Gallery image',
-    order: gallery.length + 1
+    order: nextOrder,
+    created_at: new Date()
   };
-  
-  gallery.push(newImage);
-  saveGallery(gallery);
-  
-  return new Response(JSON.stringify({ success: true, image: newImage }), {
+
+  const { data, error } = await supabase
+    .from('gallery')
+    .insert(newImage)
+    .select();
+
+  if (error) {
+    console.error('Gallery insert error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  return new Response(JSON.stringify({ success: true, image: data[0] }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
@@ -77,41 +96,88 @@ export async function PUT({ request }) {
   const id = parseInt(formData.get('id'));
   const alt = formData.get('alt');
   const order = parseInt(formData.get('order'));
-  
-  let gallery = getGallery();
-  const imageIndex = gallery.findIndex(i => i.id === id);
-  
-  if (imageIndex === -1) {
-    return new Response(JSON.stringify({ error: 'Image not found' }), { status: 404 });
+
+  if (!id) {
+    return new Response(JSON.stringify({ error: 'id is required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-  
-  gallery[imageIndex] = {
-    ...gallery[imageIndex],
-    alt,
-    order
-  };
-  
-  saveGallery(gallery);
-  
-  return new Response(JSON.stringify({ success: true, image: gallery[imageIndex] }), {
+
+  const updateData = {};
+  if (alt !== undefined) updateData.alt = alt;
+  if (order !== undefined) updateData.order = order;
+
+  const { data, error } = await supabase
+    .from('gallery')
+    .update(updateData)
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    console.error('Gallery update error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  return new Response(JSON.stringify({ success: true, image: data[0] }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
 export async function DELETE({ url }) {
   const id = parseInt(url.searchParams.get('id'));
-  let gallery = getGallery();
-  const deletedImage = gallery.find(i => i.id === id);
-  
-  if (deletedImage && deletedImage.image) {
-    const imagePath = path.join(process.cwd(), 'public', deletedImage.image);
-    if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+
+  if (!id) {
+    return new Response(JSON.stringify({ error: 'id is required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-  
-  gallery = gallery.filter(i => i.id !== id);
-  gallery = gallery.map((img, index) => ({ ...img, order: index + 1 }));
-  saveGallery(gallery);
-  
+
+  // First get the image to delete from storage
+  const { data: image, error: fetchError } = await supabase
+    .from('gallery')
+    .select('image_url')
+    .eq('id', id)
+    .single();
+
+  if (!fetchError && image?.image_url) {
+    const fileName = image.image_url.split('/').pop();
+    await supabase.storage.from('gallery').remove([fileName]);
+  }
+
+  // Delete from database
+  const { error } = await supabase
+    .from('gallery')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Gallery delete error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  // Reorder remaining images
+  const { data: remainingGallery } = await supabase
+    .from('gallery')
+    .select('id')
+    .order('order', { ascending: true });
+
+  if (remainingGallery && remainingGallery.length > 0) {
+    for (let i = 0; i < remainingGallery.length; i++) {
+      await supabase
+        .from('gallery')
+        .update({ order: i + 1 })
+        .eq('id', remainingGallery[i].id);
+    }
+  }
+
   return new Response(JSON.stringify({ success: true }), {
     headers: { 'Content-Type': 'application/json' }
   });

@@ -1,90 +1,99 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '../../lib/supabase.js';
 
-const CONTENT_FILE = path.join(process.cwd(), 'src', 'data', 'content.json');
-const dataDir = path.join(process.cwd(), 'src', 'data');
+// Helper to get content as nested object
+async function getContentObject() {
+  const { data: rows, error } = await supabase
+    .from('page_content')
+    .select('*');
 
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+  if (error) {
+    console.error('Error fetching page content:', error);
+    return {};
+  }
 
-if (!fs.existsSync(CONTENT_FILE)) {
-  const defaultContent = {
-    homepage: {
-      hero: { badge: "5+ years of impact", title: "Center for Ecosystems Research & Development", subtitle: "CERD-UG is a Non Profit Organization which aims to promote an ecosystems and systems thinking approach..." },
-      mission: { title: "Building a Sustainable Agro-Ecosystem", description: "", goal: "" },
-      vision: { quote: "A sustainable agro-ecosystem in which every aspect of development is in harmony and complements each other." },
-      impact: { title: "Changing lives together through sustainable farming", description: "", vision: "" },
-      principles: { title: "What We Stand For", items: [] },
-      producers: { title: "We Are Producers For Local Markets", description: "", image: "" },
-      recentWorks: { title: "Our Recent Works", subtitle: "" },
-      bottomCta: { text: "", buttonText: "Contact Us", buttonLink: "/contact" }
-    },
-    about: {
-      hero: { title: "How our Journey Began", description: "" },
-      focus: { title: "", description: "", highlight: "" },
-      stats: [],
-      mission: { quote: "", goal: "" },
-      programs: [],
-      gallery: { title: "Conferences & Community Engagement", images: [] },
-      bottomCta: { text: "", buttonText: "Work With Us", buttonLink: "/contact" }
-    },
-    siteSettings: {
-      siteName: "CERD-UG",
-      footerText: "Center for Ecosystems Research and Development Uganda"
+  // Convert flat rows to nested object
+  const content = {};
+
+  for (const row of rows) {
+    const { page, section, field, value } = row;
+    
+    if (!content[page]) content[page] = {};
+    if (!content[page][section]) content[page][section] = {};
+    
+    // Try to parse JSON values
+    try {
+      content[page][section][field] = JSON.parse(value);
+    } catch {
+      content[page][section][field] = value;
     }
-  };
-  fs.writeFileSync(CONTENT_FILE, JSON.stringify(defaultContent, null, 2));
+  }
+
+  return content;
 }
 
-function getContent() {
-  const data = fs.readFileSync(CONTENT_FILE, 'utf-8');
-  return JSON.parse(data);
-}
+// Helper to save content (upsert)
+async function saveContentField(page, section, field, value) {
+  const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  
+  const { error } = await supabase
+    .from('page_content')
+    .upsert({
+      page,
+      section,
+      field,
+      value: stringValue
+    }, {
+      onConflict: 'page,section,field'
+    });
 
-function saveContent(content) {
-  fs.writeFileSync(CONTENT_FILE, JSON.stringify(content, null, 2));
+  if (error) {
+    console.error('Error saving content field:', error);
+    throw error;
+  }
 }
 
 export async function GET() {
-  const content = getContent();
+  const content = await getContentObject();
   return new Response(JSON.stringify(content), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
 export async function POST({ request }) {
-  const { page, section, field, value, index } = await request.json();
-  
-  const content = getContent();
-  
-  if (index !== undefined && content[page] && content[page][section] && Array.isArray(content[page][section])) {
-    content[page][section][index][field] = value;
-  } else {
-    if (!content[page]) content[page] = {};
-    if (!content[page][section]) content[page][section] = {};
-    content[page][section][field] = value;
+  const { page, section, field, value } = await request.json();
+
+  try {
+    await saveContentField(page, section, field, value);
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-  
-  saveContent(content);
-  
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { 'Content-Type': 'application/json' }
-  });
 }
 
 export async function PUT({ request }) {
   const { page, section, data } = await request.json();
-  
-  const content = getContent();
-  
-  if (!content[page]) content[page] = {};
-  content[page][section] = data;
-  saveContent(content);
-  
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { 'Content-Type': 'application/json' }
-  });
+
+  try {
+    // For PUT requests, we're saving an entire section
+    // data is an object with multiple fields
+    for (const [field, value] of Object.entries(data)) {
+      await saveContentField(page, section, field, value);
+    }
+    
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 }

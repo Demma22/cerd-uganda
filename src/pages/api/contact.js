@@ -1,99 +1,120 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '../../lib/supabase.js';
 
-const CONTACTS_FILE = path.join(process.cwd(), 'src', 'data', 'contacts.json');
-const dataDir = path.join(process.cwd(), 'src', 'data');
+export async function GET() {
+  const { data: messages, error } = await supabase
+    .from('contact_messages')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-// Ensure data directory exists
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-
-// Initialize contacts file if it doesn't exist
-if (!fs.existsSync(CONTACTS_FILE)) {
-  fs.writeFileSync(CONTACTS_FILE, JSON.stringify([]));
-}
-
-function getContacts() {
-  const data = fs.readFileSync(CONTACTS_FILE, 'utf-8');
-  return JSON.parse(data);
-}
-
-function saveContacts(contacts) {
-  fs.writeFileSync(CONTACTS_FILE, JSON.stringify(contacts, null, 2));
-}
-
-// Mark message as read
-export async function PATCH({ request }) {
-  const { id } = await request.json();
-  const contacts = getContacts();
-  const contactIndex = contacts.findIndex(c => c.id === id);
-  
-  if (contactIndex !== -1) {
-    contacts[contactIndex].read = true;
-    saveContacts(contacts);
-    return new Response(JSON.stringify({ success: true }), {
+  if (error) {
+    console.error('Error fetching messages:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-  
-  return new Response(JSON.stringify({ error: 'Message not found' }), {
-    status: 404,
+
+  return new Response(JSON.stringify(messages), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
-// Get all messages
-export async function GET() {
-  const contacts = getContacts();
-  return new Response(JSON.stringify(contacts), {
-    headers: { 'Content-Type': 'application/json' }
-  });
-}
-
-// Submit new message
 export async function POST({ request }) {
   const { name, email, phone, message } = await request.json();
-  
+
   if (!name || !email || !message) {
     return new Response(JSON.stringify({ error: 'Name, email, and message are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
-  
-  const contacts = getContacts();
+
   const newMessage = {
-    id: Date.now(),
     name,
     email,
     phone: phone || '',
     message,
-    read: false,
-    date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-    timestamp: Date.now()
+    is_read: false,
+    created_at: new Date()
   };
-  
-  contacts.unshift(newMessage);
-  saveContacts(contacts);
-  
+
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .insert(newMessage)
+    .select();
+
+  if (error) {
+    console.error('Message insert error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   return new Response(JSON.stringify({ 
     success: true, 
-    message: 'Message sent successfully' 
+    message: 'Message sent successfully',
+    data: data[0]
   }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
-// Delete message
+// Mark message as read
+export async function PATCH({ request }) {
+  const { id, is_read } = await request.json();
+
+  if (!id) {
+    return new Response(JSON.stringify({ error: 'id is required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .update({ is_read: is_read !== undefined ? is_read : true })
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    console.error('Message update error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  return new Response(JSON.stringify({ success: true, data: data[0] }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
 export async function DELETE({ url }) {
   const id = parseInt(url.searchParams.get('id'));
-  let contacts = getContacts();
-  contacts = contacts.filter(c => c.id !== id);
-  saveContacts(contacts);
-  
+
+  if (!id) {
+    return new Response(JSON.stringify({ error: 'id is required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const { error } = await supabase
+    .from('contact_messages')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Message delete error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   return new Response(JSON.stringify({ success: true }), {
     headers: { 'Content-Type': 'application/json' }
   });
