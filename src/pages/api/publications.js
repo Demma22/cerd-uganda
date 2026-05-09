@@ -1,61 +1,34 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
+import { supabase } from '../../lib/supabase.js';
 
-const DOCUMENTS_DIR = path.join(process.cwd(), 'public', 'documents');
-const TITLES_FILE = path.join(process.cwd(), 'src', 'data', 'publication-titles.json');
+// Get all publications from Supabase
+async function getPublications() {
+  const { data: publications, error } = await supabase
+    .from('publications')
+    .select('*')
+    .order('uploaded_at', { ascending: false });
 
-// Ensure documents directory exists
-if (!fs.existsSync(DOCUMENTS_DIR)) {
-  fs.mkdirSync(DOCUMENTS_DIR, { recursive: true });
-}
+  if (error) {
+    console.error('Error fetching publications:', error);
+    return [];
+  }
 
-// Ensure data directory exists
-const dataDir = path.join(process.cwd(), 'src', 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-
-// Load custom titles (fileName -> displayTitle)
-function getTitles() {
-  if (!fs.existsSync(TITLES_FILE)) return {};
-  return JSON.parse(fs.readFileSync(TITLES_FILE, 'utf-8'));
-}
-
-function saveTitles(titles) {
-  fs.writeFileSync(TITLES_FILE, JSON.stringify(titles, null, 2));
-}
-
-// Helper function to clean filename into a readable title
-function cleanFileName(name) {
-  let cleaned = name.replace(/^\d+-/, '');
-  return cleaned.replace('.pdf', '').replace(/-/g, ' ');
-}
-
-// Get all publications from documents folder
-function getPublications() {
-  const files = fs.readdirSync(DOCUMENTS_DIR);
-  const pdfFiles = files.filter(file => file.endsWith('.pdf'));
-  const titles = getTitles();
-
-  return pdfFiles.map((file, index) => {
-    const stats = fs.statSync(path.join(DOCUMENTS_DIR, file));
-    // Use custom title if set, otherwise derive from filename
-    const displayTitle = titles[file] || cleanFileName(file);
-
-    return {
-      id: index,
-      title: displayTitle,
-      fileName: file,
-      file: `/documents/${file}`,
-      date: stats.mtime.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-    };
-  });
+  return publications.map(pub => ({
+    id: pub.id,
+    title: pub.title,
+    fileName: pub.file_name,
+    file: pub.file_url,
+    date: new Date(pub.uploaded_at).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    })
+  }));
 }
 
 export async function GET() {
-  const pubs = getPublications();
+  const pubs = await getPublications();
   return new Response(JSON.stringify(pubs), {
     headers: { 'Content-Type': 'application/json' }
   });
@@ -64,6 +37,8 @@ export async function GET() {
 export async function POST({ request }) {
   const formData = await request.formData();
   const file = formData.get('file');
+  const title = formData.get('title');
+  const type = formData.get('type') || 'Publication';
 
   if (!file || file.size === 0) {
     return new Response(JSON.stringify({ error: 'No file uploaded' }), {
@@ -79,57 +54,122 @@ export async function POST({ request }) {
     });
   }
 
+  // Clean filename for storage
   const cleanOriginal = file.name.replace('.pdf', '').replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
-  const fileName = `${cleanOriginal}.pdf`;
-  const filePath = path.join(DOCUMENTS_DIR, fileName);
+  const fileName = `${Date.now()}-${cleanOriginal}.pdf`;
 
-  const buffer = await file.arrayBuffer();
-  fs.writeFileSync(filePath, Buffer.from(buffer));
+  // Upload to Supabase Storage
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('publications')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
 
-  return new Response(JSON.stringify({ success: true, fileName: fileName }), {
+  if (uploadError) {
+    console.error('Upload error:', uploadError);
+    return new Response(JSON.stringify({ error: uploadError.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from('publications')
+    .getPublicUrl(fileName);
+
+  // Save metadata to database
+  const displayTitle = title || cleanOriginal.replace(/-/g, ' ');
+  
+  const { data: pubData, error: dbError } = await supabase
+    .from('publications')
+    .insert({
+      file_name: fileName,
+      title: displayTitle,
+      original_name: file.name,
+      file_url: urlData.publicUrl,
+      type: type
+    })
+    .select();
+
+  if (dbError) {
+    console.error('Database error:', dbError);
+    return new Response(JSON.stringify({ error: dbError.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  return new Response(JSON.stringify({ 
+    success: true, 
+    fileName: fileName,
+    publication: pubData[0]
+  }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
+// Update publication title
 export async function PATCH({ request }) {
-  const { fileName, title } = await request.json();
+  const { id, title } = await request.json();
 
-  if (!fileName || !title) {
-    return new Response(JSON.stringify({ error: 'fileName and title are required' }), {
+  if (!id || !title) {
+    return new Response(JSON.stringify({ error: 'id and title are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  const titles = getTitles();
-  titles[fileName] = title.trim();
-  saveTitles(titles);
+  const { error } = await supabase
+    .from('publications')
+    .update({ title: title.trim() })
+    .eq('id', id);
+
+  if (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 
   return new Response(JSON.stringify({ success: true }), {
     headers: { 'Content-Type': 'application/json' }
   });
 }
 
+// Delete publication
 export async function DELETE({ url }) {
+  const id = url.searchParams.get('id');
   const fileName = url.searchParams.get('fileName');
 
-  if (!fileName) {
-    return new Response(JSON.stringify({ error: 'No file name provided' }), {
+  if (!id || !fileName) {
+    return new Response(JSON.stringify({ error: 'id and fileName are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
   }
 
-  const filePath = path.join(DOCUMENTS_DIR, fileName);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
+  // Delete from storage
+  const { error: storageError } = await supabase.storage
+    .from('publications')
+    .remove([fileName]);
+
+  if (storageError) {
+    console.error('Storage delete error:', storageError);
   }
 
-  // Also remove custom title if it exists
-  const titles = getTitles();
-  if (titles[fileName]) {
-    delete titles[fileName];
-    saveTitles(titles);
+  // Delete from database
+  const { error: dbError } = await supabase
+    .from('publications')
+    .delete()
+    .eq('id', id);
+
+  if (dbError) {
+    return new Response(JSON.stringify({ error: dbError.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   return new Response(JSON.stringify({ success: true }), {

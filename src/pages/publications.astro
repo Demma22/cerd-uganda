@@ -1,42 +1,32 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import fs from 'fs';
-import path from 'path';
+import { supabase } from "../lib/supabase.js";
 
-// Load publications from documents folder
-const documentsDir = path.join(process.cwd(), 'public', 'documents');
+// Fetch publications from Supabase
 let publications = [];
 
 try {
-  if (fs.existsSync(documentsDir)) {
-    const files = fs.readdirSync(documentsDir);
-    
-    publications = files
-      .filter(file => file.endsWith('.pdf'))
-      .map((file, index) => {
-        const stats = fs.statSync(path.join(documentsDir, file));
-        const title = file.replace('.pdf', '').replace(/-/g, ' ');
-        
-        return {
-          id: index,
-          title: title,
-          fileName: file,
-          file: `/documents/${encodeURIComponent(file)}`,
-          date: stats.mtime.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-          }),
-          type: 'Publication'
-        };
-      });
+  const { data, error } = await supabase
+    .from('publications')
+    .select('*')
+    .order('uploaded_at', { ascending: false });
+
+  if (!error && data) {
+    publications = data.map(pub => ({
+      id: pub.id,
+      title: pub.title,
+      file: pub.file_url,
+      date: new Date(pub.uploaded_at).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+      type: pub.type || 'Publication'
+    }));
   }
 } catch (error) {
   console.error('Error loading publications:', error);
 }
-
-// Sort by date (newest first)
-publications.sort((a, b) => new Date(b.date) - new Date(a.date));
 ---
 
 <BaseLayout title="Publications" description="Research papers, reports, and publications from CERD-UG">
@@ -76,7 +66,7 @@ publications.sort((a, b) => new Date(b.date) - new Date(a.date));
         {publications.length === 0 && (
           <div class="empty-state">
             <p>No publications uploaded yet.</p>
-            <p class="empty-hint">Add PDF files to the <code>public/documents/</code> folder.</p>
+            <p class="empty-hint">Upload PDF files from the admin dashboard.</p>
           </div>
         )}
       </div>
@@ -280,11 +270,12 @@ publications.sort((a, b) => new Date(b.date) - new Date(a.date));
     const cards = document.querySelectorAll('.publication-card');
 
     function filterPublications() {
+      if (!searchInput) return;
       const searchTerm = searchInput.value.toLowerCase();
       
       cards.forEach(card => {
-        const title = card.getAttribute('data-title').toLowerCase();
-        if (title.includes(searchTerm)) {
+        const title = card.getAttribute('data-title');
+        if (title && title.toLowerCase().includes(searchTerm)) {
           card.style.display = 'flex';
         } else {
           card.style.display = 'none';
