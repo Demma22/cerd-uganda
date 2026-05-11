@@ -36,8 +36,8 @@ export async function POST({ request }) {
     const fileName = `${timestamp}-${safeName}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('team-images')
-      .upload(fileName, imageFile, {
+      .from('gallery')
+      .upload('team/' + fileName, imageFile, {
         cacheControl: '3600',
         upsert: false
       });
@@ -51,8 +51,8 @@ export async function POST({ request }) {
     }
     
     const { data: urlData } = supabase.storage
-      .from('team-images')
-      .getPublicUrl(fileName);
+      .from('gallery')
+      .getPublicUrl('team/' + fileName);
     
     imageUrl = urlData.publicUrl;
   }
@@ -105,8 +105,11 @@ export async function PUT({ request }) {
   
   if (imageFile && imageFile.size > 0) {
     if (existingImage) {
-      const oldFileName = existingImage.split('/').pop();
-      await supabase.storage.from('team-images').remove([oldFileName]);
+      // Extract just the team/filename part from the full URL
+      const urlParts = existingImage.split('/team/');
+      if (urlParts.length > 1) {
+        await supabase.storage.from('gallery').remove(['team/' + urlParts[1]]);
+      }
     }
     
     const timestamp = Date.now();
@@ -114,8 +117,8 @@ export async function PUT({ request }) {
     const fileName = `${timestamp}-${safeName}`;
     
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('team-images')
-      .upload(fileName, imageFile);
+      .from('gallery')
+      .upload('team/' + fileName, imageFile, { cacheControl: '3600', upsert: false });
     
     if (uploadError) {
       console.error('Image upload error:', uploadError);
@@ -126,8 +129,8 @@ export async function PUT({ request }) {
     }
     
     const { data: urlData } = supabase.storage
-      .from('team-images')
-      .getPublicUrl(fileName);
+      .from('gallery')
+      .getPublicUrl('team/' + fileName);
     imageUrl = urlData.publicUrl;
   }
   
@@ -167,8 +170,10 @@ export async function DELETE({ url }) {
     .single();
   
   if (!fetchError && member?.image_url) {
-    const fileName = member.image_url.split('/').pop();
-    await supabase.storage.from('team-images').remove([fileName]);
+    const urlParts = member.image_url.split('/team/');
+    if (urlParts.length > 1) {
+      await supabase.storage.from('gallery').remove(['team/' + urlParts[1]]);
+    }
   }
   
   const { error } = await supabase

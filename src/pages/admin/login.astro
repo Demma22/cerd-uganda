@@ -1,79 +1,257 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { checkAuth, setSessionCookies, clearSessionCookies } from "../../utils/auth.js";
+
+// Only redirect if already logged in AND session is valid
+const session = Astro.cookies.get('admin_session');
+if (session && session.value === 'authenticated') {
+  // Check if session is not expired
+  const loginTime = Astro.cookies.get('admin_login_time');
+  if (loginTime) {
+    const loginTimestamp = parseInt(loginTime.value);
+    const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+    if (Date.now() - loginTimestamp < sevenDaysInMs) {
+      // Use redirect to dashboard
+      return Astro.redirect('/admin/dashboard');
+    }
+  }
+}
+
+// Set no-cache headers to prevent back button issues
+Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+Astro.response.headers.set('Pragma', 'no-cache');
+Astro.response.headers.set('Expires', '0');
+
+let error = null;
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const password = formData.get('password');
+  
+  // Use environment variable for password, fallback to default
+  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || 'CERDadmin2025';
+  
+  if (password === ADMIN_PASSWORD) {
+    // Clear any existing session first
+    Astro.cookies.delete('admin_session', { path: '/' });
+    Astro.cookies.delete('admin_login_time', { path: '/' });
+    
+    // Set new session cookie
+    Astro.cookies.set('admin_session', 'authenticated', {
+      path: '/',
+      httpOnly: true,
+      secure: import.meta.env.PROD,
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7 // 7 days
+    });
+    
+    // Set login timestamp
+    Astro.cookies.set('admin_login_time', Date.now().toString(), {
+      path: '/',
+      httpOnly: true,
+      secure: import.meta.env.PROD,
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7
+    });
+    
+    // Create response with redirect and no-cache headers
+    const response = Astro.redirect('/admin/dashboard');
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    return response;
+  } else {
+    error = 'Invalid password. Please try again.';
+  }
+}
 ---
 
 <BaseLayout title="Admin Login">
-  <section class="login-section">
-    <div class="container-site">
-      <div class="login-card">
-        <h1>Admin Login</h1>
-        
-        <form method="POST" action="/api/login">
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required />
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <h1>Admin Access</h1>
+        <p>Please enter your credentials to continue</p>
+      </div>
+      
+      {error && (
+        <div class="error-message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
+      
+      <form method="POST" class="login-form">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="off" />
           </div>
-          
-          <button type="submit" class="btn-primary">Login</button>
-        </form>
+        </div>
         
-        {Astro.url.searchParams.has('error') && (
-          <div class="error">Invalid password</div>
-        )}
+        <button type="submit" class="login-btn">
+          <span>Login to Dashboard</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </form>
+      
+      <div class="login-footer">
+        <p>Secure admin area. Unauthorized access is prohibited.</p>
       </div>
     </div>
-  </section>
+  </div>
 
-  <style>
-    .login-section {
-      min-height: 80vh;
+  <style is:global>
+    .login-container {
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--color-mist);
-      padding-top: 4rem;
+      background: linear-gradient(135deg, #f1f2ed 0%, #e2e4db 100%);
+      padding: 2rem;
     }
-
+    
     .login-card {
       background: white;
-      padding: 3rem;
-      border-radius: 1rem;
-      max-width: 400px;
-      margin: 0 auto;
-      text-align: center;
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      max-width: 450px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
     }
-
-    .login-card h1 {
-      color: var(--color-forest-dark);
+    
+    .login-header {
+      text-align: center;
       margin-bottom: 2rem;
     }
-
+    
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      background: #f0fdf4;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      color: #2d5016;
+    }
+    
+    .login-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #1a2e0a;
+      margin-bottom: 0.5rem;
+    }
+    
+    .login-header p {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+    
+    .error-message {
+      background: #fee2e2;
+      border-left: 3px solid #dc2626;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #991b1b;
+      font-size: 0.875rem;
+    }
+    
+    .login-form {
+      margin-bottom: 1.5rem;
+    }
+    
     .form-group {
       margin-bottom: 1.5rem;
-      text-align: left;
     }
-
+    
     .form-group label {
       display: block;
-      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
       font-weight: 600;
-      color: var(--color-forest);
+      color: #374151;
+      margin-bottom: 0.5rem;
     }
-
-    .form-group input {
+    
+    .input-wrapper {
+      position: relative;
+    }
+    
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+    }
+    
+    .input-wrapper input {
       width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 0.5rem;
-    }
-
-    .error {
-      margin-top: 1rem;
-      padding: 0.75rem;
-      background: #fee2e2;
-      color: #991b1b;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid #e5e7eb;
       border-radius: 0.5rem;
       font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: #2d5016;
+      box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+    }
+    
+    .login-btn {
+      width: 100%;
+      background: #2d5016;
+      color: white;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .login-btn:hover {
+      background: #1a2e0a;
+      transform: translateY(-1px);
+    }
+    
+    .login-footer {
+      text-align: center;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    .login-footer p {
+      font-size: 0.7rem;
+      color: #9ca3af;
     }
   </style>
 </BaseLayout>

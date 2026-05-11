@@ -1,11 +1,18 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { requireAuth } from "../../utils/auth.js";
 
-// Check authentication
-const session = Astro.cookies.get('admin_session');
-if (!session || session.value !== 'authenticated') {
-  return Astro.redirect('/admin/login');
-}
+// Redirect to login if not authenticated (also clears stale cookies)
+const authRedirect = requireAuth(Astro.cookies, Astro.redirect);
+if (authRedirect) return authRedirect;
+
+// Prevent browser from caching this page — back button won't show it after logout
+Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+Astro.response.headers.set('Pragma', 'no-cache');
+Astro.response.headers.set('Expires', '0');
+
+const loginTime = Astro.cookies.get('admin_login_time');
+const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString() : 'Unknown';
 ---
 
 <BaseLayout title="Admin Dashboard">
@@ -42,7 +49,7 @@ if (!session || session.value !== 'authenticated') {
         <div style="background: white; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;">
           <table style="width: 100%; border-collapse: collapse;">
             <thead style="background: #2d5016;">
-              <tr><th style="padding: 1rem; text-align: left; color: white;">Status</th><th style="padding: 1rem; text-align: left; color: white;">Name / Email</th><th style="padding: 1rem; text-align: left; color: white;">Message</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr>
+              <tr><th style="padding: 1rem; text-align: left; color: white;">Status</th><th style="padding: 1rem; text-align: left; color: white;">From</th><th style="padding: 1rem; text-align: left; color: white;">Preview &mdash; click row to read</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr>
             </thead>
             <tbody id="messagesList"><tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">Loading messages...</td></tr></tbody>
           </table>
@@ -68,7 +75,7 @@ if (!session || session.value !== 'authenticated') {
         </div>
         <div style="background: white; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;">
           <table style="width: 100%; border-collapse: collapse;">
-            <thead style="background: #2d5016;"><tr><th style="padding: 1rem; text-align: left; color: white;">Title</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th>｜｜DSML｜｜</thead>
+            <thead style="background: #2d5016;"><tr><th style="padding: 1rem; text-align: left; color: white;">Title</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr></thead>
             <tbody id="publicationsList"><tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">Loading publications...</td></tr></tbody>
           </table>
         </div>
@@ -85,11 +92,11 @@ if (!session || session.value !== 'authenticated') {
         </div>
         <div id="blogForm" style="display: none; background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid #ddd;">
           <h3>Add New Blog Post</h3>
-          <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem;"><strong>Tip:</strong> You can paste from Word or use HTML tags: &lt;b&gt;bold&lt;\/b&gt;, &lt;i&gt;italic&lt;\/i&gt;</div>
+          <div style="background: #f0fdf4; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem;"><strong>Tip:</strong> You can paste from Word or use HTML tags: &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;</div>
           <form id="blogFormSubmit" enctype="multipart/form-data">
             <div style="margin-bottom: 1rem;"><label>Title *</label><input type="text" name="title" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
             <div style="margin-bottom: 1rem;"><label>Featured Image</label><input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
-            <div style="margin-bottom: 1rem;"><label>Abstract \/ Summary</label><textarea name="abstract" rows="2" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea></div>
+            <div style="margin-bottom: 1rem;"><label>Abstract / Summary</label><textarea name="abstract" rows="2" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea></div>
             <div style="margin-bottom: 1rem;">
               <div style="margin-bottom: 0.5rem; display: flex; gap: 0.25rem; flex-wrap: wrap;">
                 <button type="button" onclick="insertFormatting('b')" style="background: #f0f0f0; border: 1px solid #ddd; padding: 0.3rem 0.6rem; border-radius: 0.25rem;">Bold</button>
@@ -105,7 +112,7 @@ if (!session || session.value !== 'authenticated') {
         <div style="background: white; border-radius: 0.75rem; overflow: hidden; border: 1px solid #e5e7eb;">
           <table style="width: 100%; border-collapse: collapse;">
             <thead style="background: #2d5016;"><tr><th style="padding: 1rem; text-align: left; color: white;">Title</th><th style="padding: 1rem; text-align: left; color: white;">Date</th><th style="padding: 1rem; text-align: left; color: white;">Image</th><th style="padding: 1rem; text-align: left; color: white;">Actions</th></tr></thead>
-            <tbody id="blogsList"><td><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">Loading blog posts...</td></tr></tbody>
+            <tbody id="blogsList"><tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">Loading blog posts...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -231,6 +238,20 @@ if (!session || session.value !== 'authenticated') {
     }
     .tab-pane { display: block; }
     .tab-btn { padding: 0.5rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-right: 0.5rem; font-size: 0.85rem; }
+    
+    /* Session timeout notification */
+    .session-warning {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: #f59e0b;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      z-index: 1000;
+      display: none;
+    }
   </style>
 
   <script is:inline>
@@ -239,6 +260,47 @@ if (!session || session.value !== 'authenticated') {
     let allMessages = [];
     let allTeam = [];
     let allGallery = [];
+    let inactivityTimer;
+    let warningTimer;
+    const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+    const WARNING_BEFORE = 60 * 1000; // Show warning 1 minute before logout
+
+    // Session inactivity handling
+    function resetInactivityTimer() {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      if (warningTimer) clearTimeout(warningTimer);
+      
+      // Hide warning if shown
+      const warning = document.getElementById('sessionWarning');
+      if (warning) warning.style.display = 'none';
+      
+      // Set warning timer (show 1 minute before logout)
+      warningTimer = setTimeout(() => {
+        const warning = document.getElementById('sessionWarning');
+        if (warning) warning.style.display = 'block';
+      }, INACTIVITY_TIMEOUT - WARNING_BEFORE);
+      
+      // Set logout timer
+      inactivityTimer = setTimeout(() => {
+        window.location.href = '/api/logout';
+      }, INACTIVITY_TIMEOUT);
+    }
+
+    // Add session warning element
+    const warningDiv = document.createElement('div');
+    warningDiv.id = 'sessionWarning';
+    warningDiv.className = 'session-warning';
+    warningDiv.innerHTML = '⚠️ Session expiring soon due to inactivity. Move your mouse to stay logged in.';
+    document.body.appendChild(warningDiv);
+
+    // Reset timer on user activity
+    const events = ['click', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      document.addEventListener(event, resetInactivityTimer);
+    });
+    
+    // Start the timer
+    resetInactivityTimer();
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -260,9 +322,9 @@ if (!session || session.value !== 'authenticated') {
       const end = textarea.selectionEnd;
       const selected = textarea.value.substring(start, end);
       let insert = '';
-      if (type === 'b') insert = '<b>' + (selected || 'bold text') + '</b>';
-      else if (type === 'i') insert = '<i>' + (selected || 'italic text') + '</i>';
-      else if (type === 'ul') insert = '\n<ul>\n  <li>' + (selected || 'list item') + '</li>\n</ul>\n';
+      if (type === 'b') insert = '<b>' + (selected || 'bold text') + '<\/b>';
+      else if (type === 'i') insert = '<i>' + (selected || 'italic text') + '<\/i>';
+      else if (type === 'ul') insert = '\n<ul>\n  <li>' + (selected || 'list item') + '<\/li>\n<\/ul>\n';
       else return;
       textarea.value = textarea.value.substring(0, start) + insert + textarea.value.substring(end);
       textarea.focus();
@@ -307,21 +369,48 @@ if (!session || session.value !== 'authenticated') {
       }
       const tbody = document.getElementById('messagesList');
       if (allMessages.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">No messages.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">No messages.<\/td><\/tr>';
         return;
       }
       let html = '';
       for (const m of allMessages) {
         const msgDate = new Date(m.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        html += '<tr style="border-bottom: 1px solid #e5e7eb;' + (!m.is_read ? 'background: #f0fdf4;' : '') + '">';
-        html += '<td style="padding: 1rem;">' + (!m.is_read ? '<span style="background: #dc2626; color: white; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-size: 0.7rem;">New</span>' : '<span style="color: #999;">Read</span>') + '</td>';
-        html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '</strong><br><span style="font-size: 0.8rem; color: #666;">' + escapeHtml(m.email) + '</span></td>';
-        html += '<td style="padding: 1rem;">' + escapeHtml(m.message.substring(0, 150)) + (m.message.length > 150 ? '...' : '') + '</td>';
-        html += '<td style="padding: 1rem; color: #6b7280;">' + msgDate + '</td>';
-        html += '<td style="padding: 1rem;"><button onclick="markAsRead(' + m.id + ')" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem; margin-right: 0.5rem;">Mark Read</button><button onclick="deleteMessage(' + m.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.75rem;">Delete</button></td>';
-        html += '</tr>';
+        const preview = escapeHtml((m.message || '').substring(0, 120)) + (m.message && m.message.length > 120 ? '...' : '');
+        const rowBg = !m.is_read ? '#f0fdf4' : '#ffffff';
+        html += '<tr style="border-bottom: 1px solid #e5e7eb; cursor: pointer; background:' + rowBg + ';" onmouseover="this.style.background=\'#f3f4f6\'" onmouseout="this.style.background=\'' + rowBg + '\'" onclick="openMessage(' + m.id + ')">';
+        html += '<td style="padding: 1rem; white-space:nowrap;">' + (!m.is_read ? '<span style="background:#dc2626;color:white;padding:0.2rem 0.5rem;border-radius:0.25rem;font-size:0.7rem;">New<\/span>' : '<span style="color:#999;font-size:0.8rem;">Read<\/span>') + '<\/td>';
+        html += '<td style="padding: 1rem; min-width:160px;"><strong>' + escapeHtml(m.name) + '<\/strong><br><span style="font-size:0.8rem;color:#666;">' + escapeHtml(m.email) + '<\/span><\/td>';
+        html += '<td style="padding: 1rem; color:#374151;">' + preview + '<\/td>';
+        html += '<td style="padding: 1rem; color:#6b7280; white-space:nowrap;">' + msgDate + '<\/td>';
+        html += '<td style="padding: 1rem; white-space:nowrap;" onclick="event.stopPropagation()">';
+        html += '<button onclick="markAsRead(' + m.id + ')" style="background:#6b8f47;color:white;padding:0.375rem 0.75rem;border:none;border-radius:0.375rem;font-size:0.75rem;margin-right:0.5rem;cursor:pointer;">Mark Read<\/button>';
+        html += '<button onclick="deleteMessage(' + m.id + ')" style="background:#dc2626;color:white;padding:0.375rem 0.75rem;border:none;border-radius:0.375rem;font-size:0.75rem;cursor:pointer;">Delete<\/button>';
+        html += '<\/td>';
+        html += '<\/tr>';
       }
       tbody.innerHTML = html;
+    }
+
+    window.openMessage = function(id) {
+      const m = allMessages.find(function(msg) { return msg.id === id; });
+      if (!m) return;
+      const msgDate = new Date(m.created_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      document.getElementById('msgModalName').textContent = m.name;
+      const emailEl = document.getElementById('msgModalEmail');
+      emailEl.textContent = m.email;
+      emailEl.href = 'mailto:' + m.email;
+      document.getElementById('msgModalPhone').textContent = m.phone ? m.phone : '';
+      document.getElementById('msgModalPhoneRow').style.display = m.phone ? 'block' : 'none';
+      document.getElementById('msgModalDate').textContent = msgDate;
+      document.getElementById('msgModalBody').textContent = m.message;
+      const markReadBtn = document.getElementById('msgModalMarkRead');
+      markReadBtn.style.display = m.is_read ? 'none' : 'inline-flex';
+      markReadBtn.onclick = function() { markAsRead(m.id); document.getElementById('messageModal').style.display = 'none'; };
+      document.getElementById('msgModalDelete').onclick = function() {
+        if (confirm('Delete this message?')) { deleteMessage(m.id); document.getElementById('messageModal').style.display = 'none'; }
+      };
+      document.getElementById('messageModal').style.display = 'flex';
+      if (!m.is_read) markAsRead(m.id);
     }
 
     window.markAsRead = async function(id) {
@@ -348,19 +437,19 @@ if (!session || session.value !== 'authenticated') {
       const filtered = allMessages.filter(function(m) { return m.name.toLowerCase().includes(term) || m.email.toLowerCase().includes(term) || m.message.toLowerCase().includes(term); });
       const tbody = document.getElementById('messagesList');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">No messages found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #999;">No messages found. <\/td><\/tr>';
         return;
       }
       let html = '';
       for (const m of filtered) {
         const msgDate = new Date(m.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         html += '<tr style="border-bottom: 1px solid #e5e7eb;' + (!m.is_read ? 'background: #f0fdf4;' : '') + '">';
-        html += '<td style="padding: 1rem;">' + (!m.is_read ? '<span style="background: #dc2626; color: white; padding: 0.2rem 0.5rem; border-radius: 0.25rem;">New</span>' : 'Read') + '</td>';
-        html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '</strong><br>' + escapeHtml(m.email) + '</td>';
-        html += '<td style="padding: 1rem;">' + escapeHtml(m.message.substring(0, 150)) + '</td>';
-        html += '<td style="padding: 1rem;">' + msgDate + '</td>';
-        html += '<td style="padding: 1rem;"><button onclick="markAsRead(' + m.id + ')" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Mark Read</button><button onclick="deleteMessage(' + m.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete</button></td>';
-        html += '</tr>';
+        html += '<td style="padding: 1rem;">' + (!m.is_read ? '<span style="background: #dc2626; color: white; padding: 0.2rem 0.5rem; border-radius: 0.25rem;">New<\/span>' : 'Read') + '<\/td>';
+        html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '<\/strong><br>' + escapeHtml(m.email) + '<\/td>';
+        html += '<td style="padding: 1rem;">' + escapeHtml(m.message.substring(0, 150)) + '<\/td>';
+        html += '<td style="padding: 1rem;">' + msgDate + '<\/td>';
+        html += '<td style="padding: 1rem;"><button onclick="markAsRead(' + m.id + ')" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Mark Read<\/button><button onclick="deleteMessage(' + m.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete<\/button><\/td>';
+        html += '<\/tr>';
       }
       tbody.innerHTML = html;
     }
@@ -371,20 +460,20 @@ if (!session || session.value !== 'authenticated') {
       allPublications = await res.json();
       const tbody = document.getElementById('publicationsList');
       if (allPublications.length === 0) {
-        tbody.innerHTML = '<td><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">No publications.</td></tr>';
+        tbody.innerHTML = '<table><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">No publications.<\/td><\/tr>';
         return;
       }
       let html = '';
       for (const p of allPublications) {
         html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
-        html += '<td style="padding: 1rem; font-weight: 500;">' + escapeHtml(p.title) + '</td>';
-        html += '<td style="padding: 1rem; color: #6b7280;">' + p.date + '</td>';
+        html += '<td style="padding: 1rem; font-weight: 500;">' + escapeHtml(p.title) + '<\/td>';
+        html += '<td style="padding: 1rem; color: #6b7280;">' + p.date + '<\/td>';
         html += '<td style="padding: 1rem; white-space: nowrap;">';
-        html += '<a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem;">View</a>';
-        html += '<button onclick="openRenameModal(' + p.id + ', \'' + escapeHtml(p.title) + '\')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem; cursor: pointer;">Rename</button>';
-        html += '<button onclick="deletePublication(' + p.id + ', \'' + escapeHtml(p.fileName) + '\')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer;">Delete</button>';
-        html += '</td>';
-        html += '</tr>';
+        html += '<a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem;">View<\/a>';
+        html += '<button onclick="openRenameModal(' + p.id + ', \'' + escapeHtml(p.title) + '\')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem; cursor: pointer;">Rename<\/button>';
+        html += '<button onclick="deletePublication(' + p.id + ', \'' + escapeHtml(p.fileName) + '\')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer;">Delete<\/button>';
+        html += '<\/td>';
+        html += '<\/tr>';
       }
       tbody.innerHTML = html;
     }
@@ -434,12 +523,12 @@ if (!session || session.value !== 'authenticated') {
       const filtered = allPublications.filter(function(p) { return p.title.toLowerCase().includes(term); });
       const tbody = document.getElementById('publicationsList');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">No publications found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" style="padding: 2rem; text-align: center; color: #999;">No publications found.<\/td><\/tr>';
         return;
       }
       let html = '';
       for (const p of filtered) {
-        html += '<tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 1rem;">' + escapeHtml(p.title) + '</td><td style="padding: 1rem;">' + p.date + '</td><td style="padding: 1rem;"><a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem;">View</a><button onclick="deletePublication(' + p.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete</button></td></tr>';
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 1rem;">' + escapeHtml(p.title) + '<\/td><td style="padding: 1rem;">' + p.date + '<\/td><td style="padding: 1rem;"><a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem;">View<\/a><button onclick="deletePublication(' + p.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete<\/button><\/td><\/tr>';
       }
       tbody.innerHTML = html;
     }
@@ -450,18 +539,18 @@ if (!session || session.value !== 'authenticated') {
       allBlogs = await res.json();
       const tbody = document.getElementById('blogsList');
       if (allBlogs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No blog posts.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No blog posts.<\/td><\/tr>';
         return;
       }
       let html = '';
       for (const b of allBlogs) {
         const blogDate = new Date(b.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
-        html += '<td style="padding: 1rem;">' + escapeHtml(b.title) + '<div style="font-size: 0.75rem; color: #666;">' + escapeHtml((b.abstract || '').substring(0, 80)) + '...</div></td>';
-        html += '<td style="padding: 1rem;">' + blogDate + '</td>';
-        html += '<td style="padding: 1rem;">' + (b.image_url ? '<img src="' + b.image_url + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" \/>' : 'No image') + '</td>';
-        html += '<td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem;">View</a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem;">Edit</button><button onclick="deleteBlog(' + b.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete</button></td>';
-        html += '</tr>';
+        html += '<td style="padding: 1rem;">' + escapeHtml(b.title) + '<div style="font-size: 0.75rem; color: #666;">' + escapeHtml((b.abstract || '').substring(0, 80)) + '...<\/div><\/td>';
+        html += '<td style="padding: 1rem;">' + blogDate + '<\/td>';
+        html += '<td style="padding: 1rem;">' + (b.image_url ? '<img src="' + b.image_url + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" />' : 'No image') + '<\/td>';
+        html += '<td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem;">View<\/a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem;">Edit<\/button><button onclick="deleteBlog(' + b.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete<\/button><\/td>';
+        html += '<\/tr>';
       }
       tbody.innerHTML = html;
     }
@@ -478,13 +567,13 @@ if (!session || session.value !== 'authenticated') {
       const filtered = allBlogs.filter(function(b) { return b.title.toLowerCase().includes(term); });
       const tbody = document.getElementById('blogsList');
       if (filtered.length === 0) {
-        tbody.innerHTML = '</tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No blog posts found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No blog posts found.<\/td><\/tr>';
         return;
       }
       let html = '';
       for (const b of filtered) {
         const blogDate = new Date(b.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        html += '<tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 1rem;">' + escapeHtml(b.title) + '<div style="font-size: 0.75rem; color: #666;">' + escapeHtml((b.abstract || '').substring(0, 80)) + '...</div></td><td style="padding: 1rem;">' + blogDate + '</td><td style="padding: 1rem;">' + (b.image_url ? '<img src="' + b.image_url + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" \/>' : 'No image') + '</td><td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem;">View</a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Edit</button><button onclick="deleteBlog(' + b.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete</button></td></tr>';
+        html += '<tr style="border-bottom: 1px solid #e5e7eb;"><td style="padding: 1rem;">' + escapeHtml(b.title) + '<div style="font-size: 0.75rem; color: #666;">' + escapeHtml((b.abstract || '').substring(0, 80)) + '...<\/div><\/td><td style="padding: 1rem;">' + blogDate + '<\/td><td style="padding: 1rem;">' + (b.image_url ? '<img src="' + b.image_url + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" />' : 'No image') + '<\/td><td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem;">View<\/a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Edit<\/button><button onclick="deleteBlog(' + b.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-left: 0.5rem;">Delete<\/button><\/td><\/tr>';
       }
       tbody.innerHTML = html;
     }
@@ -498,7 +587,7 @@ if (!session || session.value !== 'authenticated') {
       document.getElementById('edit_blog_content').value = blog.content;
       document.getElementById('edit_blog_existing_image').value = blog.image_url || '';
       const imgDiv = document.getElementById('edit_blog_current_image');
-      if (imgDiv) imgDiv.innerHTML = blog.image_url ? '<img src="' + blog.image_url + '" style="max-width: 100px; border-radius: 0.375rem;" \/>' : 'No image';
+      if (imgDiv) imgDiv.innerHTML = blog.image_url ? '<img src="' + blog.image_url + '" style="max-width: 100px; border-radius: 0.375rem;" />' : 'No image';
       document.getElementById('editBlogModal').style.display = 'flex';
     };
 
@@ -512,19 +601,18 @@ if (!session || session.value !== 'authenticated') {
       allTeam = await res.json();
       const tbody = document.getElementById('teamList');
       if (allTeam.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No team members.您?' ;
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center; color: #999;">No team members.<\/td><\/tr>';
         return;
       }
       let html = '';
       for (const m of allTeam) {
-        // Use image_url field from database (same as gallery)
         const memberImage = m.image_url;
         html += '<tr style="border-bottom: 1px solid #e5e7eb;">';
         html += '<td style="padding: 1rem;">';
         if (memberImage && memberImage !== 'null' && memberImage !== '') {
-          html += '<img src="' + memberImage + '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.375rem;" onerror="this.style.display=\'none\'; this.parentNode.innerHTML=\'<span style=\\\'color:#999;font-size:0.75rem;\\\'>Invalid URL</span>\';" />';
+          html += '<img src="' + memberImage + '" style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.375rem;"  this.parentNode.innerHTML=\'<span style=\"color:#999;font-size:0.75rem;\">Invalid URL<\/span>\';" />';
         } else {
-          html += '<span style="color: #999; font-size: 0.75rem;">No image</span>';
+          html += '<span style="color: #999; font-size: 0.75rem;">No image<\/span>';
         }
         html += '<\/td>';
         html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '<\/strong><\/td>';
@@ -534,7 +622,6 @@ if (!session || session.value !== 'authenticated') {
       }
       tbody.innerHTML = html;
     }
-
 
     window.deleteTeam = async function(id) {
       if (confirm('Delete this team member?')) {
@@ -550,11 +637,10 @@ if (!session || session.value !== 'authenticated') {
       document.getElementById('edit_team_name').value = member.name;
       document.getElementById('edit_team_role').value = member.role;
       document.getElementById('edit_team_bio').value = member.bio || '';
-      // Use image_url field from database
-      const memberImage = member.image_url || member.image || '';
+      const memberImage = member.image_url || '';
       document.getElementById('edit_team_existing_image').value = memberImage;
       const imgDiv = document.getElementById('edit_team_current_image');
-      imgDiv.innerHTML = memberImage ? '<img src="' + memberImage + '" style="max-width: 100px; border-radius: 0.375rem;" \/>' : 'No image';
+      imgDiv.innerHTML = memberImage ? '<img src="' + memberImage + '" style="max-width: 100px; border-radius: 0.375rem;" />' : 'No image';
       document.getElementById('editTeamModal').style.display = 'flex';
     }
 
@@ -568,17 +654,17 @@ if (!session || session.value !== 'authenticated') {
       allGallery = await res.json();
       const container = document.getElementById('galleryGrid');
       if (allGallery.length === 0) {
-        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">No gallery images.</div>';
+        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #999;">No gallery images.<\/div>';
         return;
       }
       let html = '';
       for (const img of allGallery) {
         html += '<div style="background: white; border-radius: 0.5rem; overflow: hidden; border: 1px solid #e5e7eb;">';
-        html += '<img src="' + img.image_url + '" style="width: 100%; aspect-ratio: 1; object-fit: cover;" \/>';
+        html += '<img src="' + img.image_url + '" style="width: 100%; aspect-ratio: 1; object-fit: cover;" />';
         html += '<div style="padding: 0.5rem;">';
-        html += '<p style="font-size: 0.75rem; color: #666; margin-bottom: 0.5rem;">' + escapeHtml(img.alt) + '</p>';
-        html += '<button onclick="deleteGalleryImage(' + img.id + ')" style="background: #dc2626; color: white; padding: 0.25rem 0.5rem; border: none; border-radius: 0.25rem; width: 100%; cursor: pointer;">Delete</button>';
-        html += '</div></div>';
+        html += '<p style="font-size: 0.75rem; color: #666; margin-bottom: 0.5rem;">' + escapeHtml(img.alt) + '<\/p>';
+        html += '<button onclick="deleteGalleryImage(' + img.id + ')" style="background: #dc2626; color: white; padding: 0.25rem 0.5rem; border: none; border-radius: 0.25rem; width: 100%; cursor: pointer;">Delete<\/button>';
+        html += '<\/div><\/div>';
       }
       container.innerHTML = html;
     }
@@ -629,15 +715,25 @@ if (!session || session.value !== 'authenticated') {
     if (teamSubmit) {
       teamSubmit.addEventListener('submit', async function(e) {
         e.preventDefault();
+        const statusDiv = document.getElementById('teamStatus');
+        statusDiv.innerHTML = '<span style="color:#666;">Uploading...<\/span>';
         const fd = new FormData(e.target);
-        const res = await fetch('/api/team', { method: 'POST', body: fd });
-        if (res.ok) {
-          alert('Team member added successfully!');
-          e.target.reset();
-          document.getElementById('teamForm').style.display = 'none';
-          loadTeam();
-        } else {
-          alert('Failed to add. Please try again.');
+        try {
+          const res = await fetch('/api/team', { method: 'POST', body: fd });
+          const data = await res.json();
+          if (res.ok) {
+            statusDiv.innerHTML = '<span style="color:green;">Team member added! Image URL: ' + escapeHtml(data.image_url || 'none') + '<\/span>';
+            setTimeout(function() {
+              e.target.reset();
+              document.getElementById('teamForm').style.display = 'none';
+              statusDiv.innerHTML = '';
+              loadTeam();
+            }, 2000);
+          } else {
+            statusDiv.innerHTML = '<span style="color:red;">Error: ' + escapeHtml(data.error || 'Upload failed') + '<\/span>';
+          }
+        } catch(err) {
+          statusDiv.innerHTML = '<span style="color:red;">Network error: ' + escapeHtml(err.message) + '<\/span>';
         }
       });
     }
@@ -647,7 +743,6 @@ if (!session || session.value !== 'authenticated') {
       editTeamForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const fd = new FormData(e.target);
-        // The existingImage field should already have the URL
         const res = await fetch('/api/team', { method: 'PUT', body: fd });
         if (res.ok) {
           alert('Team member updated successfully!');
@@ -727,7 +822,7 @@ if (!session || session.value !== 'authenticated') {
       const container = document.getElementById('pageContentEditor');
       if (!container) return;
 
-      container.innerHTML = '<p style="color: #666; padding: 1rem;">Loading content...</p>';
+      container.innerHTML = '<p style="color: #666; padding: 1rem;">Loading content...<\/p>';
 
       const response = await fetch('/api/content');
       const c = await response.json();
@@ -738,22 +833,22 @@ if (!session || session.value !== 'authenticated') {
 
       function field(label, id, page, section, fieldName, value, type) {
         if (type === 'textarea') {
-          return '<div class="field-group"><label>' + label + '</label><textarea id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" rows="3">' + escapeHtml(value) + '</textarea></div>';
+          return '<div class="field-group"><label>' + label + '<\/label><textarea id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" rows="3">' + escapeHtml(value) + '<\/textarea><\/div>';
         }
-        return '<div class="field-group"><label>' + label + '</label><input type="text" id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" value="' + escapeHtml(value) + '"></div>';
+        return '<div class="field-group"><label>' + label + '<\/label><input type="text" id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" value="' + escapeHtml(value) + '"><\/div>';
       }
 
       function section(title, fields) {
-        return '<div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;"><h3 style="color: #2d5016; margin-bottom: 1rem;">' + title + '</h3>' + fields + '</div>';
+        return '<div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;"><h3 style="color: #2d5016; margin-bottom: 1rem;">' + title + '<\/h3>' + fields + '<\/div>';
       }
 
       let html = '<div style="background: white; border-radius: 0.75rem; padding: 1.5rem;">';
 
       html += '<div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem; flex-wrap: wrap;">';
-      html += '<button class="tab-btn" data-tab="homepage" style="background: #f0fdf4; color: #2d5016;">Homepage</button>';
-      html += '<button class="tab-btn" data-tab="about" style="background: #e5e7eb; color: #666;">About Us</button>';
-      html += '<button class="tab-btn" data-tab="settings" style="background: #e5e7eb; color: #666;">Site Settings</button>';
-      html += '</div>';
+      html += '<button class="tab-btn" data-tab="homepage" style="background: #f0fdf4; color: #2d5016;">Homepage<\/button>';
+      html += '<button class="tab-btn" data-tab="about" style="background: #e5e7eb; color: #666;">About Us<\/button>';
+      html += '<button class="tab-btn" data-tab="settings" style="background: #e5e7eb; color: #666;">Site Settings<\/button>';
+      html += '<\/div>';
 
       html += '<div id="tab-homepage" class="tab-pane">';
 
@@ -798,7 +893,7 @@ if (!session || session.value !== 'authenticated') {
         field('Button Link', 'bottomCta_buttonLink', 'homepage', 'bottomCta', 'buttonLink', (hp.bottomCta || {}).buttonLink || '')
       );
 
-      html += '</div>';
+      html += '<\/div>';
 
       html += '<div id="tab-about" class="tab-pane" style="display: none;">';
 
@@ -824,18 +919,18 @@ if (!session || session.value !== 'authenticated') {
         field('Button Link', 'about_bottomCta_buttonLink', 'about', 'bottomCta', 'buttonLink', (ab.bottomCta || {}).buttonLink || '')
       );
 
-      html += '</div>';
+      html += '<\/div>';
 
       html += '<div id="tab-settings" class="tab-pane" style="display: none;">';
       html += '<div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem;">';
       html += field('Site Name', 'siteName', 'siteSettings', 'full', 'siteName', ss.siteName || '');
       html += field('Footer Text', 'footerText', 'siteSettings', 'full', 'footerText', ss.footerText || '');
-      html += '</div></div>';
+      html += '<\/div><\/div>';
 
       html += '<div style="margin-top: 1.5rem; text-align: right;">';
-      html += '<button id="saveContentBtn" style="background: #2d5016; color: white; padding: 0.6rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 1rem;">Save All Changes</button>';
-      html += '<div id="contentStatus" style="margin-top: 1rem;"></div>';
-      html += '</div></div>';
+      html += '<button id="saveContentBtn" style="background: #2d5016; color: white; padding: 0.6rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 1rem;">Save All Changes<\/button>';
+      html += '<div id="contentStatus" style="margin-top: 1rem;"><\/div>';
+      html += '<\/div><\/div>';
 
       container.innerHTML = html;
 
@@ -876,10 +971,11 @@ if (!session || session.value !== 'authenticated') {
         btn.textContent = 'Save All Changes';
         btn.disabled = false;
         const statusDiv = document.getElementById('contentStatus');
-        statusDiv.innerHTML = '<span style="color: green; font-weight: 600;">All content saved successfully!</span>';
+        statusDiv.innerHTML = '<span style="color: green; font-weight: 600;">All content saved successfully!<\/span>';
         setTimeout(function() { statusDiv.innerHTML = ''; }, 3000);
       });
     }
+
 
     document.addEventListener('DOMContentLoaded', function() {
       loadPublications();
@@ -908,6 +1004,43 @@ if (!session || session.value !== 'authenticated') {
       <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
         <button onclick="closeRenameModal()" style="background: #e5e7eb; color: #374151; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.9rem;">Cancel</button>
         <button id="saveRenameBtn" onclick="saveRename()" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.9rem;">Save</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── Message View Modal ── -->
+  <div id="messageModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.55); z-index:2000; align-items:center; justify-content:center; padding:1rem;">
+    <div style="background:white; border-radius:0.875rem; width:100%; max-width:580px; max-height:92vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.25); display:flex; flex-direction:column;">
+
+      <!-- Header -->
+      <div style="background:#1a2e0a; padding:1.1rem 1.5rem; border-radius:0.875rem 0.875rem 0 0; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+        <h3 style="color:white; margin:0; font-size:1rem; font-weight:600;">Message</h3>
+        <button onclick="document.getElementById('messageModal').style.display='none'" style="background:transparent; border:none; color:rgba(255,255,255,0.75); cursor:pointer; font-size:1.5rem; line-height:1; padding:0; display:flex; align-items:center;">&#10005;</button>
+      </div>
+
+      <!-- Sender info -->
+      <div style="padding:1.25rem 1.5rem; border-bottom:1px solid #e5e7eb; background:#fafafa;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+          <p id="msgModalName" style="font-weight:700; color:#111827; font-size:1.05rem; margin:0;"></p>
+          <span id="msgModalDate" style="color:#9ca3af; font-size:0.78rem; white-space:nowrap; margin-top:0.2rem;"></span>
+        </div>
+        <a id="msgModalEmail" href="#" style="color:#2d5016; font-size:0.875rem; text-decoration:none; display:block; margin-bottom:0.25rem;"></a>
+        <div id="msgModalPhoneRow" style="display:none;">
+          <span style="color:#6b7280; font-size:0.85rem;">&#128222; </span><span id="msgModalPhone" style="color:#374151; font-size:0.85rem;"></span>
+        </div>
+      </div>
+
+      <!-- Message body -->
+      <div style="padding:1.5rem; flex:1;">
+        <p id="msgModalBody" style="color:#374151; line-height:1.8; white-space:pre-wrap; margin:0; font-size:0.925rem;"></p>
+      </div>
+
+      <!-- Actions -->
+      <div style="padding:1rem 1.5rem; background:#f9fafb; border-radius:0 0 0.875rem 0.875rem; display:flex; gap:0.75rem; justify-content:flex-end; border-top:1px solid #e5e7eb; flex-wrap:wrap; flex-shrink:0;">
+        <button id="msgModalMarkRead" style="display:inline-flex; align-items:center; gap:0.35rem; background:#6b8f47; color:white; padding:0.5rem 1.1rem; border:none; border-radius:0.375rem; cursor:pointer; font-size:0.85rem; font-weight:500;">&#10003;&nbsp;Mark as Read</button>
+        <button id="msgModalDelete" style="background:#dc2626; color:white; padding:0.5rem 1.1rem; border:none; border-radius:0.375rem; cursor:pointer; font-size:0.85rem; font-weight:500;">Delete</button>
+        <button onclick="document.getElementById('messageModal').style.display='none'" style="background:#e5e7eb; color:#374151; padding:0.5rem 1.1rem; border:none; border-radius:0.375rem; cursor:pointer; font-size:0.85rem; font-weight:500;">Close</button>
       </div>
     </div>
   </div>
