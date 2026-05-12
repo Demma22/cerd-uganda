@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Minimal reset — kills browser default body margin without stripping
+   padding from page content. Tailwind Preflight handles the rest. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
 @layer base {
   :root {
     --color-forest: #0C3C01;
@@ -113,7 +126,18 @@
 
   .container-site {
     max-width: 1400px;
+    width: 100%;
     margin: 0 auto;
     padding: 0 1.5rem;
+  }
+
+  /* Full-bleed wrapper — use on sections that should touch screen edges */
+  .full-bleed {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
   }
 }
