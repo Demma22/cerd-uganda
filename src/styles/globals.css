@@ -131,7 +131,7 @@ html, body {
     padding: 0 1.5rem;
   }
 
-  /* Full-bleed wrapper — use on sections that should touch screen edges */
+  /* Full-bleed wrapper */
   .full-bleed {
     width: 100vw;
     position: relative;

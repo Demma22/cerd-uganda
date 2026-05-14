@@ -2,819 +2,963 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { supabase } from "../lib/supabase.js";
 
-// Fetch page content from Supabase
 let pageContent = {
-  homepage: {
-    hero: {},
-    mission: {},
-    vision: {},
-    impact: {},
-    principles: {},
-    producers: {},
-    recentWorks: {},
-    bottomCta: {}
-  }
+  homepage: { hero: {}, mission: {}, vision: {}, impact: {}, principles: {}, producers: {}, recentWorks: {}, bottomCta: {} }
 };
 
 try {
-  const { data: contentRows, error } = await supabase
-    .from('page_content')
-    .select('*');
-
+  const { data: contentRows, error } = await supabase.from('page_content').select('*');
   if (!error && contentRows) {
-    // Build nested content object
     for (const row of contentRows) {
       const { page, section, field, value } = row;
       if (!pageContent[page]) pageContent[page] = {};
       if (!pageContent[page][section]) pageContent[page][section] = {};
-      
-      // Try to parse JSON values
-      try {
-        pageContent[page][section][field] = JSON.parse(value);
-      } catch {
-        pageContent[page][section][field] = value;
-      }
+      try { pageContent[page][section][field] = JSON.parse(value); }
+      catch { pageContent[page][section][field] = value; }
     }
   }
-} catch (error) {
-  console.error('Error fetching page content:', error);
-}
+} catch (e) { console.error('Content fetch error:', e); }
 
-// Fetch blog posts
 let recentBlogs = [];
 try {
-  const { data: blogs, error: blogError } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(4);
+  const { data: blogs, error } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false }).limit(3);
+  if (!error && blogs) recentBlogs = blogs;
+} catch (e) { console.error('Blog fetch error:', e); }
 
-  if (!blogError && blogs) {
-    recentBlogs = blogs;
-  }
-} catch (error) {
-  console.error('Error fetching blogs:', error);
-}
-
-// Fetch gallery images
 let galleryImages = [];
 try {
-  const { data: gallery, error: galleryError } = await supabase
-    .from('gallery')
-    .select('*')
-    .order('order', { ascending: true });
+  const { data: gallery, error } = await supabase.from('gallery').select('*').order('order', { ascending: true }).limit(6);
+  if (!error && gallery) galleryImages = gallery;
+} catch (e) { console.error('Gallery fetch error:', e); }
 
-  if (!galleryError && gallery) {
-    galleryImages = gallery;
-  }
-} catch (error) {
-  console.error('Error fetching gallery:', error);
-}
+const hp = pageContent.homepage || {};
+const hero = hp.hero || {};
+const missionData = hp.mission || {};
+const vision = hp.vision || {};
+const impact = hp.impact || {};
+const principles = hp.principles || {};
+const producers = hp.producers || {};
+const recentWorks = hp.recentWorks || {};
+const bottomCta = hp.bottomCta || {};
 
-const homepage = pageContent.homepage || {};
-const hero = homepage.hero || {};
-const missionData = homepage.mission || {};
-const vision = homepage.vision || {};
-const impact = homepage.impact || {};
-const principles = homepage.principles || {};
-const producers = homepage.producers || {};
-const recentWorks = homepage.recentWorks || {};
-const bottomCta = homepage.bottomCta || {};
-
-// Parse principles items if they exist
 let principleItems = [];
 if (principles.items) {
-  principleItems = Array.isArray(principles.items) ? principles.items : 
+  principleItems = Array.isArray(principles.items) ? principles.items :
     (typeof principles.items === 'string' ? JSON.parse(principles.items) : []);
 }
+
+const defaultPrinciples = [
+  { title: "Biodiversity", description: "Preserving the rich variety of plant, animal, and microbial life that sustains healthy ecosystems.", image: "/images/home/veg.avif" },
+  { title: "Ecological Balance", description: "Maintaining the natural equilibrium of ecosystems to ensure long-term environmental health.", image: "/images/home/fruits.avif" },
+  { title: "Animal Welfare", description: "Ensuring humane and ethical treatment of animals in all farming and research activities.", image: "/images/home/goats.webp" },
+  { title: "Sustainability", description: "Developing practices that meet today's needs without compromising future generations.", image: "/images/home/fruit2.avif" },
+];
+
+const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPrinciples;
 ---
 
 <BaseLayout title="Home" description="CERD-UG promotes an ecosystems and systems thinking approach in research, education and community engagement in Uganda.">
 
-  <!-- HERO -->
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- HERO                                        -->
+  <!-- ═══════════════════════════════════════════ -->
   <section class="hero">
-    <div class="hero-bg">
-      <img
-        src={hero.image || "/images/home/herobg.jpeg"}
-        alt="CERD Uganda field work"
-        class="hero-img"
-      />
+    <div class="hero-media">
+      <img src={hero.image || "/images/home/herobg.jpeg"} alt="CERD Uganda field work" class="hero-img" />
       <div class="hero-overlay"></div>
     </div>
 
-    <div class="container-site hero-content">
-      <div class="hero-badge">
-        <span class="section-label">{hero.badge || "5+ years of impact"}</span>
-      </div>
-      <h1 class="hero-title">
-        {hero.title || "Center for Ecosystems<br />Research &<br /><em>Development</em>"}
-      </h1>
-      <p class="hero-sub">
-        {hero.subtitle || "CERD-UG is a Non Profit Organization which aims to promote an ecosystems and systems thinking approach in research, education and community engagement."}
-      </p>
-      <div class="hero-actions">
-        <a href="#impact-section" class="btn-primary">{hero.buttonText || "Discover Our Work"}</a>
-        <a href="/contact" class="btn-outline">Book a Call</a>
-      </div>
-    </div>
-
-    <a href="/contact" class="hero-location">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-        <circle cx="12" cy="10" r="3"/>
-      </svg>
-      Uganda — Mpala, Entebbe Road
-    </a>
-  </section>
-
-  <!-- MISSION + CEO IMAGE -->
-  <section class="mission">
-    <div class="container-site mission-grid">
-      <div class="mission-image">
-        <img
-          src="/images/home/ceos.jpeg"
-          alt="CERD-UG CEO"
-          class="mission-photo"
-        />
-      </div>
-
-      <div class="mission-content">
-        <span class="section-label">Our Mission & Goal</span>
-        <h2 class="mission-heading">
-          {missionData.title || "Building a Sustainable Agro-Ecosystem"}
-        </h2>
-        <p class="mission-text">
-          {missionData.description || "The mission of CERD-UG is to provide all stakeholders with comprehensive and relevant knowledge and skills that contribute to the sustainability of the ecosystem, health, prosperity, food and nutritional security."}
+    <div class="hero-inner">
+      <div class="hero-left">
+        <span class="eyebrow">{hero.badge || "5+ years of impact"}</span>
+        <h1 class="hero-title">
+          {hero.title || "Center for Ecosystems Research & Development"}
+        </h1>
+        <p class="hero-desc">
+          {hero.subtitle || "CERD-UG is a Non Profit Organization which aims to promote an ecosystems and systems thinking approach in research, education and community engagement."}
         </p>
-        <p class="mission-text">
-          <strong>Our goal</strong> {missionData.goal || "is to share our extensive experience in working with the agro-ecosystem to bring about development policy change, improve people's livelihoods, and contribute to achieving food and nutrition security, hence transforming the food system."}
-        </p>
-
-        <div class="mission-pillars">
-          <div class="mission-pillar">
-            <div class="pillar-icon"></div>
-            <p>{missionData.pillar1 || "We provide agriculture services and support Organic Agriculture"}</p>
-          </div>
-          <div class="mission-pillar">
-            <div class="pillar-icon"></div>
-            <p>{missionData.pillar2 || "We support small scale farmers to transition to Agroecology and transform the current food system"}</p>
-          </div>
+        <div class="hero-btns">
+          <a href="/about-us" class="btn-forest">{hero.buttonText || "Discover Our Work"}</a>
+          <a href="/contact" class="btn-ghost">Get In Touch</a>
         </div>
-
-        <a href="/about-us" class="btn-primary">Learn More</a>
       </div>
+
+      <div class="hero-right">
+        <div class="hero-stat-card">
+          <span class="stat-num">5+</span>
+          <span class="stat-label">Years of Field Research</span>
+        </div>
+        <div class="hero-stat-card">
+          <span class="stat-num">300+</span>
+          <span class="stat-label">Farmers Supported</span>
+        </div>
+        <div class="hero-stat-card">
+          <span class="stat-num">12+</span>
+          <span class="stat-label">Partner Organisations</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-location-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Mpala, Entebbe Road, Uganda
     </div>
   </section>
 
-  <!-- VISION BANNER -->
-  <section class="vision">
-    <div class="container-site">
-      <span class="section-label" style="color: rgba(245,240,232,0.6)">Our Vision</span>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- TICKER                                       -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span>Agroecology</span><span class="ticker-dot"></span>
+      <span>Sustainable Farming</span><span class="ticker-dot"></span>
+      <span>Food Security</span><span class="ticker-dot"></span>
+      <span>Community Development</span><span class="ticker-dot"></span>
+      <span>Organic Agriculture</span><span class="ticker-dot"></span>
+      <span>Research & Education</span><span class="ticker-dot"></span>
+      <span>Biodiversity</span><span class="ticker-dot"></span>
+      <span>Ecosystem Thinking</span><span class="ticker-dot"></span>
+      <!-- duplicate for seamless loop -->
+      <span>Agroecology</span><span class="ticker-dot"></span>
+      <span>Sustainable Farming</span><span class="ticker-dot"></span>
+      <span>Food Security</span><span class="ticker-dot"></span>
+      <span>Community Development</span><span class="ticker-dot"></span>
+      <span>Organic Agriculture</span><span class="ticker-dot"></span>
+      <span>Research & Education</span><span class="ticker-dot"></span>
+      <span>Biodiversity</span><span class="ticker-dot"></span>
+      <span>Ecosystem Thinking</span><span class="ticker-dot"></span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MISSION — split layout                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="mission">
+    <div class="mission-img-col">
+      <img src="/images/home/ceos.jpeg" alt="CERD-UG leadership" class="mission-photo" />
+      <div class="mission-img-badge">
+        <strong>NGOsource</strong>
+        <span>Verified Organisation</span>
+      </div>
+    </div>
+
+    <div class="mission-text-col">
+      <span class="eyebrow eyebrow-sage">Our Mission</span>
+      <h2 class="section-h2">{missionData.title || "Building a Sustainable Agro-Ecosystem"}</h2>
+      <p class="body-text">
+        {missionData.description || "The mission of CERD-UG is to provide all stakeholders with comprehensive and relevant knowledge and skills that contribute to the sustainability of the ecosystem, health, prosperity, food and nutritional security."}
+      </p>
+      <p class="body-text">
+        <strong>Our goal</strong> {missionData.goal || " is to share our extensive experience in working with the agro-ecosystem to bring about development policy change, improve people's livelihoods, and contribute to achieving food and nutrition security."}
+      </p>
+
+      <div class="mission-pillars">
+        <div class="pillar">
+          <div class="pillar-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <p>{missionData.pillar1 || "We provide agriculture services and support Organic Agriculture"}</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <p>{missionData.pillar2 || "We support small scale farmers to transition to Agroecology and transform the current food system"}</p>
+        </div>
+      </div>
+
+      <a href="/about-us" class="btn-forest">Learn More About Us</a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- VISION BANNER                               -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="vision-banner">
+    <div class="vision-inner">
+      <div class="vision-ornament">"</div>
       <blockquote class="vision-quote">
         {vision.quote || "A sustainable agro-ecosystem in which every aspect of development is in harmony and complements each other."}
       </blockquote>
+      <div class="vision-source">CERD-UG Vision Statement</div>
     </div>
   </section>
 
-  <!-- IMPACT -->
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- IMPACT — text left, video right             -->
+  <!-- ═══════════════════════════════════════════ -->
   <section id="impact-section" class="impact">
-    <div class="container-site impact-inner">
-      <div class="impact-header">
-        <span class="section-label">Our Impact</span>
-        <h2 class="impact-heading">
-          {impact.title || "Changing lives together through sustainable farming"}
-        </h2>
-        <p class="impact-sub">
-          {impact.description || "We believe that we can change more lives together by promoting sustainable agricultural practices, engaging with local communities, and supporting local economies."}
-          {impact.vision ? " " + impact.vision : " We strive to create a better future for everyone."}
-        </p>
-        <a href="/about-us" class="btn-primary">About Us</a>
-      </div>
+    <div class="impact-text">
+      <span class="eyebrow eyebrow-sage">Our Impact</span>
+      <h2 class="section-h2">{impact.title || "Changing lives together through sustainable farming"}</h2>
+      <p class="body-text">
+        {impact.description || "We believe that we can change more lives together by promoting sustainable agricultural practices, engaging with local communities, and supporting local economies."}
+        {impact.vision ? " " + impact.vision : ""}
+      </p>
+      <a href="/about-us" class="btn-forest" style="margin-top: 1rem; display: inline-block;">About CERD-UG</a>
+    </div>
 
-      <div class="impact-video">
-        <a href="https://www.youtube.com/watch?v=vTRxLLMVqHQ" target="_blank" rel="noopener" class="video-thumb">
-          <img
-            src="/images/home/fruits.avif"
-            alt="CERD Uganda in action"
-          />
-          <div class="play-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </div>
-        </a>
-      </div>
+    <div class="impact-media">
+      <a href="https://www.youtube.com/watch?v=vTRxLLMVqHQ" target="_blank" rel="noopener" class="video-link">
+        <img src="/images/home/fruits.avif" alt="CERD Uganda in action" class="video-thumb-img" />
+        <div class="play-ring">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- NGO VERIFIED SECTION - SEPARATE -->
-  <section class="ngo-verified">
-    <div class="container-site">
-      <div class="ngo-card">
-        <img src="/images/home/ngo.avif" alt="NGOsource Verified" class="ngo-verified-logo" />
-        <p>We are a verified organization by NGOsource</p>
-        <a href="https://www.ngosource.org" target="_blank" rel="noopener" class="btn-secondary">Learn More</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRINCIPLES / WHAT WE STAND FOR -->
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PRINCIPLES — horizontal scroll cards        -->
+  <!-- ═══════════════════════════════════════════ -->
   <section class="principles">
     <div class="container-site">
-      <span class="section-label">Our Principles</span>
-      <h2 class="principles-heading">{principles.title || "What We Stand For"}</h2>
+      <div class="principles-header">
+        <div>
+          <span class="eyebrow">Our Principles</span>
+          <h2 class="section-h2">{principles.title || "What We Stand For"}</h2>
+        </div>
+        <a href="/about-us" class="btn-outline-forest">View All</a>
+      </div>
 
       <div class="principles-grid">
-        {principleItems.length > 0 ? principleItems.map((item, idx) => (
-          <article class="principle-card" key={idx}>
-            <div class="principle-img-wrap">
+        {displayPrinciples.map((item, i) => (
+          <article class="principle-card">
+            <div class="pc-img">
               <img src={item.image || "/images/home/veg.avif"} alt={item.title} />
             </div>
-            <div class="principle-body">
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
+            <div class="pc-body">
+              <span class="pc-num">0{i + 1}</span>
+              <h3 class="pc-title">{item.title}</h3>
+              <p class="pc-desc">{item.description}</p>
             </div>
           </article>
-        )) : (
-          <>
-            <article class="principle-card">
-              <div class="principle-img-wrap">
-                <img src="/images/home/veg.avif" alt="Biodiversity" />
-              </div>
-              <div class="principle-body">
-                <h3>Biodiversity</h3>
-                <p>Preserving the rich variety of plant, animal, and microbial life that sustains healthy ecosystems.</p>
-              </div>
-            </article>
-            <article class="principle-card">
-              <div class="principle-img-wrap">
-                <img src="/images/home/fruits.avif" alt="Ecological Balance" />
-              </div>
-              <div class="principle-body">
-                <h3>Ecological Balance</h3>
-                <p>Maintaining the natural equilibrium of ecosystems to ensure long-term environmental health.</p>
-              </div>
-            </article>
-            <article class="principle-card">
-              <div class="principle-img-wrap">
-                <img src="/images/home/goats.webp" alt="Animal Welfare" />
-              </div>
-              <div class="principle-body">
-                <h3>Animal Welfare</h3>
-                <p>Ensuring humane and ethical treatment of animals in all farming and research activities.</p>
-              </div>
-            </article>
-            <article class="principle-card">
-              <div class="principle-img-wrap">
-                <img src="/images/home/fruit2.avif" alt="Sustainability" />
-              </div>
-              <div class="principle-body">
-                <h3>Sustainability</h3>
-                <p>Developing practices that meet today's needs without compromising future generations.</p>
-              </div>
-            </article>
-          </>
-        )}
+        ))}
       </div>
     </div>
   </section>
 
-  <!-- PRODUCERS -->
-  <section class="producers">
-    <div class="producers-bg">
-      <img
-        src={producers.image || "/images/home/coffee.avif"}
-        alt="Coffee plantation"
-        class="producers-img"
-      />
-      <div class="producers-overlay"></div>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- HOW WE WORK — numbered steps               -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="how-we-work">
+    <div class="hww-img-col">
+      <img src="/images/home/coffee.avif" alt="CERD-UG field work" />
     </div>
-    <div class="container-site producers-content">
-      <span class="section-label" style="color: rgba(245,240,232,0.6)">Producers</span>
-      <h2 class="producers-heading">{producers.title || "We Are Producers For Local Markets"}</h2>
-      <p class="producers-text">
-        {producers.description || "Coffee, a beloved beverage enjoyed worldwide, is much more than just a morning pick-me-up. Originating from the beans of the Coffea plant, coffee is prepared in various ways, from the intense espresso shots to smooth, creamy lattes. Beyond its delicious taste, coffee is celebrated for its stimulating effects and its role in Uganda's agricultural economy and local communities."}
-      </p>
-    </div>
-  </section>
-
-  <!-- RECENT WORKS GALLERY -->
-  <section class="works">
-    <div class="container-site">
-      <span class="section-label">Recent Works</span>
-      <h2 class="works-heading">{recentWorks.title || "Our Recent Works"}</h2>
-      <p class="works-sub">
-        {recentWorks.subtitle || "The current major development initiative is the Organic Products Market at Abaita Ababiri and Kitooro Municipality — providing physical space for organic farmers to sell their produce and promoting small holder farming for sustainable development and environmental conservation."}
-      </p>
-
-      <div class="works-gallery">
-        {galleryImages.length > 0 ? galleryImages.map((img, index) => (
-          <div class={`gallery-item gallery-item-${index + 1}`}>
-            <img src={img.image_url} alt={img.alt} />
+    <div class="hww-content">
+      <span class="eyebrow eyebrow-sage">Our Approach</span>
+      <h2 class="section-h2">{producers.title || "How We Approach Sustainable Development"}</h2>
+      <div class="steps">
+        <div class="step-item">
+          <span class="step-num">01</span>
+          <div>
+            <h4>Research & Assessment</h4>
+            <p>We assess local ecosystems, community needs, and farming practices to build an evidence base for action.</p>
           </div>
-        )) : (
-          <>
-            <div class="gallery-item gallery-item-1">
-              <img src="/images/home/fruits1.avif" alt="Organic Market" />
-            </div>
-            <div class="gallery-item gallery-item-2">
-              <img src="/images/home/duck.avif" alt="Farm Activities" />
-            </div>
-            <div class="gallery-item gallery-item-3">
-              <img src="/images/home/veg.avif" alt="Community Work" />
-            </div>
-            <div class="gallery-item gallery-item-4">
-              <img src="/images/home/fruit2.avif" alt="Agroecology" />
-            </div>
-            <div class="gallery-item gallery-item-5">
-              <img src="/images/home/fruits.avif" alt="Training" />
-            </div>
-            <div class="gallery-item gallery-item-6">
-              <img src="/images/home/goats.webp" alt="Field Research" />
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  </section>
-
-  <!-- PARTNERS - SCROLLING MARQUEE -->
-  <section class="partners">
-    <div class="container-site">
-      <span class="section-label">Collaborations and Partnerships</span>
-      <div class="partners-marquee">
-        <div class="partners-track">
-          <div class="partner-logo"><img src="/images/partners/3C.avif" alt="3C Partner" /></div>
-          <div class="partner-logo"><img src="/images/partners/BLI.avif" alt="BLI Partner" /></div>
-          <div class="partner-logo"><img src="/images/partners/eoa.avif" alt="EOA Partner" /></div>
-          <div class="partner-logo"><img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" /></div>
-          <div class="partner-logo"><img src="/images/partners/nogamu.avif" alt="Nogamu Partner" /></div>
-          <div class="partner-logo"><img src="/images/partners/3C.avif" alt="3C Partner" /></div>
-          <div class="partner-logo"><img src="/images/partners/BLI.avif" alt="BLI Partner" /></div>
-          <div class="partner-logo"><img src="/images/partners/eoa.avif" alt="EOA Partner" /></div>
-          <div class="partner-logo"><img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" /></div>
-          <div class="partner-logo"><img src="/images/partners/nogamu.avif" alt="Nogamu Partner" /></div>
+        </div>
+        <div class="step-item">
+          <span class="step-num">02</span>
+          <div>
+            <h4>Capacity Building</h4>
+            <p>We equip farmers and stakeholders with skills in agroecology, organic farming, and sustainable land management.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-num">03</span>
+          <div>
+            <h4>Market Linkages</h4>
+            <p>We connect smallholder farmers to local markets and value chains, improving income and food security.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-num">04</span>
+          <div>
+            <h4>Policy Advocacy</h4>
+            <p>We influence development policy change to create enabling environments for sustainable agro-ecosystems.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- BLOG PREVIEW SECTION -->
-  <section class="blog-preview">
-    <div class="container-site">
-      <span class="section-label">Latest Updates</span>
-      <h2 class="blog-heading">From Our Blog</h2>
-      <p class="blog-sub">News, stories, and updates from our work in agroecology and community development.</p>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PRODUCERS FULL-BLEED BANNER                 -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="producers-banner">
+    <img src={producers.image || "/images/home/coffee.avif"} alt="Producers" class="pb-img" />
+    <div class="pb-overlay"></div>
+    <div class="pb-content">
+      <span class="eyebrow" style="color: rgba(255,255,255,0.55)">Producers</span>
+      <h2 class="pb-heading">{producers.title || "We Are Producers For Local Markets"}</h2>
+      <p class="pb-text">{producers.description || "Coffee, a beloved beverage enjoyed worldwide, is deeply connected to Uganda's agricultural economy and local communities. We work with producers to build sustainable supply chains that benefit farmers and consumers alike."}</p>
+      <a href="/contact" class="btn-white">Work With Us</a>
+    </div>
+  </section>
 
-      <div class="blog-grid">
-        {recentBlogs.map(blog => (
-          <a href={`/blog/${blog.slug}`} class="blog-card">
-            <div class="blog-card-img">
-              <img src={blog.image_url || "/images/home/veg.avif"} alt={blog.title} />
-            </div>
-            <div class="blog-card-body">
-              <time class="blog-date">{new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
-              <h3 class="blog-title">{blog.title}</h3>
-              <p class="blog-abstract">{blog.abstract}</p>
-              <span class="blog-arrow">Read Article →</span>
-            </div>
-          </a>
-        ))}
-        
-        {recentBlogs.length === 0 && (
-          <div class="blog-card" style="grid-column: span 4; text-align: center; padding: 2rem;">
-            <p>No blog posts yet. Check back soon for updates!</p>
-          </div>
-        )}
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- GALLERY — masonry grid                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="gallery-section">
+    <div class="container-site">
+      <div class="gallery-header">
+        <div>
+          <span class="eyebrow">Recent Works</span>
+          <h2 class="section-h2">{recentWorks.title || "Our Recent Works"}</h2>
+          <p class="body-text" style="max-width: 560px; margin-top: 0.75rem;">
+            {recentWorks.subtitle || "Our current major initiative is the Organic Products Market at Abaita Ababiri, providing space for organic farmers to sell their produce."}
+          </p>
+        </div>
+        <a href="/contact" class="btn-outline-forest" style="align-self: flex-start; margin-top: 1.5rem;">Get Involved</a>
       </div>
 
-      <div class="blog-more">
-        <a href="/blog" class="btn-primary">View All Blog Posts</a>
+      <div class="gallery-grid">
+        {galleryImages.length > 0 ? galleryImages.map((img, i) => (
+          <div class={`gi gi-${i + 1}`}>
+            <img src={img.image_url} alt={img.alt || "CERD-UG work"} />
+          </div>
+        )) : (
+          <>
+            <div class="gi gi-1"><img src="/images/home/fruits1.avif" alt="Organic Market" /></div>
+            <div class="gi gi-2"><img src="/images/home/duck.avif" alt="Farm Activities" /></div>
+            <div class="gi gi-3"><img src="/images/home/veg.avif" alt="Community Work" /></div>
+            <div class="gi gi-4"><img src="/images/home/fruit2.avif" alt="Agroecology" /></div>
+            <div class="gi gi-5"><img src="/images/home/fruits.avif" alt="Training" /></div>
+            <div class="gi gi-6"><img src="/images/home/goats.webp" alt="Field Research" /></div>
+          </>
+        )}
       </div>
     </div>
   </section>
 
-  <!-- BOTTOM CTA BANNER -->
-  <section class="bottom-cta">
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PARTNERS MARQUEE                            -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="partners">
     <div class="container-site">
-      <h2 class="bottom-cta-text">
-        {bottomCta.text || "CERD UG creates impact by promoting Agroecology farming to protect the environment, support local communities, and improve livelihoods through training, sustainable practices, and quality Agroecology products."}
+      <span class="eyebrow" style="text-align:center; display:block; margin-bottom:2.5rem;">Collaborations and Partnerships</span>
+    </div>
+    <div class="partners-track-wrap">
+      <div class="partners-track">
+        <img src="/images/partners/3C.avif" alt="3C" />
+        <img src="/images/partners/BLI.avif" alt="BLI" />
+        <img src="/images/partners/eoa.avif" alt="EOA" />
+        <img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" />
+        <img src="/images/partners/nogamu.avif" alt="Nogamu" />
+        <img src="/images/partners/3C.avif" alt="3C" />
+        <img src="/images/partners/BLI.avif" alt="BLI" />
+        <img src="/images/partners/eoa.avif" alt="EOA" />
+        <img src="/images/partners/mcKnight.avif" alt="McKnight Foundation" />
+        <img src="/images/partners/nogamu.avif" alt="Nogamu" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- BLOG PREVIEW                                -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="blog-section">
+    <div class="container-site">
+      <div class="blog-header">
+        <div>
+          <span class="eyebrow">Latest Updates</span>
+          <h2 class="section-h2">From Our Blog</h2>
+        </div>
+        <a href="/blog" class="btn-outline-forest">View All Posts</a>
+      </div>
+
+      <div class="blog-grid">
+        {recentBlogs.length > 0 ? recentBlogs.map(blog => (
+          <a href={`/blog/${blog.slug}`} class="blog-card">
+            <div class="bc-img">
+              <img src={blog.image_url || "/images/home/veg.avif"} alt={blog.title} />
+            </div>
+            <div class="bc-body">
+              <time class="bc-date">{new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</time>
+              <h3 class="bc-title">{blog.title}</h3>
+              <p class="bc-abstract">{blog.abstract}</p>
+              <span class="bc-arrow">Read Article &rarr;</span>
+            </div>
+          </a>
+        )) : (
+          <div class="blog-empty">No posts yet. Check back soon for updates.</div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- BOTTOM CTA                                  -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="bottom-cta">
+    <div class="bc-bg"><img src="/images/home/herobg.jpeg" alt="" /><div class="bc-overlay"></div></div>
+    <div class="container-site bc-inner">
+      <h2 class="bc-heading">
+        {bottomCta.text || "Join us in building a sustainable agro-ecosystem for Uganda and beyond."}
       </h2>
-      <a href={bottomCta.buttonLink || "/contact"} class="btn-outline">{bottomCta.buttonText || "Contact Us"}</a>
+      <div class="bc-btns">
+        <a href="/contact" class="btn-white">{bottomCta.buttonText || "Contact Us"}</a>
+        <a href="/about-us" class="btn-ghost-white">Our Story</a>
+      </div>
     </div>
   </section>
 
 </BaseLayout>
 
 <style>
-  /* ── HERO ── */
+  /* ── Tokens ── */
+  :root {
+    --forest:   #0C3C01;
+    --forest-l: #1a5a04;
+    --sage:     #5b6d49;
+    --earth:    #a2ac82;
+    --cream:    #f1f2ed;
+    --cream-d:  #e2e4db;
+    --bark:     #2c2c28;
+    --mist:     #f0f4eb;
+    --white:    #ffffff;
+    --ff-disp:  "Playfair Display", Georgia, serif;
+    --ff-body:  "Source Sans 3", "Helvetica Neue", sans-serif;
+  }
+
+  /* ── Shared utilities ── */
+  .eyebrow {
+    display: inline-block;
+    font-family: var(--ff-body);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 0.75rem;
+  }
+  .eyebrow-sage { color: var(--sage); }
+
+  .section-h2 {
+    font-family: var(--ff-disp);
+    font-size: clamp(1.8rem, 3.5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--forest);
+    line-height: 1.2;
+    margin: 0 0 1.25rem;
+  }
+
+  .body-text {
+    font-family: var(--ff-body);
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--bark);
+    margin-bottom: 1rem;
+  }
+
+  /* Buttons */
+  .btn-forest {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: var(--forest); color: #fff;
+    padding: 0.8rem 1.75rem;
+    font-family: var(--ff-body); font-weight: 700;
+    font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+    border: 2px solid var(--forest); border-radius: 0.25rem;
+    text-decoration: none; transition: background 0.25s, color 0.25s;
+  }
+  .btn-forest:hover { background: var(--forest-l); border-color: var(--forest-l); }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center;
+    background: transparent; color: #fff;
+    padding: 0.8rem 1.75rem;
+    font-family: var(--ff-body); font-weight: 700;
+    font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+    border: 2px solid rgba(255,255,255,0.6); border-radius: 0.25rem;
+    text-decoration: none; transition: border-color 0.25s, background 0.25s;
+  }
+  .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.1); }
+
+  .btn-outline-forest {
+    display: inline-flex; align-items: center;
+    background: transparent; color: var(--forest);
+    padding: 0.75rem 1.5rem;
+    font-family: var(--ff-body); font-weight: 700;
+    font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
+    border: 2px solid var(--forest); border-radius: 0.25rem;
+    text-decoration: none; transition: background 0.25s, color 0.25s;
+  }
+  .btn-outline-forest:hover { background: var(--forest); color: #fff; }
+
+  .btn-white {
+    display: inline-flex; align-items: center;
+    background: #fff; color: var(--forest);
+    padding: 0.8rem 1.75rem;
+    font-family: var(--ff-body); font-weight: 700;
+    font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+    border: 2px solid #fff; border-radius: 0.25rem;
+    text-decoration: none; transition: background 0.25s, color 0.25s;
+  }
+  .btn-white:hover { background: var(--forest); color: #fff; border-color: var(--forest); }
+
+  .btn-ghost-white {
+    display: inline-flex; align-items: center;
+    background: transparent; color: #fff;
+    padding: 0.8rem 1.75rem;
+    font-family: var(--ff-body); font-weight: 700;
+    font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+    border: 2px solid rgba(255,255,255,0.45); border-radius: 0.25rem;
+    text-decoration: none; transition: border-color 0.25s;
+  }
+  .btn-ghost-white:hover { border-color: #fff; }
+
+  /* ═══════════════════════════════════ */
+  /* HERO                                */
+  /* ═══════════════════════════════════ */
   .hero {
     position: relative;
     min-height: 100vh;
     display: flex;
-    align-items: flex-end;
-    padding-bottom: 5rem;
+    flex-direction: column;
+    justify-content: flex-end;
     overflow: hidden;
   }
-  .hero-bg { position: absolute; inset: 0; }
-  .hero-img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-media { position: absolute; inset: 0; }
+  .hero-img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
   .hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(12, 60, 1, 0.85) 0%, rgba(91, 109, 73, 0.5) 60%, rgba(12, 60, 1, 0.3) 100%);
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, rgba(8,42,0,0.88) 45%, rgba(8,42,0,0.45) 100%);
   }
-  .hero-content { position: relative; z-index: 2; max-width: 800px; }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(162, 172, 130, 0.25);
-    border: 1px solid rgba(162, 172, 130, 0.4);
-    padding: 0.4rem 1rem;
-    margin-bottom: 1.5rem;
-    backdrop-filter: blur(4px);
-  }
-  .hero-badge .section-label { color: #c8e6a0; }
-  .hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 700;
-    color: white;
-    line-height: 1.1;
-    margin-bottom: 1.5rem;
-  }
-  .hero-title em { font-style: italic; color: #c8e6a0; }
-  .hero-sub {
-    font-size: 1.2rem;
-    color: rgba(245, 240, 232, 0.85);
-    line-height: 1.7;
-    max-width: 600px;
-    margin-bottom: 2.5rem;
-  }
-  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
-  .hero-location {
-    position: absolute;
-    bottom: 2rem;
-    right: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(245, 240, 232, 0.1);
-    border: 1px solid rgba(245, 240, 232, 0.2);
-    color: rgba(245, 240, 232, 0.8);
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    text-decoration: none;
-    backdrop-filter: blur(4px);
-    transition: background 0.2s;
-  }
-  .hero-location:hover { background: rgba(245, 240, 232, 0.2); }
 
-  /* ── MISSION ── */
-  .mission { padding: 7rem 0; background: var(--color-background); }
-  .mission-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 5rem; align-items: center; }
-  .mission-image { position: relative; }
-  .mission-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; border-radius: 0.75rem; }
-  .mission-heading {
-    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  .hero-inner {
+    position: relative; z-index: 2;
+    max-width: 1400px; margin: 0 auto; width: 100%;
+    padding: 0 1.5rem 7rem;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 4rem;
+    align-items: flex-end;
+  }
+
+  .hero-title {
+    font-family: var(--ff-disp);
+    font-size: clamp(2.25rem, 5.5vw, 4.5rem);
     font-weight: 700;
-    color: var(--color-primary);
-    margin: 0.75rem 0 1.5rem;
-    line-height: 1.2;
+    color: #fff;
+    line-height: 1.1;
+    margin: 0.5rem 0 1.25rem;
   }
-  .mission-text { font-size: 1rem; line-height: 1.8; color: var(--color-text); margin-bottom: 1rem; }
-  .mission-pillars { display: flex; flex-direction: column; gap: 0.75rem; margin: 2rem 0; }
-  .mission-pillar {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    padding: 1rem;
-    background: var(--color-accent-light);
-    border-left: 3px solid var(--color-primary);
+  .hero-desc {
+    font-family: var(--ff-body);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: rgba(255,255,255,0.8);
+    max-width: 520px;
+    margin-bottom: 2rem;
+  }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .hero-right {
+    display: flex; flex-direction: column; gap: 1rem;
+    padding-bottom: 0.5rem;
+  }
+  .hero-stat-card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
   }
-  .pillar-icon {
-    width: 6px;
-    height: 6px;
-    background: var(--color-primary);
-    border-radius: 50%;
-    margin-top: 0.5rem;
+  .stat-num {
+    display: block;
+    font-family: var(--ff-disp);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .stat-label {
+    font-family: var(--ff-body);
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.04em;
+  }
+
+  .hero-location-tag {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    z-index: 3;
+    display: flex; align-items: center; gap: 0.4rem;
+    font-family: var(--ff-body); font-size: 0.75rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ═══════════════════════════════════ */
+  /* TICKER                              */
+  /* ═══════════════════════════════════ */
+  .ticker {
+    background: var(--forest);
+    padding: 1.1rem 0;
+    overflow: hidden;
+  }
+  .ticker-track {
+    display: flex; align-items: center; gap: 2.5rem;
+    width: fit-content;
+    animation: ticker 28s linear infinite;
+    white-space: nowrap;
+  }
+  .ticker-track span {
+    font-family: var(--ff-body);
+    font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
     flex-shrink: 0;
   }
-  .mission-pillar p { font-size: 0.9rem; line-height: 1.6; color: var(--color-text); margin: 0; }
-
-  /* ── VISION ── */
-  .vision { background: var(--color-primary); padding: 5rem 0; text-align: center; }
-  .vision-quote {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
-    font-style: italic;
-    color: white;
-    line-height: 1.4;
-    max-width: 800px;
-    margin: 1rem auto 0;
-    border: none;
-    padding: 0;
-    text-align: center;
-  }
-
-  /* ── IMPACT ── */
-  .impact { padding: 7rem 0; background: var(--color-background-dark); }
-  .impact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
-  .impact-heading {
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0.75rem 0 1rem;
-    line-height: 1.2;
-  }
-  .impact-sub { font-size: 0.95rem; line-height: 1.8; color: var(--color-text); margin-bottom: 2rem; }
-  .video-thumb {
-    position: relative;
-    display: block;
-    overflow: hidden;
-    border-radius: 0.75rem;
-  }
-  .video-thumb img {
-    width: 100%;
-    aspect-ratio: 16/10;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-  .video-thumb:hover img { transform: scale(1.03); }
-  .play-btn {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(12, 60, 1, 0.5);
-    transition: background 0.2s;
-  }
-  .play-btn > svg {
-    width: 56px;
-    height: 56px;
-    background: rgba(255,255,255,0.2);
+  .ticker-dot {
+    width: 5px; height: 5px;
+    background: var(--earth) !important;
     border-radius: 50%;
-    padding: 12px;
-    backdrop-filter: blur(4px);
-  }
-  .video-thumb:hover .play-btn { background: rgba(12, 60, 1, 0.65); }
-
-  /* ── NGO VERIFIED SECTION ── */
-  .ngo-verified { padding: 4rem 0; background: var(--color-accent); }
-  .ngo-card {
-    text-align: center;
-    max-width: 500px;
-    margin: 0 auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  }
-  .ngo-verified-logo { height: 60px; width: auto; margin-bottom: 1rem; }
-  .ngo-card p { font-size: 1rem; color: var(--color-text); margin-bottom: 1.5rem; }
-  .btn-secondary {
+    flex-shrink: 0;
     display: inline-block;
-    background-color: var(--color-secondary);
-    color: white;
-    padding: 0.75rem 2rem;
-    font-family: var(--font-body);
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-    border: 2px solid var(--color-secondary);
-    border-radius: 0.375rem;
-    text-decoration: none;
   }
-  .btn-secondary:hover {
-    background-color: transparent;
-    color: var(--color-secondary);
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ═══════════════════════════════════ */
+  /* MISSION                             */
+  /* ═══════════════════════════════════ */
+  .mission {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 680px;
+  }
+  .mission-img-col {
+    position: relative;
+    overflow: hidden;
+  }
+  .mission-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+  .mission-img-badge {
+    position: absolute; bottom: 2rem; right: -1px;
+    background: var(--forest); color: #fff;
+    padding: 1.1rem 1.75rem;
+    border-radius: 0.5rem 0 0 0.5rem;
+    display: flex; flex-direction: column;
+    gap: 0.2rem;
+  }
+  .mission-img-badge strong { font-family: var(--ff-disp); font-size: 1rem; }
+  .mission-img-badge span { font-size: 0.72rem; opacity: 0.7; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .mission-text-col {
+    background: var(--cream);
+    padding: 6rem 5rem 6rem 4rem;
+    display: flex; flex-direction: column; justify-content: center;
   }
 
-  /* ── PRINCIPLES ── */
-  .principles { padding: 7rem 0; background: var(--color-mist); }
-  .principles-heading {
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0.75rem 0 3rem;
+  .mission-pillars { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0 2rem; }
+  .pillar { display: flex; gap: 1rem; align-items: flex-start; }
+  .pillar-icon {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    background: var(--forest);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    margin-top: 0.1rem;
+  }
+  .pillar p { font-size: 0.9rem; line-height: 1.65; color: var(--bark); margin: 0; padding-top: 0.6rem; }
+
+  /* ═══════════════════════════════════ */
+  /* VISION BANNER                       */
+  /* ═══════════════════════════════════ */
+  .vision-banner {
+    background: var(--forest);
+    padding: 6rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .vision-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .vision-inner { position: relative; max-width: 820px; margin: 0 auto; padding: 0 1.5rem; }
+  .vision-ornament {
+    font-family: var(--ff-disp);
+    font-size: 8rem; line-height: 0.5;
+    color: rgba(255,255,255,0.1);
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .vision-quote {
+    font-family: var(--ff-disp);
+    font-size: clamp(1.35rem, 2.75vw, 2rem);
+    font-weight: 600;
+    font-style: italic;
+    color: #fff;
+    line-height: 1.55;
+    margin: 0 0 1.5rem;
+  }
+  .vision-source {
+    font-family: var(--ff-body);
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--earth);
+  }
+
+  /* ═══════════════════════════════════ */
+  /* IMPACT                              */
+  /* ═══════════════════════════════════ */
+  .impact {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: var(--mist);
+  }
+  .impact-text {
+    padding: 7rem 4rem 7rem 6rem;
+    display: flex; flex-direction: column; justify-content: center;
+    max-width: 700px;
+  }
+  .impact-media { position: relative; overflow: hidden; min-height: 560px; }
+  .video-link { display: block; width: 100%; height: 100%; position: relative; }
+  .video-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+  .video-link:hover .video-thumb-img { transform: scale(1.04); }
+  .play-ring {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 72px; height: 72px;
+    background: var(--forest);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 12px rgba(12,60,1,0.25);
+    transition: transform 0.3s ease;
+  }
+  .video-link:hover .play-ring { transform: translate(-50%, -50%) scale(1.08); }
+
+  /* ═══════════════════════════════════ */
+  /* PRINCIPLES                          */
+  /* ═══════════════════════════════════ */
+  .principles {
+    padding: 8rem 0;
+    background: var(--cream);
+  }
+  .principles-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3.5rem; flex-wrap: wrap; gap: 1.5rem;
   }
   .principles-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
+    gap: 1.5rem;
   }
   .principle-card {
-    background: white;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: var(--white);
     border-radius: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex; flex-direction: column;
   }
-  .principle-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-  }
-  .principle-img-wrap img {
-    width: 100%;
-    aspect-ratio: 4/3;
-    object-fit: cover;
+  .principle-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,0.1); }
+  .pc-img { overflow: hidden; }
+  .pc-img img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; transition: transform 0.4s; }
+  .principle-card:hover .pc-img img { transform: scale(1.05); }
+  .pc-body { padding: 1.5rem 1.25rem; flex: 1; display: flex; flex-direction: column; }
+  .pc-num {
+    font-family: var(--ff-disp);
+    font-size: 2rem; font-weight: 700;
+    color: var(--earth);
+    line-height: 1; margin-bottom: 0.5rem;
     display: block;
   }
-  .principle-body { padding: 1.25rem; }
-  .principle-body h3 {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    margin-bottom: 0.5rem;
+  .pc-title {
+    font-family: var(--ff-disp);
+    font-size: 1.1rem; font-weight: 600;
+    color: var(--forest); margin-bottom: 0.5rem;
   }
-  .principle-body p { font-size: 0.85rem; line-height: 1.6; color: var(--color-text); margin: 0; }
+  .pc-desc { font-size: 0.85rem; line-height: 1.65; color: var(--bark); margin: 0; }
 
-  /* ── PRODUCERS ── */
-  .producers {
+  /* ═══════════════════════════════════ */
+  /* HOW WE WORK                         */
+  /* ═══════════════════════════════════ */
+  .how-we-work {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--forest);
+  }
+  .hww-img-col { overflow: hidden; min-height: 600px; }
+  .hww-img-col img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.75); }
+  .hww-content {
+    padding: 6rem 5rem 6rem 4.5rem;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .hww-content .eyebrow-sage { color: var(--earth); }
+  .hww-content .section-h2 { color: #fff; }
+
+  .steps { display: flex; flex-direction: column; gap: 2rem; margin-top: 0.5rem; }
+  .step-item {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .step-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-num {
+    font-family: var(--ff-disp);
+    font-size: 2.5rem; font-weight: 700;
+    color: var(--earth); line-height: 1;
+    flex-shrink: 0; width: 3rem;
+  }
+  .step-item h4 {
+    font-family: var(--ff-disp);
+    font-size: 1.05rem; font-weight: 600;
+    color: #fff; margin: 0 0 0.4rem;
+  }
+  .step-item p { font-size: 0.875rem; line-height: 1.7; color: rgba(255,255,255,0.65); margin: 0; }
+
+  /* ═══════════════════════════════════ */
+  /* PRODUCERS BANNER                    */
+  /* ═══════════════════════════════════ */
+  .producers-banner {
     position: relative;
-    padding: 8rem 0;
+    padding: 9rem 0;
     overflow: hidden;
   }
-  .producers-bg { position: absolute; inset: 0; }
-  .producers-img { width: 100%; height: 100%; object-fit: cover; }
-  .producers-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(12, 60, 1, 0.85);
-  }
-  .producers-content {
-    position: relative;
-    z-index: 2;
+  .pb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .pb-overlay { position: absolute; inset: 0; background: rgba(8,42,0,0.82); }
+  .pb-content {
+    position: relative; z-index: 2;
     max-width: 680px;
+    padding: 0 1.5rem 0 calc((100vw - 1400px)/2 + 1.5rem);
   }
-  .producers-heading {
-    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-    color: white;
-    font-weight: 700;
-    margin: 0.75rem 0 1.5rem;
+  .pb-heading {
+    font-family: var(--ff-disp);
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 700; color: #fff;
+    margin: 0.75rem 0 1.25rem; line-height: 1.2;
   }
-  .producers-text {
-    color: rgba(245, 240, 232, 0.85);
-    font-size: 1rem;
-    line-height: 1.8;
-  }
+  .pb-text { font-size: 1rem; line-height: 1.8; color: rgba(255,255,255,0.75); margin-bottom: 2rem; }
 
-  /* ── RECENT WORKS ── */
-  .works { padding: 7rem 0; background: var(--color-background); }
-  .works-heading {
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0.75rem 0 1rem;
+  /* ═══════════════════════════════════ */
+  /* GALLERY                             */
+  /* ═══════════════════════════════════ */
+  .gallery-section { padding: 8rem 0; background: var(--cream-d); }
+  .gallery-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;
   }
-  .works-sub {
-    font-size: 0.95rem;
-    line-height: 1.8;
-    color: var(--color-text);
-    max-width: 640px;
-    margin-bottom: 3rem;
-  }
-  .works-gallery {
+  .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 220px;
-    gap: 1rem;
+    grid-auto-rows: 230px;
+    gap: 0.75rem;
   }
-  .gallery-item {
-    overflow: hidden;
-    border-radius: 0.5rem;
-  }
-  .gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-  .gallery-item:hover img { transform: scale(1.05); }
-  .gallery-item-2, .gallery-item-6 { grid-row: span 2; }
+  .gi { overflow: hidden; border-radius: 0.5rem; }
+  .gi img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
+  .gi:hover img { transform: scale(1.06); }
+  .gi-2, .gi-5 { grid-row: span 2; }
 
-  /* ── PARTNERS MARQUEE ── */
-  .partners { padding: 5rem 0; background: var(--color-background-dark); overflow: hidden; }
-  .partners-marquee {
-    width: 100%;
-    overflow: hidden;
-    margin-top: 2rem;
-  }
+  /* ═══════════════════════════════════ */
+  /* PARTNERS                            */
+  /* ═══════════════════════════════════ */
+  .partners { padding: 5rem 0; background: var(--cream); overflow: hidden; }
+  .partners-track-wrap { overflow: hidden; }
   .partners-track {
-    display: flex;
-    gap: 3rem;
-    animation: scroll 20s linear infinite;
+    display: flex; align-items: center; gap: 4rem;
     width: fit-content;
+    animation: ticker 22s linear infinite;
   }
-  .partners-track:hover {
-    animation-play-state: paused;
-  }
-  .partner-logo img {
-    height: 60px;
-    width: auto;
-    object-fit: contain;
-    transition: opacity 0.2s;
-  }
-  .partner-logo:hover img { opacity: 0.7; }
-  @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+  .partners-track img { height: 52px; width: auto; object-fit: contain; opacity: 0.6; transition: opacity 0.2s; filter: grayscale(30%); }
+  .partners-track img:hover { opacity: 1; }
 
-  /* ── BLOG PREVIEW ── */
-  .blog-preview { padding: 7rem 0; background: var(--color-background); }
-  .blog-heading {
-    font-size: clamp(1.75rem, 3vw, 2.25rem);
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0.75rem 0 0.5rem;
+  /* ═══════════════════════════════════ */
+  /* BLOG                                */
+  /* ═══════════════════════════════════ */
+  .blog-section { padding: 8rem 0; background: var(--mist); }
+  .blog-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3rem; flex-wrap: wrap; gap: 1.5rem;
   }
-  .blog-sub { font-size: 0.95rem; color: var(--color-text); margin-bottom: 3rem; max-width: 600px; }
   .blog-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-bottom: 3rem;
   }
   .blog-card {
     text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    background: white;
+    display: flex; flex-direction: column;
+    background: var(--white);
+    border-radius: 0.75rem; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     transition: transform 0.3s, box-shadow 0.3s;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-  .blog-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  .blog-card:hover { transform: translateY(-5px); box-shadow: 0 16px 32px rgba(0,0,0,0.1); }
+  .bc-img { overflow: hidden; }
+  .bc-img img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; transition: transform 0.4s; }
+  .blog-card:hover .bc-img img { transform: scale(1.05); }
+  .bc-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+  .bc-date {
+    font-family: var(--ff-body); font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--sage); margin-bottom: 0.5rem; display: block;
   }
-  .blog-card-img { width: 100%; overflow: hidden; }
-  .blog-card-img img {
-    width: 100%;
-    aspect-ratio: 2/1;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.4s ease;
+  .bc-title {
+    font-family: var(--ff-disp); font-size: 1rem; font-weight: 600;
+    color: var(--forest); line-height: 1.4; margin-bottom: 0.6rem;
   }
-  .blog-card:hover .blog-card-img img { transform: scale(1.05); }
-  .blog-card-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
-  .blog-date {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-secondary);
-    margin-bottom: 0.5rem;
-  }
-  .blog-title {
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    line-height: 1.4;
-    margin-bottom: 0.5rem;
-  }
-  .blog-abstract { font-size: 0.8rem; line-height: 1.5; color: var(--color-text); margin-bottom: 1rem; flex: 1; }
-  .blog-arrow { font-size: 0.75rem; font-weight: 600; color: var(--color-secondary); transition: color 0.2s; }
-  .blog-card:hover .blog-arrow { color: var(--color-primary); }
-  .blog-more { text-align: center; }
+  .bc-abstract { font-size: 0.85rem; line-height: 1.6; color: var(--bark); flex: 1; margin-bottom: 1rem; }
+  .bc-arrow { font-size: 0.78rem; font-weight: 700; color: var(--sage); transition: color 0.2s; }
+  .blog-card:hover .bc-arrow { color: var(--forest); }
+  .blog-empty { grid-column: span 3; padding: 3rem; text-align: center; color: var(--bark); opacity: 0.6; }
 
-  /* ── BOTTOM CTA ── */
-  .bottom-cta { background: var(--color-primary); padding: 6rem 0; text-align: center; }
-  .bottom-cta-text {
-    font-family: var(--font-display);
-    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-    color: white;
-    line-height: 1.5;
-    max-width: 800px;
-    margin: 0 auto 2.5rem;
-    font-weight: 600;
+  /* ═══════════════════════════════════ */
+  /* BOTTOM CTA                          */
+  /* ═══════════════════════════════════ */
+  .bottom-cta { position: relative; padding: 9rem 0; overflow: hidden; }
+  .bc-bg { position: absolute; inset: 0; }
+  .bc-bg img { width: 100%; height: 100%; object-fit: cover; }
+  .bc-overlay { position: absolute; inset: 0; background: rgba(8,42,0,0.88); }
+  .bc-inner { position: relative; z-index: 2; text-align: center; }
+  .bc-heading {
+    font-family: var(--ff-disp);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700; color: #fff;
+    line-height: 1.45; max-width: 720px; margin: 0 auto 2.5rem;
   }
+  .bc-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
-  /* ── RESPONSIVE ── */
+  /* ═══════════════════════════════════ */
+  /* RESPONSIVE                          */
+  /* ═══════════════════════════════════ */
+  @media (max-width: 1200px) {
+    .mission-text-col { padding: 5rem 3rem 5rem 3rem; }
+    .pb-content { padding-left: 1.5rem; }
+    .principles-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 1024px) {
-    .principles-grid, .blog-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-inner { grid-template-columns: 1fr; padding-bottom: 5rem; }
+    .hero-right { flex-direction: row; }
+    .mission { grid-template-columns: 1fr; }
+    .mission-img-col { min-height: 420px; }
+    .impact { grid-template-columns: 1fr; }
+    .impact-text { padding: 5rem 1.5rem; max-width: 100%; }
+    .impact-media { min-height: 380px; }
+    .how-we-work { grid-template-columns: 1fr; }
+    .hww-img-col { min-height: 360px; }
+    .hww-content { padding: 5rem 1.5rem; }
+    .blog-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 768px) {
-    .mission-grid, .impact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-    .works-gallery { grid-template-columns: repeat(2, 1fr); }
-    .gallery-item-2, .gallery-item-6 { grid-row: span 1; }
-    .hero-content { max-width: 100%; }
-    .hero-sub { font-size: 1rem; }
+    .hero-inner { padding: 0 1.5rem 4rem; }
+    .hero-right { flex-direction: column; }
+    .mission-text-col { padding: 4rem 1.5rem; }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .gi-2, .gi-5 { grid-row: span 1; }
+    .principles-grid { grid-template-columns: 1fr; }
+    .principles-header { flex-direction: column; align-items: flex-start; }
+    .gallery-header { flex-direction: column; }
+    .blog-header { flex-direction: column; }
   }
   @media (max-width: 540px) {
-    .principles-grid, .blog-grid { grid-template-columns: 1fr; }
-    .works-gallery { grid-template-columns: 1fr; }
-    .hero-actions { flex-direction: column; }
-    .hero-location { display: none; }
-    .partners-track { gap: 1.5rem; }
-    .partner-logo img { height: 40px; }
+    .hero-btns { flex-direction: column; }
+    .hero-right { display: none; }
+    .hero-location-tag { display: none; }
+    .blog-grid { grid-template-columns: 1fr; }
+    .blog-empty { grid-column: span 1; }
+    .gallery-grid { grid-template-columns: 1fr; }
+    .bc-btns { flex-direction: column; align-items: center; }
   }
 </style>
