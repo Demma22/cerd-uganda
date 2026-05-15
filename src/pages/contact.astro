@@ -2,321 +2,459 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Contact Us | CERD-UG">
-  <div class="contact-page">
-    <!-- Hero Section -->
-    <div class="contact-hero">
-      <div class="container-site">
-        <h1>Get in Touch</h1>
-        <p>Have questions about our work or want to partner with us? We'd love to hear from you.</p>
-      </div>
-    </div>
+<BaseLayout title="Contact Us | CERD-UG" description="Reach out to CERD-UG for partnerships, research collaborations, or general enquiries. Based in Kampala, Uganda.">
 
-    <!-- Contact Content -->
-    <div class="contact-content container-site">
-      
-      <!-- Left Column: Contact Info -->
-      <div class="contact-info">
-        <h2>Contact Information</h2>
-        <p>Reach out to us through any of these channels. Our team typically responds within 48 hours.</p>
-        
-        <div class="contact-details">
-          <div class="contact-item">
-            <div class="contact-icon">
-              <div class="icon-placeholder phone-icon"></div>
-            </div>
-            <div>
-              <h3>Phone (Primary)</h3>
-              <a href="tel:+256702616988">+256 702 616988</a>
-            </div>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE HERO                                   -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="page-hero">
+    <img src="/images/home/herobg.jpeg" alt="CERD-UG field work" class="ph-img" />
+    <div class="ph-overlay"></div>
+    <div class="ph-content">
+      <span class="eyebrow">Reach Out</span>
+      <h1 class="ph-title">Get in Touch</h1>
+      <p class="ph-sub">Have questions about our work or want to partner with us? Our team typically responds within 48 hours.</p>
+    </div>
+    <div class="ph-breadcrumb">
+      <a href="/">Home</a><span>/</span><span>Contact</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MAIN CONTACT BLOCK                          -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="contact-block">
+
+    <!-- LEFT: dark info panel -->
+    <div class="info-panel">
+      <span class="eyebrow" style="color:rgba(255,255,255,0.45)">Contact Information</span>
+      <h2 class="info-heading">How to Find Us</h2>
+      <p class="info-desc">Reach out through any of these channels. We welcome research enquiries, partnership proposals, and community questions.</p>
+
+      <div class="info-items">
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-.84a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+            </svg>
           </div>
-          
-          <div class="contact-item">
-            <div class="contact-icon">
-              <div class="icon-placeholder phone-icon"></div>
-            </div>
-            <div>
-              <h3>Phone (Secondary)</h3>
-              <a href="tel:+256782634937">+256 782 634937</a>
-            </div>
-          </div>
-          
-          <div class="contact-item">
-            <div class="contact-icon">
-              <div class="icon-placeholder email-icon"></div>
-            </div>
-            <div>
-              <h3>Email</h3>
-              <a href="mailto:info@cerd-uganda.org">info@cerd-uganda.org</a>
-            </div>
-          </div>
-          
-          <div class="contact-item">
-            <div class="contact-icon">
-              <div class="icon-placeholder location-icon"></div>
-            </div>
-            <div>
-              <h3>Location</h3>
-              <p>Mpala, Entebbe Road, Kampala, Uganda</p>
-            </div>
+          <div>
+            <p class="info-label">Phone (Primary)</p>
+            <a href="tel:+256702616988" class="info-value">+256 702 616 988</a>
           </div>
         </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-.84a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="info-label">Phone (Secondary)</p>
+            <a href="tel:+256782634937" class="info-value">+256 782 634 937</a>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+          <div>
+            <p class="info-label">Email Address</p>
+            <a href="mailto:info@cerd-uganda.org" class="info-value">info@cerd-uganda.org</a>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div>
+            <p class="info-label">Location</p>
+            <p class="info-value">Mpala, Entebbe Road<br />Kampala, Uganda</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <p class="info-label">Office Hours</p>
+            <p class="info-value">Monday – Friday<br />8:00 am – 5:00 pm EAT</p>
+          </div>
+        </div>
+
       </div>
-      
-      <!-- Right Column: Contact Form -->
-      <div class="contact-form-wrapper">
-        <h2>Send us a Message</h2>
-        
-        <div id="formMessage" class="form-message"></div>
-        
-        <form id="contactForm">
-          <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" required placeholder="Your full name" />
-          </div>
-          
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" required placeholder="your@email.com" />
-          </div>
-          
-          <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" placeholder="Optional" />
-          </div>
-          
-          <div class="form-group">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" required placeholder="How can we help you?"></textarea>
-          </div>
-          
-          <button type="submit" class="submit-btn">Send Message</button>
-        </form>
+
+      <!-- decorative leaf pattern -->
+      <div class="info-deco" aria-hidden="true">
+        <svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="110" cy="110" r="108" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
+          <circle cx="110" cy="110" r="80" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+          <circle cx="110" cy="110" r="52" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+        </svg>
       </div>
     </div>
-  </div>
+
+    <!-- RIGHT: form -->
+    <div class="form-panel">
+      <span class="eyebrow eyebrow-sage">Send a Message</span>
+      <h2 class="form-heading">We Would Love to Hear From You</h2>
+
+      <div id="formMessage" class="form-message" role="alert"></div>
+
+      <form id="contactForm" novalidate>
+        <div class="field-row">
+          <div class="field-group">
+            <label for="name">Full Name <span class="req">*</span></label>
+            <input type="text" id="name" name="name" required placeholder="Your full name" autocomplete="name" />
+          </div>
+          <div class="field-group">
+            <label for="email">Email Address <span class="req">*</span></label>
+            <input type="email" id="email" name="email" required placeholder="your@email.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="phone">Phone Number <span class="optional">(optional)</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="+256 700 000 000" autocomplete="tel" />
+        </div>
+
+        <div class="field-group">
+          <label for="message">Message <span class="req">*</span></label>
+          <textarea id="message" name="message" required placeholder="Tell us how we can help, or describe your collaboration idea..." rows="6"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span class="btn-text">Send Message</span>
+          <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MAP STRIP                                   -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="map-strip">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.747!2d32.4752!3d0.2916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbbf8de5d0d91%3A0x1c4b6c1c9a6c6b0a!2sMpala%2C%20Entebbe%20Rd%2C%20Kampala%2C%20Uganda!5e0!3m2!1sen!2sug!4v1"
+      width="100%" height="100%"
+      style="border:0;"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="CERD-UG location on map"
+    ></iframe>
+    <a href="https://maps.google.com/?q=Mpala,Entebbe+Road,Kampala,Uganda" target="_blank" rel="noopener" class="map-cta">
+      Open in Google Maps
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    </a>
+  </section>
 
   <style>
-    .contact-page {
-      background: var(--color-cream);
-      min-height: 100vh;
+    :root {
+      --forest:   #0C3C01;
+      --forest-l: #1a5a04;
+      --forest-d: #082a00;
+      --sage:     #5b6d49;
+      --earth:    #a2ac82;
+      --cream:    #f1f2ed;
+      --cream-d:  #e2e4db;
+      --bark:     #2c2c28;
+      --mist:     #f0f4eb;
+      --ff-disp:  "Playfair Display", Georgia, serif;
+      --ff-body:  "Source Sans 3", "Helvetica Neue", sans-serif;
     }
 
-    .contact-hero {
-      background: linear-gradient(135deg, var(--color-forest) 0%, var(--color-forest-dark) 100%);
-      padding: 8rem 0 4rem;
-      text-align: center;
+    .eyebrow {
+      display: inline-block;
+      font-family: var(--ff-body);
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--sage); margin-bottom: 0.75rem;
     }
+    .eyebrow-sage { color: var(--sage); }
 
-    .contact-hero h1 {
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem, 5vw, 3.5rem);
-      font-weight: 700;
-      color: white;
-      margin-bottom: 1rem;
+    /* ── PAGE HERO ── */
+    .page-hero {
+      position: relative;
+      height: 60vh; min-height: 420px;
+      display: flex; flex-direction: column;
+      justify-content: flex-end; overflow: hidden;
     }
-
-    .contact-hero p {
-      color: rgba(245, 240, 232, 0.85);
-      max-width: 600px;
-      margin: 0 auto;
-      font-size: 1.1rem;
+    .ph-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 40%;
     }
+    .ph-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(8,42,0,0.92) 0%, rgba(8,42,0,0.45) 55%, rgba(8,42,0,0.2) 100%);
+    }
+    .ph-content {
+      position: relative; z-index: 2;
+      max-width: 1400px; width: 100%;
+      margin: 0 auto; padding: 0 1.5rem 5rem;
+    }
+    .ph-title {
+      font-family: var(--ff-disp);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 700; color: #fff;
+      line-height: 1.1; margin: 0.5rem 0 1rem;
+    }
+    .ph-sub {
+      font-family: var(--ff-body);
+      font-size: 1.05rem; line-height: 1.7;
+      color: rgba(255,255,255,0.75);
+      max-width: 520px;
+    }
+    .ph-breadcrumb {
+      position: absolute; top: 2rem;
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 1400px;
+      padding: 0 1.5rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: var(--ff-body); font-size: 0.75rem;
+      color: rgba(255,255,255,0.5); z-index: 3;
+    }
+    .ph-breadcrumb a { color: rgba(255,255,255,0.5); text-decoration: none; }
+    .ph-breadcrumb a:hover { color: #fff; }
+    .ph-breadcrumb span:last-child { color: rgba(255,255,255,0.85); }
 
-    .contact-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 5rem 1.5rem;
+    /* ── CONTACT BLOCK ── */
+    .contact-block {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
+      grid-template-columns: 420px 1fr;
+      min-height: 680px;
     }
 
-    .contact-info h2,
-    .contact-form-wrapper h2 {
-      font-family: var(--font-display);
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--color-forest-dark);
-      margin-bottom: 1rem;
+    /* INFO PANEL */
+    .info-panel {
+      background: var(--forest);
+      padding: 5rem 3rem;
+      position: relative;
+      overflow: hidden;
+      display: flex; flex-direction: column;
     }
-
-    .contact-info > p {
-      color: var(--color-bark);
-      margin-bottom: 2rem;
-      line-height: 1.6;
+    .info-heading {
+      font-family: var(--ff-disp);
+      font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+      font-weight: 700; color: #fff;
+      line-height: 1.2; margin: 0 0 1rem;
     }
-
-    .contact-details {
-      margin-bottom: 2rem;
+    .info-desc {
+      font-family: var(--ff-body);
+      font-size: 0.9rem; line-height: 1.75;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 2.5rem;
     }
-
-    .contact-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+    .info-items {
+      display: flex; flex-direction: column; gap: 1.75rem;
+      flex: 1;
     }
-
-    .contact-icon {
-      width: 48px;
-      height: 48px;
-      background: rgba(45, 80, 22, 0.1);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .info-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+    }
+    .info-icon {
       flex-shrink: 0;
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 0.375rem;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--earth);
+      margin-top: 0.1rem;
     }
-
-    .icon-placeholder {
-      width: 24px;
-      height: 24px;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
+    .info-label {
+      font-family: var(--ff-body);
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--earth); margin: 0 0 0.25rem;
     }
-
-    .phone-icon {
-      background-image: url('/icons/phone.svg');
-    }
-
-    .email-icon {
-      background-image: url('/icons/mail.svg');
-    }
-
-    .location-icon {
-      background-image: url('/icons/pin.svg');
-    }
-
-    .contact-item h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--color-forest);
-      margin-bottom: 0.25rem;
-    }
-
-    .contact-item p,
-    .contact-item a {
-      color: var(--color-bark);
-      text-decoration: none;
+    .info-value {
+      font-family: var(--ff-body);
+      font-size: 0.9rem; line-height: 1.55;
+      color: rgba(255,255,255,0.85);
+      text-decoration: none; margin: 0;
+      display: block;
       transition: color 0.2s;
     }
-
-    .contact-item a:hover {
-      color: var(--color-forest);
+    a.info-value:hover { color: #fff; }
+    .info-deco {
+      position: absolute; bottom: -40px; right: -40px;
+      opacity: 1; pointer-events: none;
     }
 
-    .contact-form-wrapper {
-      background: white;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    /* FORM PANEL */
+    .form-panel {
+      background: var(--cream);
+      padding: 5rem 4.5rem;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .form-heading {
+      font-family: var(--ff-disp);
+      font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+      font-weight: 700; color: var(--forest);
+      line-height: 1.2; margin: 0 0 2rem;
     }
 
-    .form-group {
+    /* Fields */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
       margin-bottom: 1.25rem;
     }
-
-    .form-group label {
+    .field-group {
+      margin-bottom: 1.25rem;
+    }
+    .field-group label {
       display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--color-forest);
-      margin-bottom: 0.5rem;
+      font-family: var(--ff-body);
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--bark); margin-bottom: 0.5rem;
     }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--color-cream-dark);
-      border-radius: 0.5rem;
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-      transition: border-color 0.2s;
-      background: white;
+    .req { color: var(--forest); }
+    .optional {
+      font-weight: 400; text-transform: none;
+      letter-spacing: 0; font-size: 0.75rem;
+      color: var(--sage);
     }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
+    .field-group input,
+    .field-group textarea {
+      display: block; width: 100%;
+      padding: 0.85rem 1rem;
+      background: #fff;
+      border: 1.5px solid var(--cream-d);
+      border-radius: 0.375rem;
+      font-family: var(--ff-body);
+      font-size: 0.9rem; color: var(--bark);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+    }
+    .field-group input::placeholder,
+    .field-group textarea::placeholder { color: #b0b4a8; }
+    .field-group input:focus,
+    .field-group textarea:focus {
       outline: none;
-      border-color: var(--color-sage);
+      border-color: var(--forest);
+      box-shadow: 0 0 0 3px rgba(12,60,1,0.1);
+    }
+    .field-group textarea {
+      resize: vertical; min-height: 140px;
     }
 
-    .form-group textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
+    /* Submit button */
     .submit-btn {
-      background: var(--color-forest);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 2rem;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      width: 100%;
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: var(--forest); color: #fff;
+      border: 2px solid var(--forest);
+      padding: 0.9rem 2rem;
+      font-family: var(--ff-body); font-weight: 700;
+      font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: 0.25rem; cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
     }
-
-    .submit-btn:hover {
-      background: var(--color-forest-dark);
-      transform: translateY(-2px);
+    .submit-btn:hover { background: var(--forest-l); border-color: var(--forest-l); }
+    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:disabled {
+      opacity: 0.65; cursor: not-allowed; transform: none;
     }
+    .btn-arrow { transition: transform 0.2s; }
+    .submit-btn:hover .btn-arrow { transform: translateX(3px); }
 
+    /* Status messages */
     .form-message {
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-size: 0.9rem;
       display: none;
+      padding: 1rem 1.25rem;
+      border-radius: 0.375rem;
+      margin-bottom: 1.5rem;
+      font-family: var(--ff-body);
+      font-size: 0.875rem; line-height: 1.5;
     }
-
     .form-message.success {
-      background: #d1fae5;
-      color: #065f46;
       display: block;
+      background: #d1fae5; color: #065f46;
+      border-left: 4px solid #059669;
     }
-
     .form-message.error {
-      background: #fee2e2;
-      color: #991b1b;
       display: block;
+      background: #fee2e2; color: #991b1b;
+      border-left: 4px solid #dc2626;
     }
 
-    @media (max-width: 768px) {
-      .contact-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 3rem 1.5rem;
-      }
-      .contact-hero {
-        padding: 6rem 0 3rem;
-      }
+    /* ── MAP ── */
+    .map-strip {
+      position: relative;
+      height: 420px;
+      background: var(--cream-d);
+    }
+    .map-strip iframe { display: block; width: 100%; height: 100%; }
+    .map-cta {
+      position: absolute; bottom: 1.5rem; right: 1.5rem;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--forest); color: #fff;
+      padding: 0.65rem 1.25rem;
+      font-family: var(--ff-body); font-weight: 700;
+      font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+      border-radius: 0.25rem; text-decoration: none;
+      transition: background 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .map-cta:hover { background: var(--forest-l); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .contact-block { grid-template-columns: 360px 1fr; }
+      .form-panel { padding: 4rem 3rem; }
+    }
+    @media (max-width: 900px) {
+      .contact-block { grid-template-columns: 1fr; }
+      .info-panel { padding: 4rem 2rem; }
+      .info-deco { display: none; }
+      .form-panel { padding: 4rem 2rem; }
+    }
+    @media (max-width: 640px) {
+      .page-hero { height: auto; min-height: 380px; }
+      .ph-content { padding: 0 1.5rem 3.5rem; }
+      .field-row { grid-template-columns: 1fr; gap: 0; }
+      .form-panel { padding: 3rem 1.5rem; }
+      .info-panel { padding: 3rem 1.5rem; }
+      .map-strip { height: 300px; }
+      .submit-btn { width: 100%; justify-content: center; }
     }
   </style>
 
   <script>
     const form = document.getElementById('contactForm');
     const formMessage = document.getElementById('formMessage');
-    
-    if (form) {
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn ? submitBtn.querySelector('.btn-text') : null;
+
+    if (form && submitBtn) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const submitBtn = form.querySelector('.submit-btn');
-        const originalText = submitBtn.textContent;
-        
+
         formMessage.className = 'form-message';
         formMessage.textContent = '';
-        
-        submitBtn.textContent = 'Sending...';
+
+        btnText.textContent = 'Sending...';
         submitBtn.disabled = true;
-        
+
         const formData = new FormData(form);
         const data = {
           name: formData.get('name'),
@@ -324,20 +462,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           phone: formData.get('phone') || '',
           message: formData.get('message')
         };
-        
+
         try {
           const response = await fetch('/api/contact', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
           });
-          
+
           if (response.ok) {
             const result = await response.json();
             formMessage.className = 'form-message success';
-            formMessage.textContent = result.message || 'Message sent successfully. We will get back to you soon.';
+            formMessage.textContent = result.message || 'Message sent successfully. We will get back to you within 48 hours.';
             form.reset();
           } else {
             const error = await response.json();
@@ -346,12 +482,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         } catch (error) {
           console.error('Form error:', error);
           formMessage.className = 'form-message error';
-          formMessage.innerHTML = 'Unable to send message. Please try again or contact us directly by phone.';
+          formMessage.textContent = 'Unable to send message. Please try again or contact us directly by phone.';
         } finally {
-          submitBtn.textContent = originalText;
+          btnText.textContent = 'Send Message';
           submitBtn.disabled = false;
         }
       });
     }
   </script>
+
 </BaseLayout>
