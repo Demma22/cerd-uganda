@@ -511,7 +511,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   /* ═══════════════════════════════════ */
   .hero {
     position: relative;
-    min-height: 100vh;
+    min-height: 88vh;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -527,7 +527,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   .hero-inner {
     position: relative; z-index: 2;
     max-width: 1400px; margin: 0 auto; width: 100%;
-    padding: 0 1.5rem 7rem;
+    padding: 0 1.5rem 4rem;
     display: grid;
     grid-template-columns: 1fr 320px;
     gap: 4rem;
@@ -623,14 +623,14 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   /* ═══════════════════════════════════ */
   .mission {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 680px;
+    grid-template-columns: 42% 58%;
+    min-height: 560px;
   }
   .mission-img-col {
     position: relative;
     overflow: hidden;
   }
-  .mission-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+  .mission-photo { width: 100%; height: 100%; max-height: 560px; object-fit: cover; object-position: top center; display: block; }
   .mission-img-badge {
     position: absolute; bottom: 2rem; right: -1px;
     background: var(--forest); color: #fff;
@@ -714,9 +714,9 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
     display: flex; flex-direction: column; justify-content: center;
     max-width: 700px;
   }
-  .impact-media { position: relative; overflow: hidden; min-height: 560px; }
+  .impact-media { position: relative; overflow: hidden; min-height: 380px; max-height: 480px; }
   .video-link { display: block; width: 100%; height: 100%; position: relative; }
-  .video-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+  .video-thumb-img { width: 100%; height: 100%; max-height: 480px; object-fit: cover; object-position: center; display: block; transition: transform 0.5s ease; }
   .video-link:hover .video-thumb-img { transform: scale(1.04); }
   .play-ring {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -734,7 +734,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   /* ═══════════════════════════════════ */
   .principles {
     padding: 8rem 0;
-    background: var(--cream);
+    background: #e8ede0;
   }
   .principles-header {
     display: flex; justify-content: space-between; align-items: flex-end;
@@ -743,34 +743,42 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   .principles-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    gap: 1rem;
   }
+  /* Full-image overlay card */
   .principle-card {
-    background: var(--white);
+    position: relative;
     border-radius: 0.75rem;
     overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     transition: transform 0.3s, box-shadow 0.3s;
+    aspect-ratio: 3/4;
+    display: block;
+  }
+  .principle-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.22); }
+  .pc-img { position: absolute; inset: 0; }
+  .pc-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s; }
+  .principle-card:hover .pc-img img { transform: scale(1.06); }
+  /* text overlay at bottom */
+  .pc-body {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 2rem 1.5rem 1.5rem;
+    background: linear-gradient(to top, rgba(8,42,0,0.88) 0%, rgba(8,42,0,0.6) 60%, transparent 100%);
     display: flex; flex-direction: column;
   }
-  .principle-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,0.1); }
-  .pc-img { overflow: hidden; }
-  .pc-img img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; transition: transform 0.4s; }
-  .principle-card:hover .pc-img img { transform: scale(1.05); }
-  .pc-body { padding: 1.5rem 1.25rem; flex: 1; display: flex; flex-direction: column; }
   .pc-num {
     font-family: var(--ff-disp);
-    font-size: 2rem; font-weight: 700;
+    font-size: 1.5rem; font-weight: 700;
     color: var(--earth);
-    line-height: 1; margin-bottom: 0.5rem;
+    line-height: 1; margin-bottom: 0.4rem;
     display: block;
   }
   .pc-title {
     font-family: var(--ff-disp);
-    font-size: 1.1rem; font-weight: 600;
-    color: var(--forest); margin-bottom: 0.5rem;
+    font-size: 1.15rem; font-weight: 700;
+    color: #fff; margin-bottom: 0.4rem;
   }
-  .pc-desc { font-size: 0.85rem; line-height: 1.65; color: var(--bark); margin: 0; }
+  .pc-desc { font-size: 0.82rem; line-height: 1.6; color: rgba(255,255,255,0.8); margin: 0; }
 
   /* ═══════════════════════════════════ */
   /* HOW WE WORK                         */
