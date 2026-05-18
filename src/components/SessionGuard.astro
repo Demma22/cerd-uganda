@@ -1,13 +1,10 @@
 ---
-// This component ensures session is valid on every protected page
-const session = Astro.cookies.get('admin_session');
-const isAuthenticated = session && session.value === 'authenticated';
+import { checkAuth } from '../utils/auth.js';
 
-if (!isAuthenticated) {
+if (!checkAuth(Astro.cookies)) {
   return Astro.redirect('/admin/login');
 }
 
-// Set no-cache headers
 Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 Astro.response.headers.set('Pragma', 'no-cache');
 Astro.response.headers.set('Expires', '0');

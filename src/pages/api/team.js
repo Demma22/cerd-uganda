@@ -1,6 +1,12 @@
 export const prerender = false;
 
 import { supabase } from '../../lib/supabase.js';
+import { checkAuth } from '../../utils/auth.js';
+
+const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  status: 401,
+  headers: { 'Content-Type': 'application/json' }
+});
 
 export async function GET() {
   const { data: team, error } = await supabase
@@ -21,7 +27,8 @@ export async function GET() {
   });
 }
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const formData = await request.formData();
   const name = formData.get('name');
   const role = formData.get('role');
@@ -92,7 +99,8 @@ export async function POST({ request }) {
   });
 }
 
-export async function PUT({ request }) {
+export async function PUT({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const formData = await request.formData();
   const id = parseInt(formData.get('id'));
   const name = formData.get('name');
@@ -160,7 +168,8 @@ export async function PUT({ request }) {
   });
 }
 
-export async function DELETE({ url }) {
+export async function DELETE({ url, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const id = parseInt(url.searchParams.get('id'));
   
   const { data: member, error: fetchError } = await supabase

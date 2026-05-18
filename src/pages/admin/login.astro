@@ -1,20 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { checkAuth, setSessionCookies, clearSessionCookies } from "../../utils/auth.js";
+import { checkAuth } from "../../utils/auth.js";
 
-// Only redirect if already logged in AND session is valid
-const session = Astro.cookies.get('admin_session');
-if (session && session.value === 'authenticated') {
-  // Check if session is not expired
-  const loginTime = Astro.cookies.get('admin_login_time');
-  if (loginTime) {
-    const loginTimestamp = parseInt(loginTime.value);
-    const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
-    if (Date.now() - loginTimestamp < sevenDaysInMs) {
-      // Use redirect to dashboard
-      return Astro.redirect('/admin/dashboard');
-    }
-  }
+if (checkAuth(Astro.cookies)) {
+  return Astro.redirect('/admin/dashboard');
 }
 
 // Set no-cache headers to prevent back button issues
@@ -28,8 +17,7 @@ if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
   const password = formData.get('password');
   
-  // Use environment variable for password, fallback to default
-  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || 'CERDadmin2025';
+  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD;
   
   if (password === ADMIN_PASSWORD) {
     // Clear any existing session first

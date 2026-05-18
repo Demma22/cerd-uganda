@@ -1,6 +1,12 @@
 export const prerender = false;
 
-import { supabaseAdmin as supabase } from '../../lib/supabase.js';
+import { supabaseAdmin as supabase } from '../../lib/supabase-admin.js';
+import { checkAuth } from '../../utils/auth.js';
+
+const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  status: 401,
+  headers: { 'Content-Type': 'application/json' }
+});
 
 // Helper to get content as nested object
 async function getContentObject() {
@@ -59,7 +65,8 @@ export async function GET() {
   });
 }
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const { page, section, field, value } = await request.json();
 
   try {
@@ -75,7 +82,8 @@ export async function POST({ request }) {
   }
 }
 
-export async function PUT({ request }) {
+export async function PUT({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const { page, section, data } = await request.json();
 
   try {
@@ -95,7 +103,8 @@ export async function PUT({ request }) {
 
 // Image upload for page content fields
 // Stores in the 'content-images' bucket under 'page-content/' folder
-export async function PATCH({ request }) {
+export async function PATCH({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const formData = await request.formData();
   const file = formData.get('file');
   const page = formData.get('page');

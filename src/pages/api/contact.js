@@ -1,8 +1,15 @@
 export const prerender = false;
 
 import { supabase } from '../../lib/supabase.js';
+import { checkAuth } from '../../utils/auth.js';
 
-export async function GET() {
+const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  status: 401,
+  headers: { 'Content-Type': 'application/json' }
+});
+
+export async function GET({ cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const { data: messages, error } = await supabase
     .from('contact_messages')
     .select('*')
@@ -63,7 +70,8 @@ export async function POST({ request }) {
 }
 
 // Mark message as read
-export async function PATCH({ request }) {
+export async function PATCH({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const { id, is_read } = await request.json();
 
   if (!id) {
@@ -92,7 +100,8 @@ export async function PATCH({ request }) {
   });
 }
 
-export async function DELETE({ url }) {
+export async function DELETE({ url, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const id = parseInt(url.searchParams.get('id'));
 
   if (!id) {

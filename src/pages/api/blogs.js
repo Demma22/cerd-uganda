@@ -1,6 +1,12 @@
 export const prerender = false;
 
 import { supabase } from '../../lib/supabase.js';
+import { checkAuth } from '../../utils/auth.js';
+
+const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  status: 401,
+  headers: { 'Content-Type': 'application/json' }
+});
 
 // Helper function to generate slug
 function generateSlug(title) {
@@ -32,7 +38,8 @@ export async function GET() {
   });
 }
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const formData = await request.formData();
   const title = formData.get('title');
   const content = formData.get('content');
@@ -93,7 +100,8 @@ export async function POST({ request }) {
   });
 }
 
-export async function PUT({ request }) {
+export async function PUT({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const formData = await request.formData();
   const id = parseInt(formData.get('id'));
   const title = formData.get('title');
@@ -157,7 +165,8 @@ export async function PUT({ request }) {
   });
 }
 
-export async function DELETE({ url }) {
+export async function DELETE({ url, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const id = parseInt(url.searchParams.get('id'));
   
   // First get the blog to check if it has an image
