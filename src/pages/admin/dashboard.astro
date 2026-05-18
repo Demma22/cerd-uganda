@@ -838,6 +838,18 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         return '<div class="field-group"><label>' + label + '<\/label><input type="text" id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" value="' + escapeHtml(value) + '"><\/div>';
       }
 
+      function imageField(label, id, page, section, fieldName, currentUrl) {
+        const preview = currentUrl
+          ? '<img src="' + escapeHtml(currentUrl) + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" />'
+          : '<span style="font-size:0.75rem;color:#999;display:block;margin-bottom:0.5rem;">No image</span>';
+        return '<div class="field-group">' +
+          '<label>' + label + '<\/label>' +
+          '<div id="preview_' + id + '">' + preview + '<\/div>' +
+          '<input type="file" accept="image/*" style="display:block;width:100%;padding:0.4rem 0;font-size:0.85rem;" onchange="uploadContentImage(this, \'' + page + '\', \'' + section + '\', \'' + fieldName + '\', \'' + id + '\')" />' +
+          '<input type="hidden" id="' + id + '" class="content-field" data-page="' + page + '" data-section="' + section + '" data-field="' + fieldName + '" value="' + escapeHtml(currentUrl) + '" />' +
+        '<\/div>';
+      }
+
       function section(title, fields) {
         return '<div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;"><h3 style="color: #2d5016; margin-bottom: 1rem;">' + title + '<\/h3>' + fields + '<\/div>';
       }
@@ -857,13 +869,16 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         field('Title', 'hero_title', 'homepage', 'hero', 'title', (hp.hero || {}).title || '') +
         field('Subtitle', 'hero_subtitle', 'homepage', 'hero', 'subtitle', (hp.hero || {}).subtitle || '', 'textarea') +
         field('Button Text', 'hero_buttonText', 'homepage', 'hero', 'buttonText', (hp.hero || {}).buttonText || '') +
-        field('Hero Image URL', 'hero_image', 'homepage', 'hero', 'image', (hp.hero || {}).image || '')
+        field('Button Link', 'hero_buttonLink', 'homepage', 'hero', 'buttonLink', (hp.hero || {}).buttonLink || '') +
+        imageField('Hero Image', 'hero_image', 'homepage', 'hero', 'image', (hp.hero || {}).image || '')
       );
 
       html += section('Mission & Goal Section',
         field('Title', 'mission_title', 'homepage', 'mission', 'title', (hp.mission || {}).title || '') +
         field('Description', 'mission_description', 'homepage', 'mission', 'description', (hp.mission || {}).description || '', 'textarea') +
-        field('Goal', 'mission_goal', 'homepage', 'mission', 'goal', (hp.mission || {}).goal || '', 'textarea')
+        field('Goal', 'mission_goal', 'homepage', 'mission', 'goal', (hp.mission || {}).goal || '', 'textarea') +
+        field('Pillar 1', 'mission_pillar1', 'homepage', 'mission', 'pillar1', (hp.mission || {}).pillar1 || '') +
+        field('Pillar 2', 'mission_pillar2', 'homepage', 'mission', 'pillar2', (hp.mission || {}).pillar2 || '')
       );
 
       html += section('Vision Section',
@@ -876,10 +891,26 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         field('Vision Statement', 'impact_vision', 'homepage', 'impact', 'vision', (hp.impact || {}).vision || '', 'textarea')
       );
 
+      html += section('Principles Section (What We Stand For)',
+        field('Title', 'principles_title', 'homepage', 'principles', 'title', (hp.principles || {}).title || '') +
+        imageField('Card 1 Image', 'principles_items_0_image', 'homepage', 'principles', 'items_0_image', ((hp.principles || {}).items || [])[0]?.image || '') +
+        field('Card 1 Title', 'principles_items_0_title', 'homepage', 'principles', 'items_0_title', ((hp.principles || {}).items || [])[0]?.title || '') +
+        field('Card 1 Description', 'principles_items_0_desc', 'homepage', 'principles', 'items_0_desc', ((hp.principles || {}).items || [])[0]?.description || '', 'textarea') +
+        imageField('Card 2 Image', 'principles_items_1_image', 'homepage', 'principles', 'items_1_image', ((hp.principles || {}).items || [])[1]?.image || '') +
+        field('Card 2 Title', 'principles_items_1_title', 'homepage', 'principles', 'items_1_title', ((hp.principles || {}).items || [])[1]?.title || '') +
+        field('Card 2 Description', 'principles_items_1_desc', 'homepage', 'principles', 'items_1_desc', ((hp.principles || {}).items || [])[1]?.description || '', 'textarea') +
+        imageField('Card 3 Image', 'principles_items_2_image', 'homepage', 'principles', 'items_2_image', ((hp.principles || {}).items || [])[2]?.image || '') +
+        field('Card 3 Title', 'principles_items_2_title', 'homepage', 'principles', 'items_2_title', ((hp.principles || {}).items || [])[2]?.title || '') +
+        field('Card 3 Description', 'principles_items_2_desc', 'homepage', 'principles', 'items_2_desc', ((hp.principles || {}).items || [])[2]?.description || '', 'textarea') +
+        imageField('Card 4 Image', 'principles_items_3_image', 'homepage', 'principles', 'items_3_image', ((hp.principles || {}).items || [])[3]?.image || '') +
+        field('Card 4 Title', 'principles_items_3_title', 'homepage', 'principles', 'items_3_title', ((hp.principles || {}).items || [])[3]?.title || '') +
+        field('Card 4 Description', 'principles_items_3_desc', 'homepage', 'principles', 'items_3_desc', ((hp.principles || {}).items || [])[3]?.description || '', 'textarea')
+      );
+
       html += section('Producers Section',
         field('Title', 'producers_title', 'homepage', 'producers', 'title', (hp.producers || {}).title || '') +
         field('Description', 'producers_description', 'homepage', 'producers', 'description', (hp.producers || {}).description || '', 'textarea') +
-        field('Background Image URL', 'producers_image', 'homepage', 'producers', 'image', (hp.producers || {}).image || '')
+        imageField('Background Image', 'producers_image', 'homepage', 'producers', 'image', (hp.producers || {}).image || '')
       );
 
       html += section('Recent Works Section',
@@ -908,6 +939,32 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         field('Highlight', 'about_focus_highlight', 'about', 'focus', 'highlight', (ab.focus || {}).highlight || '')
       );
 
+      html += section('Stats Section',
+        field('Stat 1 Number', 'about_stats_0_number', 'about', 'stats', 'items_0_number', ((ab.stats || {}).items || [])[0]?.number || '') +
+        field('Stat 1 Label', 'about_stats_0_label', 'about', 'stats', 'items_0_label', ((ab.stats || {}).items || [])[0]?.label || '') +
+        field('Stat 2 Number', 'about_stats_1_number', 'about', 'stats', 'items_1_number', ((ab.stats || {}).items || [])[1]?.number || '') +
+        field('Stat 2 Label', 'about_stats_1_label', 'about', 'stats', 'items_1_label', ((ab.stats || {}).items || [])[1]?.label || '')
+      );
+
+      html += section('Programs Section',
+        imageField('Program 1 Image', 'about_programs_0_image', 'about', 'programs', 'items_0_image', ((ab.programs || {}).items || [])[0]?.image || '') +
+        field('Program 1 Title', 'about_programs_0_title', 'about', 'programs', 'items_0_title', ((ab.programs || {}).items || [])[0]?.title || '') +
+        field('Program 1 Description', 'about_programs_0_desc', 'about', 'programs', 'items_0_desc', ((ab.programs || {}).items || [])[0]?.description || '', 'textarea') +
+        imageField('Program 2 Image', 'about_programs_1_image', 'about', 'programs', 'items_1_image', ((ab.programs || {}).items || [])[1]?.image || '') +
+        field('Program 2 Title', 'about_programs_1_title', 'about', 'programs', 'items_1_title', ((ab.programs || {}).items || [])[1]?.title || '') +
+        field('Program 2 Description', 'about_programs_1_desc', 'about', 'programs', 'items_1_desc', ((ab.programs || {}).items || [])[1]?.description || '', 'textarea')
+      );
+
+      html += section('Gallery Section',
+        field('Title', 'about_gallery_title', 'about', 'gallery', 'title', (ab.gallery || {}).title || '') +
+        imageField('Gallery Image 1', 'about_gallery_img_0', 'about', 'gallery', 'images_0', ((ab.gallery || {}).images || [])[0] || '') +
+        imageField('Gallery Image 2', 'about_gallery_img_1', 'about', 'gallery', 'images_1', ((ab.gallery || {}).images || [])[1] || '') +
+        imageField('Gallery Image 3', 'about_gallery_img_2', 'about', 'gallery', 'images_2', ((ab.gallery || {}).images || [])[2] || '') +
+        imageField('Gallery Image 4', 'about_gallery_img_3', 'about', 'gallery', 'images_3', ((ab.gallery || {}).images || [])[3] || '') +
+        imageField('Gallery Image 5', 'about_gallery_img_4', 'about', 'gallery', 'images_4', ((ab.gallery || {}).images || [])[4] || '') +
+        imageField('Gallery Image 6', 'about_gallery_img_5', 'about', 'gallery', 'images_5', ((ab.gallery || {}).images || [])[5] || '')
+      );
+
       html += section('Mission Quote Section',
         field('Quote', 'about_mission_quote', 'about', 'mission', 'quote', (ab.mission || {}).quote || '', 'textarea') +
         field('Goal Statement', 'about_mission_goal', 'about', 'mission', 'goal', (ab.mission || {}).goal || '', 'textarea')
@@ -923,8 +980,15 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
 
       html += '<div id="tab-settings" class="tab-pane" style="display: none;">';
       html += '<div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem;">';
-      html += field('Site Name', 'siteName', 'siteSettings', 'full', 'siteName', ss.siteName || '');
-      html += field('Footer Text', 'footerText', 'siteSettings', 'full', 'footerText', ss.footerText || '');
+      html += '<h3 style="color: #2d5016; margin-bottom: 1rem;">Site Settings<\/h3>';
+      html += field('Site Name', 'siteName', 'siteSettings', 'full', 'siteName', (ss.full || {}).siteName || '');
+      html += field('Site Tagline', 'siteTagline', 'siteSettings', 'full', 'siteTagline', (ss.full || {}).siteTagline || '');
+      html += field('Footer Text', 'footerText', 'siteSettings', 'full', 'footerText', (ss.full || {}).footerText || '');
+      html += field('Contact Email', 'contactEmail', 'siteSettings', 'full', 'contactEmail', (ss.full || {}).contactEmail || '');
+      html += field('Primary Phone', 'contactPhone', 'siteSettings', 'full', 'contactPhone', (ss.full || {}).contactPhone || '');
+      html += field('Secondary Phone', 'contactPhone2', 'siteSettings', 'full', 'contactPhone2', (ss.full || {}).contactPhone2 || '');
+      html += field('Address', 'address', 'siteSettings', 'full', 'address', (ss.full || {}).address || '', 'textarea');
+      html += field('Location (e.g. city or map label)', 'location', 'siteSettings', 'full', 'location', (ss.full || {}).location || '');
       html += '<\/div><\/div>';
 
       html += '<div style="margin-top: 1.5rem; text-align: right;">';
@@ -955,25 +1019,82 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         const btn = document.getElementById('saveContentBtn');
         btn.textContent = 'Saving...';
         btn.disabled = true;
+
+        // Collect all plain content-field values
         const fields = container.querySelectorAll('.content-field');
+        // Group sub-fields (e.g. items_0_title, items_1_image) by their parent field
+        const structured = {}; // key: "page|section|parentField" -> array of sub-values
+        const plainFields = [];
+
         for (const f of fields) {
+          const fieldName = f.dataset.field;
+          // Sub-field pattern: items_N_key or images_N
+          const subMatch = fieldName.match(/^(items|images)_(\d+)(?:_(.+))?$/);
+          if (subMatch) {
+            const parentField = subMatch[1]; // "items" or "images"
+            const idx = parseInt(subMatch[2]);
+            const subKey = subMatch[3] || null; // null for plain images array
+            const storeKey = f.dataset.page + '|' + f.dataset.section + '|' + parentField;
+            if (!structured[storeKey]) structured[storeKey] = { page: f.dataset.page, section: f.dataset.section, field: parentField, items: [] };
+            if (!structured[storeKey].items[idx]) structured[storeKey].items[idx] = subKey ? {} : '';
+            if (subKey) {
+              structured[storeKey].items[idx][subKey] = f.value;
+            } else {
+              structured[storeKey].items[idx] = f.value;
+            }
+          } else {
+            plainFields.push(f);
+          }
+        }
+
+        // Save plain fields
+        for (const f of plainFields) {
           await fetch('/api/content', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              page: f.dataset.page,
-              section: f.dataset.section,
-              field: f.dataset.field,
-              value: f.value
-            })
+            body: JSON.stringify({ page: f.dataset.page, section: f.dataset.section, field: f.dataset.field, value: f.value })
           });
         }
+
+        // Save structured fields as JSON arrays
+        for (const entry of Object.values(structured)) {
+          await fetch('/api/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: entry.page, section: entry.section, field: entry.field, value: JSON.stringify(entry.items) })
+          });
+        }
+
         btn.textContent = 'Save All Changes';
         btn.disabled = false;
         const statusDiv = document.getElementById('contentStatus');
         statusDiv.innerHTML = '<span style="color: green; font-weight: 600;">All content saved successfully!<\/span>';
         setTimeout(function() { statusDiv.innerHTML = ''; }, 3000);
       });
+
+      // Image upload for content fields
+      window.uploadContentImage = async function(input, page, section, fieldName, id) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const previewDiv = document.getElementById('preview_' + id);
+        if (previewDiv) previewDiv.innerHTML = '<span style="font-size:0.75rem;color:#666;">Uploading...</span>';
+
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('page', page);
+        fd.append('section', section);
+        fd.append('field', fieldName);
+
+        const res = await fetch('/api/content', { method: 'PATCH', body: fd });
+        const data = await res.json();
+
+        if (data.url) {
+          document.getElementById(id).value = data.url;
+          if (previewDiv) previewDiv.innerHTML = '<img src="' + data.url + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" />';
+        } else {
+          if (previewDiv) previewDiv.innerHTML = '<span style="font-size:0.75rem;color:red;">Upload failed<\/span>';
+        }
+      };
     }
 
 

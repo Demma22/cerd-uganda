@@ -56,7 +56,13 @@ const siteSettings = pageContent.siteSettings || {};
         <div class="form-group"><label>Title</label><input type="text" id="hero_title" class="content-field" data-page="homepage" data-section="hero" data-field="title" value={homepage.hero?.title || ""} /></div>
         <div class="form-group"><label>Subtitle</label><textarea id="hero_subtitle" class="content-field" data-page="homepage" data-section="hero" data-field="subtitle" rows="3">{homepage.hero?.subtitle || ""}</textarea></div>
         <div class="form-group"><label>Button Text</label><input type="text" id="hero_buttonText" class="content-field" data-page="homepage" data-section="hero" data-field="buttonText" value={homepage.hero?.buttonText || ""} /></div>
-        <div class="form-group"><label>Hero Image URL</label><input type="text" id="hero_image" class="content-field" data-page="homepage" data-section="hero" data-field="image" value={homepage.hero?.image || ""} /></div>
+        <div class="form-group"><label>Button Link</label><input type="text" id="hero_buttonLink" class="content-field" data-page="homepage" data-section="hero" data-field="buttonLink" value={homepage.hero?.buttonLink || ""} /></div>
+        <div class="form-group">
+          <label>Hero Image</label>
+          <div id="preview_hero_image">{homepage.hero?.image ? <img src={homepage.hero.image} style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" /> : <span style="font-size:0.75rem;color:#999;display:block;margin-bottom:0.5rem;">No image</span>}</div>
+          <input type="file" accept="image/*" style="display:block;width:100%;padding:0.4rem 0;font-size:0.85rem;" onchange="uploadContentImage(this, 'homepage', 'hero', 'image', 'hero_image')" />
+          <input type="hidden" id="hero_image" class="content-field" data-page="homepage" data-section="hero" data-field="image" value={homepage.hero?.image || ""} />
+        </div>
       </div>
 
       <!-- Mission Section -->
@@ -65,6 +71,8 @@ const siteSettings = pageContent.siteSettings || {};
         <div class="form-group"><label>Title</label><input type="text" id="mission_title" class="content-field" data-page="homepage" data-section="mission" data-field="title" value={homepage.mission?.title || ""} /></div>
         <div class="form-group"><label>Description</label><textarea id="mission_description" class="content-field" data-page="homepage" data-section="mission" data-field="description" rows="4">{homepage.mission?.description || ""}</textarea></div>
         <div class="form-group"><label>Goal</label><textarea id="mission_goal" class="content-field" data-page="homepage" data-section="mission" data-field="goal" rows="4">{homepage.mission?.goal || ""}</textarea></div>
+        <div class="form-group"><label>Pillar 1</label><input type="text" id="mission_pillar1" class="content-field" data-page="homepage" data-section="mission" data-field="pillar1" value={homepage.mission?.pillar1 || ""} /></div>
+        <div class="form-group"><label>Pillar 2</label><input type="text" id="mission_pillar2" class="content-field" data-page="homepage" data-section="mission" data-field="pillar2" value={homepage.mission?.pillar2 || ""} /></div>
       </div>
 
       <!-- Vision Section -->
@@ -81,12 +89,39 @@ const siteSettings = pageContent.siteSettings || {};
         <div class="form-group"><label>Vision Statement</label><textarea id="impact_vision" class="content-field" data-page="homepage" data-section="impact" data-field="vision" rows="3">{homepage.impact?.vision || ""}</textarea></div>
       </div>
 
+      <!-- Principles Section -->
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Principles Section (What We Stand For)</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="principles_title" class="content-field" data-page="homepage" data-section="principles" data-field="title" value={homepage.principles?.title || ""} /></div>
+        {[0,1,2,3].map((i) => {
+          const card = (homepage.principles?.items || [])[i] || {};
+          return (
+            <div style="border:1px solid #e5e7eb;border-radius:0.375rem;padding:1rem;margin-bottom:0.75rem;">
+              <p style="font-weight:600;font-size:0.8rem;color:#6b7280;margin:0 0 0.75rem;">Card {i+1}</p>
+              <div class="form-group">
+                <label>Image</label>
+                <div id={`preview_principles_items_${i}_image`}>{card.image ? <img src={card.image} style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" /> : <span style="font-size:0.75rem;color:#999;display:block;margin-bottom:0.5rem;">No image</span>}</div>
+                <input type="file" accept="image/*" style="display:block;width:100%;padding:0.4rem 0;font-size:0.85rem;" onchange={`uploadContentImage(this,'homepage','principles','items_${i}_image','principles_items_${i}_image')`} />
+                <input type="hidden" id={`principles_items_${i}_image`} class="content-field" data-page="homepage" data-section="principles" data-field={`items_${i}_image`} value={card.image || ""} />
+              </div>
+              <div class="form-group"><label>Title</label><input type="text" id={`principles_items_${i}_title`} class="content-field" data-page="homepage" data-section="principles" data-field={`items_${i}_title`} value={card.title || ""} /></div>
+              <div class="form-group"><label>Description</label><textarea id={`principles_items_${i}_desc`} class="content-field" data-page="homepage" data-section="principles" data-field={`items_${i}_desc`} rows="2">{card.description || ""}</textarea></div>
+            </div>
+          );
+        })}
+      </div>
+
       <!-- Producers Section -->
       <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
         <h3 style="color: #2d5016; margin-bottom: 1rem;">Producers Section</h3>
         <div class="form-group"><label>Title</label><input type="text" id="producers_title" class="content-field" data-page="homepage" data-section="producers" data-field="title" value={homepage.producers?.title || ""} /></div>
         <div class="form-group"><label>Description</label><textarea id="producers_description" class="content-field" data-page="homepage" data-section="producers" data-field="description" rows="5">{homepage.producers?.description || ""}</textarea></div>
-        <div class="form-group"><label>Background Image URL</label><input type="text" id="producers_image" class="content-field" data-page="homepage" data-section="producers" data-field="image" value={homepage.producers?.image || ""} /></div>
+        <div class="form-group">
+          <label>Background Image</label>
+          <div id="preview_producers_image">{homepage.producers?.image ? <img src={homepage.producers.image} style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" /> : <span style="font-size:0.75rem;color:#999;display:block;margin-bottom:0.5rem;">No image</span>}</div>
+          <input type="file" accept="image/*" style="display:block;width:100%;padding:0.4rem 0;font-size:0.85rem;" onchange="uploadContentImage(this,'homepage','producers','image','producers_image')" />
+          <input type="hidden" id="producers_image" class="content-field" data-page="homepage" data-section="producers" data-field="image" value={homepage.producers?.image || ""} />
+        </div>
       </div>
 
       <!-- Recent Works Section -->
@@ -121,6 +156,56 @@ const siteSettings = pageContent.siteSettings || {};
       </div>
 
       <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Stats Section</h3>
+        {[0,1].map((i) => {
+          const stat = (about.stats?.items || [])[i] || {};
+          return (
+            <div style="border:1px solid #e5e7eb;border-radius:0.375rem;padding:1rem;margin-bottom:0.75rem;">
+              <p style="font-weight:600;font-size:0.8rem;color:#6b7280;margin:0 0 0.75rem;">Stat {i+1}</p>
+              <div class="form-group"><label>Number</label><input type="text" id={`about_stats_${i}_number`} class="content-field" data-page="about" data-section="stats" data-field={`items_${i}_number`} value={stat.number || ""} /></div>
+              <div class="form-group"><label>Label</label><input type="text" id={`about_stats_${i}_label`} class="content-field" data-page="about" data-section="stats" data-field={`items_${i}_label`} value={stat.label || ""} /></div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Programs Section</h3>
+        {[0,1].map((i) => {
+          const prog = (about.programs?.items || [])[i] || {};
+          return (
+            <div style="border:1px solid #e5e7eb;border-radius:0.375rem;padding:1rem;margin-bottom:0.75rem;">
+              <p style="font-weight:600;font-size:0.8rem;color:#6b7280;margin:0 0 0.75rem;">Program {i+1}</p>
+              <div class="form-group">
+                <label>Image</label>
+                <div id={`preview_about_programs_${i}_image`}>{prog.image ? <img src={prog.image} style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" /> : <span style="font-size:0.75rem;color:#999;display:block;margin-bottom:0.5rem;">No image</span>}</div>
+                <input type="file" accept="image/*" style="display:block;width:100%;padding:0.4rem 0;font-size:0.85rem;" onchange={`uploadContentImage(this,'about','programs','items_${i}_image','about_programs_${i}_image')`} />
+                <input type="hidden" id={`about_programs_${i}_image`} class="content-field" data-page="about" data-section="programs" data-field={`items_${i}_image`} value={prog.image || ""} />
+              </div>
+              <div class="form-group"><label>Title</label><input type="text" id={`about_programs_${i}_title`} class="content-field" data-page="about" data-section="programs" data-field={`items_${i}_title`} value={prog.title || ""} /></div>
+              <div class="form-group"><label>Description</label><textarea id={`about_programs_${i}_desc`} class="content-field" data-page="about" data-section="programs" data-field={`items_${i}_desc`} rows="3">{prog.description || ""}</textarea></div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
+        <h3 style="color: #2d5016; margin-bottom: 1rem;">Gallery Section</h3>
+        <div class="form-group"><label>Title</label><input type="text" id="about_gallery_title" class="content-field" data-page="about" data-section="gallery" data-field="title" value={about.gallery?.title || ""} /></div>
+        {[0,1,2,3,4,5].map((i) => {
+          const imgUrl = (about.gallery?.images || [])[i] || "";
+          return (
+            <div class="form-group">
+              <label>Gallery Image {i+1}</label>
+              <div id={`preview_about_gallery_img_${i}`}>{imgUrl ? <img src={imgUrl} style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" /> : <span style="font-size:0.75rem;color:#999;display:block;margin-bottom:0.5rem;">No image</span>}</div>
+              <input type="file" accept="image/*" style="display:block;width:100%;padding:0.4rem 0;font-size:0.85rem;" onchange={`uploadContentImage(this,'about','gallery','images_${i}','about_gallery_img_${i}')`} />
+              <input type="hidden" id={`about_gallery_img_${i}`} class="content-field" data-page="about" data-section="gallery" data-field={`images_${i}`} value={imgUrl} />
+            </div>
+          );
+        })}
+      </div>
+
+      <div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;">
         <h3 style="color: #2d5016; margin-bottom: 1rem;">Mission Quote Section</h3>
         <div class="form-group"><label>Quote</label><textarea id="about_mission_quote" class="content-field" data-page="about" data-section="mission" data-field="quote" rows="3">{about.mission?.quote || ""}</textarea></div>
         <div class="form-group"><label>Goal Statement</label><textarea id="about_mission_goal" class="content-field" data-page="about" data-section="mission" data-field="goal" rows="3">{about.mission?.goal || ""}</textarea></div>
@@ -138,13 +223,14 @@ const siteSettings = pageContent.siteSettings || {};
     <div id="settings-editor" class="editor-pane" style="display: none;">
       <div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem;">
         <h3 style="color: #2d5016; margin-bottom: 1rem;">Site Settings</h3>
-        <div class="form-group"><label>Site Name</label><input type="text" id="siteName" class="content-field" data-page="siteSettings" data-section="full" data-field="siteName" value={siteSettings.siteName || ""} /></div>
-        <div class="form-group"><label>Footer Text</label><input type="text" id="footerText" class="content-field" data-page="siteSettings" data-section="full" data-field="footerText" value={siteSettings.footerText || ""} /></div>
-        <div class="form-group"><label>Contact Email</label><input type="email" id="contactEmail" class="content-field" data-page="siteSettings" data-section="full" data-field="contactEmail" value={siteSettings.contactEmail || ""} /></div>
-        <div class="form-group"><label>Primary Phone</label><input type="text" id="contactPhone" class="content-field" data-page="siteSettings" data-section="full" data-field="contactPhone" value={siteSettings.contactPhone || ""} /></div>
-        <div class="form-group"><label>Secondary Phone</label><input type="text" id="contactPhone2" class="content-field" data-page="siteSettings" data-section="full" data-field="contactPhone2" value={siteSettings.contactPhone2 || ""} /></div>
-        <div class="form-group"><label>Address</label><textarea id="address" class="content-field" data-page="siteSettings" data-section="full" data-field="address" rows="2">{siteSettings.address || ""}</textarea></div>
-        <div class="form-group"><label>Location (e.g. city or map label)</label><input type="text" id="location" class="content-field" data-page="siteSettings" data-section="full" data-field="location" value={siteSettings.location || ""} /></div>
+        <div class="form-group"><label>Site Name</label><input type="text" id="siteName" class="content-field" data-page="siteSettings" data-section="full" data-field="siteName" value={siteSettings.full?.siteName || ""} /></div>
+        <div class="form-group"><label>Site Tagline</label><input type="text" id="siteTagline" class="content-field" data-page="siteSettings" data-section="full" data-field="siteTagline" value={siteSettings.full?.siteTagline || ""} /></div>
+        <div class="form-group"><label>Footer Text</label><input type="text" id="footerText" class="content-field" data-page="siteSettings" data-section="full" data-field="footerText" value={siteSettings.full?.footerText || ""} /></div>
+        <div class="form-group"><label>Contact Email</label><input type="email" id="contactEmail" class="content-field" data-page="siteSettings" data-section="full" data-field="contactEmail" value={siteSettings.full?.contactEmail || ""} /></div>
+        <div class="form-group"><label>Primary Phone</label><input type="text" id="contactPhone" class="content-field" data-page="siteSettings" data-section="full" data-field="contactPhone" value={siteSettings.full?.contactPhone || ""} /></div>
+        <div class="form-group"><label>Secondary Phone</label><input type="text" id="contactPhone2" class="content-field" data-page="siteSettings" data-section="full" data-field="contactPhone2" value={siteSettings.full?.contactPhone2 || ""} /></div>
+        <div class="form-group"><label>Address</label><textarea id="address" class="content-field" data-page="siteSettings" data-section="full" data-field="address" rows="2">{siteSettings.full?.address || ""}</textarea></div>
+        <div class="form-group"><label>Location (e.g. city or map label)</label><input type="text" id="location" class="content-field" data-page="siteSettings" data-section="full" data-field="location" value={siteSettings.full?.location || ""} /></div>
       </div>
     </div>
 
@@ -206,32 +292,53 @@ const siteSettings = pageContent.siteSettings || {};
     // Save all content to Supabase
     window.savePageContent = async function() {
       const fields = document.querySelectorAll('.content-field');
-      let successCount = 0;
-      let errorCount = 0;
-      
-      for (const field of fields) {
-        try {
-          const response = await fetch('/api/content', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              page: field.dataset.page, 
-              section: field.dataset.section, 
-              field: field.dataset.field, 
-              value: field.value 
-            })
-          });
-          
-          if (response.ok) {
-            successCount++;
+      const structured = {};
+      const plainFields = [];
+
+      for (const f of fields) {
+        const fieldName = f.dataset.field;
+        const subMatch = fieldName.match(/^(items|images)_(\d+)(?:_(.+))?$/);
+        if (subMatch) {
+          const parentField = subMatch[1];
+          const idx = parseInt(subMatch[2]);
+          const subKey = subMatch[3] || null;
+          const storeKey = f.dataset.page + '|' + f.dataset.section + '|' + parentField;
+          if (!structured[storeKey]) structured[storeKey] = { page: f.dataset.page, section: f.dataset.section, field: parentField, items: [] };
+          if (!structured[storeKey].items[idx]) structured[storeKey].items[idx] = subKey ? {} : '';
+          if (subKey) {
+            structured[storeKey].items[idx][subKey] = f.value;
           } else {
-            errorCount++;
+            structured[storeKey].items[idx] = f.value;
           }
-        } catch (error) {
-          errorCount++;
+        } else {
+          plainFields.push(f);
         }
       }
-      
+
+      let errorCount = 0;
+
+      for (const f of plainFields) {
+        try {
+          const res = await fetch('/api/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: f.dataset.page, section: f.dataset.section, field: f.dataset.field, value: f.value })
+          });
+          if (!res.ok) errorCount++;
+        } catch { errorCount++; }
+      }
+
+      for (const entry of Object.values(structured)) {
+        try {
+          const res = await fetch('/api/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: entry.page, section: entry.section, field: entry.field, value: JSON.stringify(entry.items) })
+          });
+          if (!res.ok) errorCount++;
+        } catch { errorCount++; }
+      }
+
       const statusDiv = document.getElementById('contentStatus');
       if (errorCount === 0) {
         statusDiv.innerHTML = '<span style="color: green;">All content saved successfully!</span>';
@@ -239,6 +346,29 @@ const siteSettings = pageContent.siteSettings || {};
         statusDiv.innerHTML = '<span style="color: orange;">Saved with some errors. Please check your connection.</span>';
       }
       setTimeout(() => { statusDiv.innerHTML = ''; }, 3000);
+    }
+
+    // Image upload for content image fields
+    window.uploadContentImage = async function(input, page, section, fieldName, id) {
+      if (!input.files || !input.files[0]) return;
+      const previewDiv = document.getElementById('preview_' + id);
+      if (previewDiv) previewDiv.innerHTML = '<span style="font-size:0.75rem;color:#666;">Uploading...</span>';
+
+      const fd = new FormData();
+      fd.append('file', input.files[0]);
+      fd.append('page', page);
+      fd.append('section', section);
+      fd.append('field', fieldName);
+
+      const res = await fetch('/api/content', { method: 'PATCH', body: fd });
+      const data = await res.json();
+
+      if (data.url) {
+        document.getElementById(id).value = data.url;
+        if (previewDiv) previewDiv.innerHTML = '<img src="' + data.url + '" style="max-width:120px;max-height:80px;object-fit:cover;border-radius:0.375rem;display:block;margin-bottom:0.5rem;" />';
+      } else {
+        if (previewDiv) previewDiv.innerHTML = '<span style="font-size:0.75rem;color:red;">Upload failed</span>';
+      }
     }
 
     // Tab navigation
