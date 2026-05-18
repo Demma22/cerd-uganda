@@ -70,15 +70,15 @@ if (galleryData.images) {
   <!-- STORY SPLIT -->
   <section class="story">
     <div class="story-text">
-      <span class="eyebrow eyebrow-sage">About CERD-UG</span>
-      <h2 class="section-h2">{focusData.title || "Learning About Our Journey and Impact"}</h2>
-      <p class="body-text">
+      <span class="eyebrow eyebrow-sage" data-anim="up">About CERD-UG</span>
+      <h2 class="section-h2" data-anim="up" style="transition-delay:0.1s">{focusData.title || "Learning About Our Journey and Impact"}</h2>
+      <p class="body-text" data-anim="up" style="transition-delay:0.18s">
         {focusData.description || "From 2020 to 2024, CERD-UG operated nationally in Uganda focusing on environmental and natural resource management with the primary goal of ecosystem conservation. The organisation carried out several activities promoting sustainable practices and community involvement, aiming to align environmental health with community well-being."}
       </p>
       <p class="body-text focus-highlight">
         {focusData.highlight || "These efforts led to notable achievements in conservation and local development."}
       </p>
-      <div class="story-features">
+      <div class="story-features" data-anim="up" style="transition-delay:0.25s">
         <div class="sf-item">
           <div class="sf-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -100,7 +100,7 @@ if (galleryData.images) {
       </div>
       <a href="/contact" class="btn-forest">Work With Us</a>
     </div>
-    <div class="story-media">
+    <div class="story-media" data-anim="left">
       <img src="/images/home/ceos.jpeg" alt="CERD-UG leadership" class="story-img" />
       <div class="story-badge">
         <span class="sb-num">5+</span>
@@ -111,9 +111,9 @@ if (galleryData.images) {
 
   <!-- STATS BAND -->
   <section class="stats-band">
-    {statsList.length > 0 ? statsList.map((stat) => (
+    {statsList.length > 0 ? statsList.map((stat, i) => (
       <>
-        <div class="stat-cell">
+        <div class="stat-cell" data-anim="up" style={`transition-delay:${i * 0.1}s`}>
           <span class="stat-num">{stat.number}</span>
           <span class="stat-lbl">{stat.label}</span>
         </div>
@@ -121,13 +121,13 @@ if (galleryData.images) {
       </>
     )) : (
       <>
-        <div class="stat-cell"><span class="stat-num">6</span><span class="stat-lbl">Years in Operation</span></div>
+        <div class="stat-cell" data-anim="up" style="transition-delay:0s"><span class="stat-num">6</span><span class="stat-lbl">Years in Operation</span></div>
         <div class="stat-divider"></div>
-        <div class="stat-cell"><span class="stat-num">300+</span><span class="stat-lbl">Farmers Supported</span></div>
+        <div class="stat-cell" data-anim="up" style="transition-delay:0.1s"><span class="stat-num">300+</span><span class="stat-lbl">Farmers Supported</span></div>
         <div class="stat-divider"></div>
-        <div class="stat-cell"><span class="stat-num">12+</span><span class="stat-lbl">Partner Organisations</span></div>
+        <div class="stat-cell" data-anim="up" style="transition-delay:0.2s"><span class="stat-num">12+</span><span class="stat-lbl">Partner Organisations</span></div>
         <div class="stat-divider"></div>
-        <div class="stat-cell"><span class="stat-num">5+</span><span class="stat-lbl">Research Projects</span></div>
+        <div class="stat-cell" data-anim="up" style="transition-delay:0.3s"><span class="stat-num">5+</span><span class="stat-lbl">Research Projects</span></div>
       </>
     )}
   </section>
@@ -135,20 +135,20 @@ if (galleryData.images) {
   <!-- PROGRAMS -->
   <section class="programs">
     <div class="container-site">
-      <div class="programs-header">
+      <div class="programs-header" data-anim="up">
         <span class="eyebrow">Our Programs</span>
         <h2 class="section-h2">How We Make a Difference</h2>
       </div>
     </div>
     <div class="programs-grid">
-      {programsList.length > 0 ? programsList.map((p) => (
-        <div class="program-card">
+      {programsList.length > 0 ? programsList.map((p, i) => (
+        <div class="program-card" data-anim="up" style={`transition-delay:${i * 0.12}s`}>
           <div class="pc-img-wrap"><img src={p.image} alt={p.title} /></div>
           <div class="pc-content"><h3>{p.title}</h3><p>{p.description}</p></div>
         </div>
       )) : (
         <>
-          <div class="program-card">
+          <div class="program-card" data-anim="up" style="transition-delay:0s">
             <div class="pc-img-wrap"><img src="/images/about/InvolveChildren.jpg" alt="School children in agroecological farming" /></div>
             <div class="pc-content">
               <span class="eyebrow eyebrow-sage">Youth Program</span>
@@ -156,7 +156,7 @@ if (galleryData.images) {
               <p>We involve school children in Agroecological farming and understanding their environment. Young school children are taught to appreciate and respect nature, knowing that every component of the ecosystem affects and benefits the other for overall sustainability.</p>
             </div>
           </div>
-          <div class="program-card">
+          <div class="program-card" data-anim="up" style="transition-delay:0.12s">
             <div class="pc-img-wrap"><img src="/images/about/conference1.avif" alt="Policy and systems thinking" /></div>
             <div class="pc-content">
               <span class="eyebrow eyebrow-sage">Policy Program</span>
@@ -187,14 +187,14 @@ if (galleryData.images) {
   <!-- TEAM -->
   <section class="team">
     <div class="container-site">
-      <div class="team-header">
+      <div class="team-header" data-anim="up">
         <span class="eyebrow">Meet The Team</span>
         <h2 class="section-h2">Leadership &amp; Expertise</h2>
         <p class="body-text" style="max-width:580px;">Graduates and students of Agro-ecology can find a practical home at CERD-UG. Our team brings decades of experience in ecosystem research, policy, and community development.</p>
       </div>
       <div class="team-grid">
-        {teamMembers.length > 0 ? teamMembers.map(member => (
-          <div class="team-card">
+        {teamMembers.length > 0 ? teamMembers.map((member, i) => (
+          <div class="team-card" data-anim="up" style={`transition-delay:${i * 0.1}s`}>
             <div class="tc-img"><img src={member.image_url || "/images/about/placeholder.avif"} alt={member.name} /></div>
             <div class="tc-body">
               <h3 class="tc-name">{member.name}</h3>
@@ -277,6 +277,19 @@ if (galleryData.images) {
     </div>
   </section>
 
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('[data-anim]').forEach(el => io.observe(el));
+</script>
+
 </BaseLayout>
 
 <style>
@@ -314,9 +327,9 @@ if (galleryData.images) {
   /* STORY */
   .story { display:grid; grid-template-columns:1fr 1fr; min-height:680px; background:var(--cream); }
   .story-text { padding:7rem 4rem 7rem 6rem; display:flex; flex-direction:column; justify-content:center; }
-  .story-media { position:relative; overflow:hidden; }
-  .story-img { width:100%; height:100%; object-fit:cover; object-position:top center; display:block; }
-  .story-badge { position:absolute; bottom:2.5rem; left:-1px; background:var(--forest); color:#fff; padding:1.25rem 2rem 1.25rem 1.5rem; border-radius:0 0.5rem 0.5rem 0; display:flex; flex-direction:column; gap:0.25rem; }
+  .story-media { position:relative; background:var(--cream); padding:3rem 2.5rem 3rem 1.5rem; display:flex; align-items:stretch; }
+  .story-img { width:100%; object-fit:cover; object-position:top center; display:block; border-radius:0.75rem; box-shadow:0 12px 40px rgba(0,0,0,0.15); }
+  .story-badge { position:absolute; bottom:4.5rem; left:3rem; background:var(--forest); color:#fff; padding:1.25rem 2rem 1.25rem 1.5rem; border-radius:0.5rem; display:flex; flex-direction:column; gap:0.25rem; box-shadow:0 4px 16px rgba(0,0,0,0.25); }
   .sb-num { font-family:var(--ff-disp); font-size:2.25rem; font-weight:700; line-height:1; }
   .sb-label { font-family:var(--ff-body); font-size:0.72rem; opacity:0.7; letter-spacing:0.08em; text-transform:uppercase; }
   .focus-highlight { font-style:italic; color:var(--sage); border-left:3px solid var(--earth); padding-left:1rem; margin:0.5rem 0 1.5rem; }
@@ -392,6 +405,20 @@ if (galleryData.images) {
   .bc-inner { position:relative; z-index:2; text-align:center; }
   .bc-heading { font-family:var(--ff-disp); font-size:clamp(1.5rem,3vw,2.25rem); font-weight:700; color:#fff; line-height:1.45; max-width:680px; margin:0 auto 2.5rem; }
   .bc-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+
+  /* ═══════════════════════════════════ */
+  /* SCROLL ANIMATIONS                   */
+  /* ═══════════════════════════════════ */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-anim] {
+      opacity: 0;
+      transition: opacity 0.75s cubic-bezier(0.4,0,0.2,1), transform 0.75s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-anim="up"]    { transform: translateY(40px); }
+    [data-anim="left"]  { transform: translateX(48px); }
+    [data-anim="right"] { transform: translateX(-48px); }
+    [data-anim].visible { opacity: 1; transform: none; }
+  }
 
   /* RESPONSIVE */
   @media (max-width:1200px) {

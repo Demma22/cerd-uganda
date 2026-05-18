@@ -134,7 +134,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   <!-- MISSION — split layout                      -->
   <!-- ═══════════════════════════════════════════ -->
   <section class="mission">
-    <div class="mission-img-col">
+    <div class="mission-img-col" data-anim="right">
       <img src="/images/home/ceos.jpeg" alt="CERD-UG leadership" class="mission-photo" />
       <div class="mission-img-badge">
         <strong>NGOsource</strong>
@@ -143,16 +143,16 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
     </div>
 
     <div class="mission-text-col">
-      <span class="eyebrow eyebrow-sage">Our Mission</span>
-      <h2 class="section-h2">{missionData.title || "Building a Sustainable Agro-Ecosystem"}</h2>
-      <p class="body-text">
+      <span class="eyebrow eyebrow-sage" data-anim="up">Our Mission</span>
+      <h2 class="section-h2" data-anim="up" style="transition-delay:0.1s">{missionData.title || "Building a Sustainable Agro-Ecosystem"}</h2>
+      <p class="body-text" data-anim="up" style="transition-delay:0.18s">
         {missionData.description || "The mission of CERD-UG is to provide all stakeholders with comprehensive and relevant knowledge and skills that contribute to the sustainability of the ecosystem, health, prosperity, food and nutritional security."}
       </p>
       <p class="body-text">
         <strong>Our goal</strong> {missionData.goal || " is to share our extensive experience in working with the agro-ecosystem to bring about development policy change, improve people's livelihoods, and contribute to achieving food and nutrition security."}
       </p>
 
-      <div class="mission-pillars">
+      <div class="mission-pillars" data-anim="up" style="transition-delay:0.25s">
         <div class="pillar">
           <div class="pillar-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
@@ -175,7 +175,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   <!-- VISION BANNER                               -->
   <!-- ═══════════════════════════════════════════ -->
   <section class="vision-banner">
-    <div class="vision-inner">
+    <div class="vision-inner" data-anim="up">
       <div class="vision-ornament">"</div>
       <blockquote class="vision-quote">
         {vision.quote || "A sustainable agro-ecosystem in which every aspect of development is in harmony and complements each other."}
@@ -189,16 +189,16 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   <!-- ═══════════════════════════════════════════ -->
   <section id="impact-section" class="impact">
     <div class="impact-text">
-      <span class="eyebrow eyebrow-sage">Our Impact</span>
-      <h2 class="section-h2">{impact.title || "Changing lives together through sustainable farming"}</h2>
-      <p class="body-text">
+      <span class="eyebrow eyebrow-sage" data-anim="up">Our Impact</span>
+      <h2 class="section-h2" data-anim="up" style="transition-delay:0.1s">{impact.title || "Changing lives together through sustainable farming"}</h2>
+      <p class="body-text" data-anim="up" style="transition-delay:0.18s">
         {impact.description || "We believe that we can change more lives together by promoting sustainable agricultural practices, engaging with local communities, and supporting local economies."}
         {impact.vision ? " " + impact.vision : ""}
       </p>
       <a href="/about-us" class="btn-forest" style="margin-top: 1rem; display: inline-block;">About CERD-UG</a>
     </div>
 
-    <div class="impact-media">
+    <div class="impact-media" data-anim="left">
       <a href="https://www.youtube.com/watch?v=vTRxLLMVqHQ" target="_blank" rel="noopener" class="video-link">
         <img src="/images/home/fruits.avif" alt="CERD Uganda in action" class="video-thumb-img" />
         <div class="play-ring">
@@ -213,7 +213,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   <!-- ═══════════════════════════════════════════ -->
   <section class="principles">
     <div class="container-site">
-      <div class="principles-header">
+      <div class="principles-header" data-anim="up">
         <div>
           <span class="eyebrow">Our Principles</span>
           <h2 class="section-h2">{principles.title || "What We Stand For"}</h2>
@@ -223,7 +223,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
 
       <div class="principles-grid">
         {displayPrinciples.map((item, i) => (
-          <article class="principle-card">
+          <article class="principle-card" data-anim="up" style={`transition-delay:${i * 0.1}s`}>
             <div class="pc-img">
               <img src={item.image || "/images/home/veg.avif"} alt={item.title} />
             </div>
@@ -242,35 +242,35 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   <!-- HOW WE WORK — numbered steps               -->
   <!-- ═══════════════════════════════════════════ -->
   <section class="how-we-work">
-    <div class="hww-img-col">
+    <div class="hww-img-col" data-anim="right">
       <img src="/images/home/coffee.avif" alt="CERD-UG field work" />
     </div>
     <div class="hww-content">
-      <span class="eyebrow eyebrow-sage">Our Approach</span>
-      <h2 class="section-h2">{producers.title || "How We Approach Sustainable Development"}</h2>
+      <span class="eyebrow eyebrow-sage" data-anim="up">Our Approach</span>
+      <h2 class="section-h2" data-anim="up" style="transition-delay:0.1s">{producers.title || "How We Approach Sustainable Development"}</h2>
       <div class="steps">
-        <div class="step-item">
+        <div class="step-item" data-anim="up" style="transition-delay:0.15s">
           <span class="step-num">01</span>
           <div>
             <h4>Research & Assessment</h4>
             <p>We assess local ecosystems, community needs, and farming practices to build an evidence base for action.</p>
           </div>
         </div>
-        <div class="step-item">
+        <div class="step-item" data-anim="up" style="transition-delay:0.22s">
           <span class="step-num">02</span>
           <div>
             <h4>Capacity Building</h4>
             <p>We equip farmers and stakeholders with skills in agroecology, organic farming, and sustainable land management.</p>
           </div>
         </div>
-        <div class="step-item">
+        <div class="step-item" data-anim="up" style="transition-delay:0.29s">
           <span class="step-num">03</span>
           <div>
             <h4>Market Linkages</h4>
             <p>We connect smallholder farmers to local markets and value chains, improving income and food security.</p>
           </div>
         </div>
-        <div class="step-item">
+        <div class="step-item" data-anim="up" style="transition-delay:0.36s">
           <span class="step-num">04</span>
           <div>
             <h4>Policy Advocacy</h4>
@@ -300,7 +300,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   <!-- ═══════════════════════════════════════════ -->
   <section class="gallery-section">
     <div class="container-site">
-      <div class="gallery-header">
+      <div class="gallery-header" data-anim="up">
         <div>
           <span class="eyebrow">Recent Works</span>
           <h2 class="section-h2">{recentWorks.title || "Our Recent Works"}</h2>
@@ -313,17 +313,17 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
 
       <div class="gallery-grid">
         {galleryImages.length > 0 ? galleryImages.map((img, i) => (
-          <div class={`gi gi-${i + 1}`}>
+          <div class={`gi gi-${i + 1}`} data-anim="up" style={`transition-delay:${i * 0.07}s`}>
             <img src={img.image_url} alt={img.alt || "CERD-UG work"} />
           </div>
         )) : (
           <>
-            <div class="gi gi-1"><img src="/images/home/fruits1.avif" alt="Organic Market" /></div>
-            <div class="gi gi-2"><img src="/images/home/duck.avif" alt="Farm Activities" /></div>
-            <div class="gi gi-3"><img src="/images/home/veg.avif" alt="Community Work" /></div>
-            <div class="gi gi-4"><img src="/images/home/fruit2.avif" alt="Agroecology" /></div>
-            <div class="gi gi-5"><img src="/images/home/fruits.avif" alt="Training" /></div>
-            <div class="gi gi-6"><img src="/images/home/goats.webp" alt="Field Research" /></div>
+            <div class="gi gi-1" data-anim="up" style="transition-delay:0s"><img src="/images/home/fruits1.avif" alt="Organic Market" /></div>
+            <div class="gi gi-2" data-anim="up" style="transition-delay:0.07s"><img src="/images/home/duck.avif" alt="Farm Activities" /></div>
+            <div class="gi gi-3" data-anim="up" style="transition-delay:0.14s"><img src="/images/home/veg.avif" alt="Community Work" /></div>
+            <div class="gi gi-4" data-anim="up" style="transition-delay:0.21s"><img src="/images/home/fruit2.avif" alt="Agroecology" /></div>
+            <div class="gi gi-5" data-anim="up" style="transition-delay:0.28s"><img src="/images/home/fruits.avif" alt="Training" /></div>
+            <div class="gi gi-6" data-anim="up" style="transition-delay:0.35s"><img src="/images/home/goats.webp" alt="Field Research" /></div>
           </>
         )}
       </div>
@@ -367,8 +367,8 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
       </div>
 
       <div class="blog-grid">
-        {recentBlogs.length > 0 ? recentBlogs.map(blog => (
-          <a href={`/blog/${blog.slug}`} class="blog-card">
+        {recentBlogs.length > 0 ? recentBlogs.map((blog, i) => (
+          <a href={`/blog/${blog.slug}`} class="blog-card" data-anim="up" style={`transition-delay:${i * 0.12}s`}>
             <div class="bc-img">
               <img src={blog.image_url || "/images/home/veg.avif"} alt={blog.title} />
             </div>
@@ -401,6 +401,19 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
       </div>
     </div>
   </section>
+
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('[data-anim]').forEach(el => io.observe(el));
+</script>
 
 </BaseLayout>
 
@@ -628,16 +641,27 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   }
   .mission-img-col {
     position: relative;
-    overflow: hidden;
+    background: var(--mist);
+    padding: 2.5rem 2rem;
+    display: flex;
+    align-items: stretch;
   }
-  .mission-photo { width: 100%; height: 100%; max-height: 560px; object-fit: cover; object-position: top center; display: block; }
+  .mission-photo {
+    width: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  }
   .mission-img-badge {
-    position: absolute; bottom: 2rem; right: -1px;
+    position: absolute; bottom: 4rem; right: 1.5rem;
     background: var(--forest); color: #fff;
     padding: 1.1rem 1.75rem;
-    border-radius: 0.5rem 0 0 0.5rem;
+    border-radius: 0.5rem;
     display: flex; flex-direction: column;
     gap: 0.2rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
   }
   .mission-img-badge strong { font-family: var(--ff-disp); font-size: 1rem; }
   .mission-img-badge span { font-size: 0.72rem; opacity: 0.7; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -714,9 +738,22 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
     display: flex; flex-direction: column; justify-content: center;
     max-width: 700px;
   }
-  .impact-media { position: relative; overflow: hidden; min-height: 380px; max-height: 480px; }
-  .video-link { display: block; width: 100%; height: 100%; position: relative; }
-  .video-thumb-img { width: 100%; height: 100%; max-height: 480px; object-fit: cover; object-position: center; display: block; transition: transform 0.5s ease; }
+  .impact-media {
+    position: relative;
+    background: var(--mist);
+    padding: 3rem 2.5rem 3rem 1.5rem;
+    display: flex;
+    align-items: stretch;
+  }
+  .video-link {
+    display: block;
+    width: 100%;
+    position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  }
+  .video-thumb-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 0.5s ease; }
   .video-link:hover .video-thumb-img { transform: scale(1.04); }
   .play-ring {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -968,5 +1005,19 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
     .blog-empty { grid-column: span 1; }
     .gallery-grid { grid-template-columns: 1fr; }
     .bc-btns { flex-direction: column; align-items: center; }
+  }
+
+  /* ═══════════════════════════════════ */
+  /* SCROLL ANIMATIONS                   */
+  /* ═══════════════════════════════════ */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-anim] {
+      opacity: 0;
+      transition: opacity 0.75s cubic-bezier(0.4,0,0.2,1), transform 0.75s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-anim="up"]    { transform: translateY(40px); }
+    [data-anim="left"]  { transform: translateX(48px); }
+    [data-anim="right"] { transform: translateX(-48px); }
+    [data-anim].visible { opacity: 1; transform: none; }
   }
 </style>
