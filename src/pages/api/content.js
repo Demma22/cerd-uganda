@@ -97,7 +97,6 @@ export async function PUT({ request }) {
 
 // Image upload for page content fields
 // Stores in the 'content-images' bucket under 'page-content/' folder
-// Replaces the old image in storage if one already exists for this field
 export async function PATCH({ request }) {
   const formData = await request.formData();
   const file = formData.get('file');
@@ -112,33 +111,10 @@ export async function PATCH({ request }) {
     });
   }
 
-  // Build a stable filename so re-uploading the same field replaces the old file
-  const ext = file.name.split('.').pop();
-  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-');
   const timestamp = Date.now();
+  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-');
   const fileName = `page-content/${page}-${section}-${field}-${timestamp}-${safeName}`;
 
-  // Delete previous image for this field if one exists
-  const { data: existingRows } = await supabase
-    .from('page_content')
-    .select('value')
-    .eq('page', page)
-    .eq('section', section)
-    .eq('field', field)
-    .single();
-
-  if (existingRows?.value) {
-    // Extract the storage path from the public URL
-    const oldUrl = existingRows.value;
-    const marker = '/object/public/content-images/';
-    const markerIdx = oldUrl.indexOf(marker);
-    if (markerIdx !== -1) {
-      const oldPath = oldUrl.slice(markerIdx + marker.length);
-      await supabase.storage.from('content-images').remove([oldPath]);
-    }
-  }
-
-  // Upload new image
   const { error: uploadError } = await supabase.storage
     .from('content-images')
     .upload(fileName, file, {
