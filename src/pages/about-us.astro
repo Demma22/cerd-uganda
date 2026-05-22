@@ -55,7 +55,7 @@ if (galleryData.images) {
 
   <!-- PAGE HERO -->
   <section class="page-hero">
-    <img src="/images/about/conf3.avif" alt="CERD-UG conference" class="ph-img" />
+    <img src="/images/home/video_image.avif" alt="CERD-UG in action" class="ph-img" />
     <div class="ph-overlay"></div>
     <div class="ph-content">
       <span class="eyebrow" style="color:rgba(255,255,255,0.5)">Our Story</span>
@@ -102,10 +102,6 @@ if (galleryData.images) {
     </div>
     <div class="story-media" data-anim="left">
       <img src="/images/home/ceos.jpeg" alt="CERD-UG leadership" class="story-img" />
-      <div class="story-badge">
-        <span class="sb-num">5+</span>
-        <span class="sb-label">Years of Research &amp; Impact</span>
-      </div>
     </div>
   </section>
 
@@ -327,8 +323,8 @@ if (galleryData.images) {
   /* STORY */
   .story { display:grid; grid-template-columns:1fr 1fr; min-height:680px; background:var(--cream); }
   .story-text { padding:7rem 4rem 7rem 6rem; display:flex; flex-direction:column; justify-content:center; }
-  .story-media { position:relative; background:var(--cream); padding:3rem 2.5rem 3rem 1.5rem; display:flex; align-items:stretch; }
-  .story-img { width:100%; object-fit:cover; object-position:top center; display:block; border-radius:0.75rem; box-shadow:0 12px 40px rgba(0,0,0,0.15); }
+  .story-media { position:relative; background:var(--cream); padding:3rem 2.5rem 3rem 1.5rem; display:flex; align-items:center; }
+  .story-img { width:100%; height:auto; max-height:420px; object-fit:cover; object-position:top center; display:block; border-radius:0.75rem; box-shadow:0 12px 40px rgba(0,0,0,0.15); }
   .story-badge { position:absolute; bottom:4.5rem; left:3rem; background:var(--forest); color:#fff; padding:1.25rem 2rem 1.25rem 1.5rem; border-radius:0.5rem; display:flex; flex-direction:column; gap:0.25rem; box-shadow:0 4px 16px rgba(0,0,0,0.25); }
   .sb-num { font-family:var(--ff-disp); font-size:2.25rem; font-weight:700; line-height:1; }
   .sb-label { font-family:var(--ff-body); font-size:0.72rem; opacity:0.7; letter-spacing:0.08em; text-transform:uppercase; }
@@ -346,16 +342,14 @@ if (galleryData.images) {
 
   /* PROGRAMS */
   .programs { padding:8rem 0; background:var(--mist); }
-  .programs-header { max-width:1400px; margin:0 auto 3.5rem; padding:0 1.5rem; }
-  .programs-grid { display:grid; grid-template-columns:1fr 1fr; max-width:1400px; margin:0 auto; }
-  .program-card { display:flex; flex-direction:column; background:var(--white); border:1px solid var(--cream-d); overflow:hidden; transition:transform 0.3s,box-shadow 0.3s; }
-  .program-card:first-child { border-radius:0.75rem 0 0 0.75rem; }
-  .program-card:last-child { border-radius:0 0.75rem 0.75rem 0; }
-  .program-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.1); z-index:1; }
+  .programs-header { max-width:1200px; margin:0 auto 3.5rem; padding:0 2rem; }
+  .programs-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; max-width:1200px; margin:0 auto; padding:0 2rem; }
+  .program-card { display:flex; flex-direction:column; background:var(--white); border-radius:0.75rem; border:1px solid var(--cream-d); overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.05); transition:transform 0.3s,box-shadow 0.3s; }
+  .program-card:hover { transform:translateY(-5px); box-shadow:0 20px 44px rgba(0,0,0,0.1); }
   .pc-img-wrap { overflow:hidden; }
   .pc-img-wrap img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; transition:transform 0.5s; }
   .program-card:hover .pc-img-wrap img { transform:scale(1.04); }
-  .pc-content { padding:2.5rem; flex:1; }
+  .pc-content { padding:2rem 2rem 2.5rem; flex:1; border-top:3px solid var(--forest); }
   .pc-content h3 { font-family:var(--ff-disp); font-size:1.4rem; font-weight:700; color:var(--forest); margin:0.5rem 0 0.75rem; }
   .pc-content p { font-size:0.95rem; line-height:1.75; color:var(--bark); }
 
@@ -370,16 +364,16 @@ if (galleryData.images) {
   /* TEAM */
   .team { padding:8rem 0; background:var(--cream); }
   .team-header { margin-bottom:3.5rem; }
-  .team-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; }
-  .team-card { background:var(--white); border-radius:0.75rem; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); transition:transform 0.3s,box-shadow 0.3s; }
-  .team-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,0.1); }
-  .tc-img { overflow:hidden; }
-  .tc-img img { width:100%; aspect-ratio:3/4; object-fit:cover; object-position:top center; display:block; transition:transform 0.4s; }
+  .team-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.75rem; }
+  .team-card { background:var(--white); border-radius:0.75rem; overflow:hidden; border:1px solid rgba(0,0,0,0.07); box-shadow:0 2px 10px rgba(0,0,0,0.05); transition:transform 0.3s,box-shadow 0.3s; }
+  .team-card:hover { transform:translateY(-5px); box-shadow:0 18px 40px rgba(0,0,0,0.1); }
+  .tc-img { overflow:hidden; position:relative; }
+  .tc-img img { width:100%; aspect-ratio:4/5; object-fit:cover; object-position:top center; display:block; transition:transform 0.4s; }
   .team-card:hover .tc-img img { transform:scale(1.04); }
-  .tc-body { padding:1.5rem 1.25rem; }
-  .tc-name { font-family:var(--ff-disp); font-size:1.05rem; font-weight:700; color:var(--forest); margin-bottom:0.25rem; }
-  .tc-role { font-family:var(--ff-body); font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage); margin-bottom:0.6rem; }
-  .tc-bio { font-size:0.82rem; line-height:1.6; color:var(--bark); margin:0; }
+  .tc-body { padding:1.25rem 1.25rem 1.5rem; border-top:3px solid var(--forest); }
+  .tc-name { font-family:var(--ff-disp); font-size:1.05rem; font-weight:700; color:var(--forest); margin:0 0 0.5rem; }
+  .tc-role { display:inline-block; font-family:var(--ff-body); font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--white); background:var(--sage); padding:0.2rem 0.65rem; border-radius:2rem; margin-bottom:0.75rem; }
+  .tc-bio { font-size:0.82rem; line-height:1.65; color:var(--bark); opacity:0.85; margin:0; }
 
   /* GALLERY */
   .gallery-section { padding:8rem 0; background:var(--cream-d); }
@@ -430,8 +424,6 @@ if (galleryData.images) {
     .story-media { min-height:420px; }
     .story-text { padding:5rem 1.5rem; }
     .programs-grid { grid-template-columns:1fr; }
-    .program-card:first-child { border-radius:0.75rem 0.75rem 0 0; }
-    .program-card:last-child { border-radius:0 0 0.75rem 0.75rem; }
     .gallery-grid { grid-template-columns:repeat(2,1fr); }
     .gi-2,.gi-5 { grid-row:span 1; }
   }
