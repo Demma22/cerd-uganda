@@ -140,7 +140,7 @@ if (galleryData.images) {
       {programsList.length > 0 ? programsList.map((p, i) => (
         <div class="program-card" data-anim="up" style={`transition-delay:${i * 0.12}s`}>
           <div class="pc-img-wrap"><img src={p.image} alt={p.title} /></div>
-          <div class="pc-content"><h3>{p.title}</h3><p>{p.description}</p></div>
+          <div class="pc-content"><h3>{p.title}</h3><p>{p.description || p.desc}</p></div>
         </div>
       )) : (
         <>
@@ -351,7 +351,7 @@ if (galleryData.images) {
   .program-card:hover .pc-img-wrap img { transform:scale(1.04); }
   .pc-content { padding:2rem 2rem 2.5rem; flex:1; border-top:3px solid var(--forest); }
   .pc-content h3 { font-family:var(--ff-disp); font-size:1.4rem; font-weight:700; color:var(--forest); margin:0.5rem 0 0.75rem; }
-  .pc-content p { font-size:0.95rem; line-height:1.75; color:var(--bark); }
+  .pc-content p { font-size:0.95rem; line-height:1.75; color:var(--bark); white-space:pre-line; }
 
   /* VISION */
   .vision-banner { position:relative; padding:8rem 0; background-image:url('/images/about/conf3.avif'); background-size:cover; background-position:center; background-attachment:fixed; text-align:center; }
