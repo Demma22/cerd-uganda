@@ -1,7 +1,11 @@
 ---
-// Page Content Editor Component
-// This component handles all page content editing without affecting other dashboard sections
+import { checkAuth } from "../../utils/auth.js";
 import { supabase } from "../../lib/supabase.js";
+
+if (!checkAuth(Astro.cookies)) {
+  return Astro.redirect('/admin/login');
+}
+
 
 // Fetch page content from Supabase
 let pageContent = {

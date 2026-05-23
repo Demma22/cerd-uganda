@@ -1,9 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { checkAuth } from "../../utils/auth.js";
 
-// Check authentication
-const session = Astro.cookies.get('admin_session');
-if (!session || session.value !== 'authenticated') {
+if (!checkAuth(Astro.cookies)) {
   return Astro.redirect('/admin/login');
 }
 ---

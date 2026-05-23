@@ -2,6 +2,12 @@ export const prerender = false;
 
 import fs from 'fs';
 import path from 'path';
+import { checkAuth } from '../../utils/auth.js';
+
+const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  status: 401,
+  headers: { 'Content-Type': 'application/json' }
+});
 
 const CONTENT_FILE = path.join(process.cwd(), 'src', 'data', 'content.json');
 
@@ -56,7 +62,8 @@ export async function GET() {
   });
 }
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const { page, section, field, value } = await request.json();
   
   const content = getContent();
@@ -72,7 +79,8 @@ export async function POST({ request }) {
   });
 }
 
-export async function PUT({ request }) {
+export async function PUT({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const { page, section, data } = await request.json();
   
   const content = getContent();

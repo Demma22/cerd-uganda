@@ -1,6 +1,12 @@
 export const prerender = false;
 
 import { supabase } from '../../lib/supabase.js';
+import { checkAuth } from '../../utils/auth.js';
+
+const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
+  status: 401,
+  headers: { 'Content-Type': 'application/json' }
+});
 
 // Get all publications from Supabase
 async function getPublications() {
@@ -34,7 +40,8 @@ export async function GET() {
   });
 }
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const formData = await request.formData();
   const file = formData.get('file');
   const title = formData.get('title');
@@ -111,7 +118,8 @@ export async function POST({ request }) {
 }
 
 // Update publication title
-export async function PATCH({ request }) {
+export async function PATCH({ request, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const { id, title } = await request.json();
 
   if (!id || !title) {
@@ -139,7 +147,8 @@ export async function PATCH({ request }) {
 }
 
 // Delete publication
-export async function DELETE({ url }) {
+export async function DELETE({ url, cookies }) {
+  if (!checkAuth(cookies)) return UNAUTHORIZED;
   const id = url.searchParams.get('id');
   const fileName = url.searchParams.get('fileName');
 
