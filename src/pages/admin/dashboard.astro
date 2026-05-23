@@ -895,16 +895,12 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         field('Title', 'principles_title', 'homepage', 'principles', 'title', (hp.principles || {}).title || '') +
         imageField('Card 1 Image', 'principles_items_0_image', 'homepage', 'principles', 'items_0_image', ((hp.principles || {}).items || [])[0]?.image || '') +
         field('Card 1 Title', 'principles_items_0_title', 'homepage', 'principles', 'items_0_title', ((hp.principles || {}).items || [])[0]?.title || '') +
-        field('Card 1 Description', 'principles_items_0_desc', 'homepage', 'principles', 'items_0_desc', ((hp.principles || {}).items || [])[0]?.description || '', 'textarea') +
         imageField('Card 2 Image', 'principles_items_1_image', 'homepage', 'principles', 'items_1_image', ((hp.principles || {}).items || [])[1]?.image || '') +
         field('Card 2 Title', 'principles_items_1_title', 'homepage', 'principles', 'items_1_title', ((hp.principles || {}).items || [])[1]?.title || '') +
-        field('Card 2 Description', 'principles_items_1_desc', 'homepage', 'principles', 'items_1_desc', ((hp.principles || {}).items || [])[1]?.description || '', 'textarea') +
         imageField('Card 3 Image', 'principles_items_2_image', 'homepage', 'principles', 'items_2_image', ((hp.principles || {}).items || [])[2]?.image || '') +
-        field('Card 3 Title', 'principles_items_2_title', 'homepage', 'principles', 'items_2_title', ((hp.principles || {}).items || [])[2]?.title || '') +
-        field('Card 3 Description', 'principles_items_2_desc', 'homepage', 'principles', 'items_2_desc', ((hp.principles || {}).items || [])[2]?.description || '', 'textarea') +
+        field('Card 3 Title', 'principles_items_2_title', 'homepage', 'principles', 'items_3_title', ((hp.principles || {}).items || [])[2]?.title || '') +
         imageField('Card 4 Image', 'principles_items_3_image', 'homepage', 'principles', 'items_3_image', ((hp.principles || {}).items || [])[3]?.image || '') +
-        field('Card 4 Title', 'principles_items_3_title', 'homepage', 'principles', 'items_3_title', ((hp.principles || {}).items || [])[3]?.title || '') +
-        field('Card 4 Description', 'principles_items_3_desc', 'homepage', 'principles', 'items_3_desc', ((hp.principles || {}).items || [])[3]?.description || '', 'textarea')
+        field('Card 4 Title', 'principles_items_3_title', 'homepage', 'principles', 'items_3_title', ((hp.principles || {}).items || [])[3]?.title || '')
       );
 
       html += section('Producers Section',
@@ -913,15 +909,26 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         imageField('Background Image', 'producers_image', 'homepage', 'producers', 'image', (hp.producers || {}).image || '')
       );
 
+      const hwwData = hp.howWeWork || {};
+      html += section('How We Work Section (Our Approach)',
+        field('Section Title', 'hww_title', 'homepage', 'howWeWork', 'title', hwwData.title || '') +
+        field('Step 1 Title', 'hww_step1_title', 'homepage', 'howWeWork', 'step1_title', hwwData.step1_title || '') +
+        field('Step 1 Description', 'hww_step1_desc', 'homepage', 'howWeWork', 'step1_description', hwwData.step1_description || '', 'textarea') +
+        field('Step 2 Title', 'hww_step2_title', 'homepage', 'howWeWork', 'step2_title', hwwData.step2_title || '') +
+        field('Step 2 Description', 'hww_step2_desc', 'homepage', 'howWeWork', 'step2_description', hwwData.step2_description || '', 'textarea') +
+        field('Step 3 Title', 'hww_step3_title', 'homepage', 'howWeWork', 'step3_title', hwwData.step3_title || '') +
+        field('Step 3 Description', 'hww_step3_desc', 'homepage', 'howWeWork', 'step3_description', hwwData.step3_description || '', 'textarea') +
+        field('Step 4 Title', 'hww_step4_title', 'homepage', 'howWeWork', 'step4_title', hwwData.step4_title || '') +
+        field('Step 4 Description', 'hww_step4_desc', 'homepage', 'howWeWork', 'step4_description', hwwData.step4_description || '', 'textarea')
+      );
+
       html += section('Recent Works Section',
         field('Title', 'recentWorks_title', 'homepage', 'recentWorks', 'title', (hp.recentWorks || {}).title || '') +
         field('Subtitle', 'recentWorks_subtitle', 'homepage', 'recentWorks', 'subtitle', (hp.recentWorks || {}).subtitle || '', 'textarea')
       );
 
       html += section('Bottom Call to Action',
-        field('Text', 'bottomCta_text', 'homepage', 'bottomCta', 'text', (hp.bottomCta || {}).text || '', 'textarea') +
-        field('Button Text', 'bottomCta_buttonText', 'homepage', 'bottomCta', 'buttonText', (hp.bottomCta || {}).buttonText || '') +
-        field('Button Link', 'bottomCta_buttonLink', 'homepage', 'bottomCta', 'buttonLink', (hp.bottomCta || {}).buttonLink || '')
+        field('Text', 'bottomCta_text', 'homepage', 'bottomCta', 'text', (hp.bottomCta || {}).text || '', 'textarea')
       );
 
       html += '<\/div>';
@@ -949,10 +956,10 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
       html += section('Programs Section',
         imageField('Program 1 Image', 'about_programs_0_image', 'about', 'programs', 'items_0_image', ((ab.programs || {}).items || [])[0]?.image || '') +
         field('Program 1 Title', 'about_programs_0_title', 'about', 'programs', 'items_0_title', ((ab.programs || {}).items || [])[0]?.title || '') +
-        field('Program 1 Description', 'about_programs_0_desc', 'about', 'programs', 'items_0_desc', ((ab.programs || {}).items || [])[0]?.description || '', 'textarea') +
+        field('Program 1 Description', 'about_programs_0_desc', 'about', 'programs', 'items_0_description', ((ab.programs || {}).items || [])[0]?.description || '', 'textarea') +
         imageField('Program 2 Image', 'about_programs_1_image', 'about', 'programs', 'items_1_image', ((ab.programs || {}).items || [])[1]?.image || '') +
         field('Program 2 Title', 'about_programs_1_title', 'about', 'programs', 'items_1_title', ((ab.programs || {}).items || [])[1]?.title || '') +
-        field('Program 2 Description', 'about_programs_1_desc', 'about', 'programs', 'items_1_desc', ((ab.programs || {}).items || [])[1]?.description || '', 'textarea')
+        field('Program 2 Description', 'about_programs_1_desc', 'about', 'programs', 'items_1_description', ((ab.programs || {}).items || [])[1]?.description || '', 'textarea')
       );
 
       html += section('Gallery Section',
@@ -971,9 +978,7 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
       );
 
       html += section('Bottom Call to Action',
-        field('Text', 'about_bottomCta_text', 'about', 'bottomCta', 'text', (ab.bottomCta || {}).text || '', 'textarea') +
-        field('Button Text', 'about_bottomCta_buttonText', 'about', 'bottomCta', 'buttonText', (ab.bottomCta || {}).buttonText || '') +
-        field('Button Link', 'about_bottomCta_buttonLink', 'about', 'bottomCta', 'buttonLink', (ab.bottomCta || {}).buttonLink || '')
+        field('Text', 'about_bottomCta_text', 'about', 'bottomCta', 'text', (ab.bottomCta || {}).text || '', 'textarea')
       );
 
       html += '<\/div>';
@@ -981,14 +986,12 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
       html += '<div id="tab-settings" class="tab-pane" style="display: none;">';
       html += '<div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem;">';
       html += '<h3 style="color: #2d5016; margin-bottom: 1rem;">Site Settings<\/h3>';
-      html += field('Site Name', 'siteName', 'siteSettings', 'full', 'siteName', (ss.full || {}).siteName || '');
       html += field('Site Tagline', 'siteTagline', 'siteSettings', 'full', 'siteTagline', (ss.full || {}).siteTagline || '');
       html += field('Footer Text', 'footerText', 'siteSettings', 'full', 'footerText', (ss.full || {}).footerText || '');
       html += field('Contact Email', 'contactEmail', 'siteSettings', 'full', 'contactEmail', (ss.full || {}).contactEmail || '');
       html += field('Primary Phone', 'contactPhone', 'siteSettings', 'full', 'contactPhone', (ss.full || {}).contactPhone || '');
       html += field('Secondary Phone', 'contactPhone2', 'siteSettings', 'full', 'contactPhone2', (ss.full || {}).contactPhone2 || '');
       html += field('Address', 'address', 'siteSettings', 'full', 'address', (ss.full || {}).address || '', 'textarea');
-      html += field('Location (e.g. city or map label)', 'location', 'siteSettings', 'full', 'location', (ss.full || {}).location || '');
       html += '<\/div><\/div>';
 
       html += '<div style="margin-top: 1.5rem; text-align: right;">';
