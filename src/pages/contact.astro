@@ -1,5 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { supabase } from '../lib/supabase.js';
+
+let ss: Record<string, string> = {};
+try {
+  const { data, error } = await supabase
+    .from('page_content')
+    .select('field, value')
+    .eq('page', 'siteSettings')
+    .eq('section', 'full');
+  if (!error && data) {
+    for (const row of data) {
+      try { ss[row.field] = JSON.parse(row.value); }
+      catch { ss[row.field] = row.value; }
+    }
+  }
+} catch (e) {}
+
+const phone1  = ss.contactPhone  || '+256 702 616 988';
+const phone2  = ss.contactPhone2 || '+256 782 634 937';
+const email   = ss.contactEmail  || 'info@cerd-uganda.org';
+const address = ss.address       || 'Mpala, Entebbe Road\nEntebbe, Uganda';
 ---
 
 <BaseLayout title="Contact Us | CERD-UG" description="Reach out to CERD-UG for partnerships, research collaborations, or general enquiries. Based in Kampala, Uganda.">
@@ -41,7 +62,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
           <div>
             <p class="info-label">Phone (Primary)</p>
-            <a href="tel:+256702616988" class="info-value">+256 702 616 988</a>
+            <a href={`tel:${phone1.replace(/\s/g,'')}`} class="info-value">{phone1}</a>
           </div>
         </div>
 
@@ -53,7 +74,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
           <div>
             <p class="info-label">Phone (Secondary)</p>
-            <a href="tel:+256782634937" class="info-value">+256 782 634 937</a>
+            <a href={`tel:${phone2.replace(/\s/g,'')}`} class="info-value">{phone2}</a>
           </div>
         </div>
 
@@ -66,7 +87,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
           <div>
             <p class="info-label">Email Address</p>
-            <a href="mailto:info@cerd-uganda.org" class="info-value">info@cerd-uganda.org</a>
+            <a href={`mailto:${email}`} class="info-value">{email}</a>
           </div>
         </div>
 
@@ -79,7 +100,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
           <div>
             <p class="info-label">Location</p>
-            <p class="info-value">Mpala, Entebbe Road<br />Kampala, Uganda</p>
+            <p class="info-value" set:html={address.replace(/\n/g, '<br>')}></p>
           </div>
         </div>
 

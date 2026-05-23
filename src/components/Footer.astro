@@ -1,4 +1,27 @@
 ---
+import { supabase } from '../lib/supabase.js';
+
+let ss: Record<string, string> = {};
+try {
+  const { data, error } = await supabase
+    .from('page_content')
+    .select('field, value')
+    .eq('page', 'siteSettings')
+    .eq('section', 'full');
+  if (!error && data) {
+    for (const row of data) {
+      try { ss[row.field] = JSON.parse(row.value); }
+      catch { ss[row.field] = row.value; }
+    }
+  }
+} catch (e) {}
+
+const tagline  = ss.siteTagline  || 'Center for Ecosystems Research and Development — promoting sustainable agroecology in Uganda and the African region.';
+const address  = ss.address      || 'P.O BOX 701229\nMpala, Entebbe Road\nEntebbe, Uganda';
+const phone1   = ss.contactPhone  || '+256 702 616988';
+const phone2   = ss.contactPhone2 || '+256 782 634937';
+const email    = ss.contactEmail  || 'info@cerd-uganda.org';
+const footerTxt= ss.footerText   || 'Center for Ecosystems Research and Development';
 ---
 
 <footer class="footer">
@@ -7,17 +30,10 @@
       <!-- Brand -->
       <div class="footer-brand">
         <a href="/" class="footer-logo">
-
           <span class="footer-logo-name">CERD-UG</span>
         </a>
-        <p class="footer-tagline">
-          Center for Ecosystems Research and Development — promoting sustainable agroecology in Uganda and the African region.
-        </p>
-        <p class="footer-address">
-          P.O BOX 701229<br>
-          Mpala, Entebbe Road<br>
-          Entebbe, Uganda
-        </p>
+        <p class="footer-tagline">{tagline}</p>
+        <p class="footer-address" set:html={address.replace(/\n/g, '<br>')}></p>
       </div>
 
       <!-- Pages -->
@@ -35,7 +51,7 @@
       <div class="footer-col">
         <h4 class="footer-col-title">Other Pages</h4>
         <ul class="footer-links">
-          <li><a href="/publications">Blog</a></li>
+          <li><a href="/blog">Blog</a></li>
         </ul>
       </div>
 
@@ -43,8 +59,9 @@
       <div class="footer-col">
         <h4 class="footer-col-title">Get In Touch</h4>
         <ul class="footer-links">
-          <li><a href="tel:+256702616988">+256 702 616988</a></li>
-          <li><a href="tel:+256782634937">+256 782 634937</a></li>
+          <li><a href={`tel:${phone1.replace(/\s/g,'')}`}>{phone1}</a></li>
+          {phone2 && <li><a href={`tel:${phone2.replace(/\s/g,'')}`}>{phone2}</a></li>}
+          {email && <li><a href={`mailto:${email}`}>{email}</a></li>}
         </ul>
         <p class="footer-hours">Mon – Fri, 9am – 5pm</p>
       </div>
@@ -54,7 +71,7 @@
   <div class="footer-bottom">
     <div class="container-site footer-bottom-inner">
       <p>&copy; {new Date().getFullYear()} CERD-UG. All rights reserved.</p>
-      <p>Center for Ecosystems Research and Development</p>
+      <p>{footerTxt}</p>
     </div>
   </div>
 </footer>
