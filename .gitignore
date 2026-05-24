@@ -27,3 +27,5 @@ pnpm-debug.log*
 
 .astro
 .vercel
+
+CERD_Dashboard_QA.xlsx
