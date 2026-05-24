@@ -167,24 +167,6 @@ const address = ss.address       || 'Mpala, Entebbe Road\nEntebbe, Uganda';
 
   </section>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- MAP STRIP                                   -->
-  <!-- ═══════════════════════════════════════════ -->
-  <section class="map-strip">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.747!2d32.4752!3d0.2916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbbf8de5d0d91%3A0x1c4b6c1c9a6c6b0a!2sMpala%2C%20Entebbe%20Rd%2C%20Kampala%2C%20Uganda!5e0!3m2!1sen!2sug!4v1"
-      width="100%" height="100%"
-      style="border:0;"
-      allowfullscreen=""
-      loading="lazy"
-      referrerpolicy="no-referrer-when-downgrade"
-      title="CERD-UG location on map"
-    ></iframe>
-    <a href="https://maps.google.com/?q=Mpala,Entebbe+Road,Kampala,Uganda" target="_blank" rel="noopener" class="map-cta">
-      Open in Google Maps
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    </a>
-  </section>
 
   <style>
     :root {
@@ -418,26 +400,6 @@ const address = ss.address       || 'Mpala, Entebbe Road\nEntebbe, Uganda';
       border-left: 4px solid #dc2626;
     }
 
-    /* ── MAP ── */
-    .map-strip {
-      position: relative;
-      height: 420px;
-      background: var(--cream-d);
-    }
-    .map-strip iframe { display: block; width: 100%; height: 100%; }
-    .map-cta {
-      position: absolute; bottom: 1.5rem; right: 1.5rem;
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: var(--forest); color: #fff;
-      padding: 0.65rem 1.25rem;
-      font-family: var(--ff-body); font-weight: 700;
-      font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
-      border-radius: 0.25rem; text-decoration: none;
-      transition: background 0.2s;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-    }
-    .map-cta:hover { background: var(--forest-l); }
-
     /* ── RESPONSIVE ── */
     @media (max-width: 1100px) {
       .contact-block { grid-template-columns: 360px 1fr; }
@@ -455,8 +417,7 @@ const address = ss.address       || 'Mpala, Entebbe Road\nEntebbe, Uganda';
       .field-row { grid-template-columns: 1fr; gap: 0; }
       .form-panel { padding: 3rem 1.5rem; }
       .info-panel { padding: 3rem 1.5rem; }
-      .map-strip { height: 300px; }
-      .submit-btn { width: 100%; justify-content: center; }
+.submit-btn { width: 100%; justify-content: center; }
     }
   </style>
 
