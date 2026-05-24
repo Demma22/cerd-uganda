@@ -868,8 +868,6 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         field('Badge', 'hero_badge', 'homepage', 'hero', 'badge', (hp.hero || {}).badge || '') +
         field('Title', 'hero_title', 'homepage', 'hero', 'title', (hp.hero || {}).title || '') +
         field('Subtitle', 'hero_subtitle', 'homepage', 'hero', 'subtitle', (hp.hero || {}).subtitle || '', 'textarea') +
-        field('Button Text', 'hero_buttonText', 'homepage', 'hero', 'buttonText', (hp.hero || {}).buttonText || '') +
-        field('Button Link', 'hero_buttonLink', 'homepage', 'hero', 'buttonLink', (hp.hero || {}).buttonLink || '') +
         imageField('Hero Image', 'hero_image', 'homepage', 'hero', 'image', (hp.hero || {}).image || '')
       );
 
