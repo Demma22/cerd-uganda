@@ -90,12 +90,8 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
           <span class="stat-label">Years of Field Research</span>
         </div>
         <div class="hero-stat-card">
-          <span class="stat-num">300+</span>
+          <span class="stat-num">100+</span>
           <span class="stat-label">Farmers Supported</span>
-        </div>
-        <div class="hero-stat-card">
-          <span class="stat-num">12+</span>
-          <span class="stat-label">Partner Organisations</span>
         </div>
       </div>
     </div>
@@ -111,9 +107,11 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   <!-- ═══════════════════════════════════════════ -->
   <section class="mission">
     <div class="mission-img-col" data-anim="right">
-      <img src="/images/home/ceos.jpeg" alt="CERD-UG leadership" class="mission-photo" />
+      <img src="/images/home/ceos.png" alt="CERD-UG leadership" class="mission-photo" />
       <div class="mission-img-badge">
-        <strong>NGOsource</strong>
+        <a href="https://www.ngosource.org/" target="_blank" rel="noopener noreferrer">
+          <img src="/images/home/ngo.jpeg" alt="NGOsource" class="ngo-logo" />
+        </a>
         <span>Verified Organisation</span>
       </div>
     </div>
@@ -176,7 +174,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
 
     <div class="impact-media" data-anim="left">
       <a href="https://www.youtube.com/watch?v=vTRxLLMVqHQ" target="_blank" rel="noopener" class="video-link">
-        <img src="/images/home/video_image.avif" alt="CERD Uganda in action" class="video-thumb-img" />
+        <img src="/images/home/video_image.png" alt="CERD Uganda in action" class="video-thumb-img" />
         <div class="play-ring">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
         </div>
@@ -598,15 +596,15 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   }
   .mission-img-badge {
     position: absolute; bottom: 4rem; right: 1.5rem;
-    background: var(--forest); color: #fff;
-    padding: 1.1rem 1.75rem;
+    background: #fff;
+    padding: 0.75rem 1rem;
     border-radius: 0.5rem;
-    display: flex; flex-direction: column;
-    gap: 0.2rem;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    display: block;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    line-height: 0;
   }
-  .mission-img-badge strong { font-family: var(--ff-disp); font-size: 1rem; }
-  .mission-img-badge span { font-size: 0.72rem; opacity: 0.7; letter-spacing: 0.08em; text-transform: uppercase; }
+  .ngo-logo { width: 140px; height: auto; display: block; }
+  .mission-img-badge span { display: block; font-size: 0.68rem; color: #000; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.4rem; text-align: center; line-height: 1; }
 
   .mission-text-col {
     background: var(--cream);
