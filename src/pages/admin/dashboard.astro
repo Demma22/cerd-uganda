@@ -115,7 +115,7 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
       <div id="messages-section" class="admin-section" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <h2 style="font-size: 1.5rem; color: #1a2e0a;">Contact Messages</h2>
-          <button onclick="markAllAsRead()" style="background: #6b8f47; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Mark All as Read</button>
+          <button id="markAllReadBtn" onclick="markAllAsRead()" style="background: #6b8f47; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer;">Mark All as Read</button>
         </div>
         <div style="margin-bottom: 1.5rem;">
           <input type="text" id="messageSearchInput" placeholder="Search messages..." style="width: 100%; max-width: 400px; padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 0.5rem;" onkeyup="filterMessages()" />
@@ -142,8 +142,8 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         <div id="uploadForm" style="display: none; background: white; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; border: 1px solid #ddd;">
           <h3>Upload New Publication (PDF only)</h3>
           <form id="publicationForm" enctype="multipart/form-data">
-            <div style="margin-bottom: 1rem;"><label>Select PDF File *</label><input type="file" name="file" accept=".pdf" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
-            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Upload</button><button type="button" onclick="toggleUploadForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
+            <div style="margin-bottom: 1rem;"><label>Select PDF Files *</label><input type="file" name="file" accept=".pdf" multiple required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
+            <div style="display: flex; gap: 1rem;"><button id="pubUploadBtn" type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Upload</button><button type="button" onclick="toggleUploadForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
           </form>
           <div id="uploadStatus" style="margin-top: 1rem;"></div>
         </div>
@@ -179,7 +179,7 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
               </div>
               <textarea id="blogContent" name="content" rows="12" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: monospace;"></textarea>
             </div>
-            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Publish</button><button type="button" onclick="toggleBlogForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
+            <div style="display: flex; gap: 1rem;"><button id="blogSubmitBtn" type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Publish</button><button type="button" onclick="toggleBlogForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
           </form>
           <div id="blogStatus"></div>
         </div>
@@ -204,7 +204,7 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
             <div style="margin-bottom: 1rem;"><label>Role *</label><input type="text" name="role" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
             <div style="margin-bottom: 1rem;"><label>Bio</label><textarea name="bio" rows="3" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;"></textarea></div>
             <div style="margin-bottom: 1rem;"><label>Profile Image</label><input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
-            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Add Member</button><button type="button" onclick="toggleTeamForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
+            <div style="display: flex; gap: 1rem;"><button id="teamSubmitBtn" type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Add Member</button><button type="button" onclick="toggleTeamForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
           </form>
           <div id="teamStatus"></div>
         </div>
@@ -227,7 +227,7 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
           <form id="galleryFormSubmit" enctype="multipart/form-data">
             <div style="margin-bottom: 1rem;"><label>Image File *</label><input type="file" name="image" accept="image/*" required style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
             <div style="margin-bottom: 1rem;"><label>Alt Text</label><input type="text" name="alt" placeholder="Describe the image" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" /></div>
-            <div style="display: flex; gap: 1rem;"><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Add Image</button><button type="button" onclick="toggleGalleryForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
+            <div style="display: flex; gap: 1rem;"><button id="gallerySubmitBtn" type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Add Image</button><button type="button" onclick="toggleGalleryForm()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button></div>
           </form>
           <div id="galleryStatus"></div>
         </div>
@@ -260,7 +260,7 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         </div>
         <div style="display: flex; gap: 1rem; justify-content: flex-end;">
           <button type="button" onclick="closeEditTeamModal()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button>
-          <button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save Changes</button>
+          <button id="editTeamSubmitBtn" type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save Changes</button>
         </div>
       </form>
     </div>
@@ -280,7 +280,7 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
           <label>Upload New Image</label><input type="file" name="image" accept="image/*" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 0.375rem;" />
           <input type="hidden" name="existingImage" id="edit_blog_existing_image" />
         </div>
-        <div style="display: flex; gap: 1rem; justify-content: flex-end;"><button type="button" onclick="closeEditModal()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button><button type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save Changes</button></div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;"><button type="button" onclick="closeEditModal()" style="background: #999; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Cancel</button><button id="editBlogSubmitBtn" type="submit" style="background: #2d5016; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 0.375rem; cursor: pointer;">Save Changes</button></div>
       </form>
     </div>
   </div>
@@ -666,9 +666,12 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     }
 
     window.markAllAsRead = async function() {
+      const btn = document.getElementById('markAllReadBtn');
+      if (btn) { btn.textContent = 'Marking...'; btn.disabled = true; }
       for (const m of allMessages.filter(function(m) { return !m.is_read; })) {
         await fetch('/api/contact', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: m.id, is_read: true }) });
       }
+      if (btn) { btn.textContent = 'Mark All as Read'; btn.disabled = false; }
       loadMessages();
     }
 
@@ -718,15 +721,16 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         html += '<td style="padding: 1rem; white-space: nowrap;">';
         html += '<a href="' + p.file + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem;">View<\/a>';
         html += '<button onclick="openRenameModal(' + p.id + ', \'' + escapeHtml(p.title) + '\')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem; font-size: 0.8rem; cursor: pointer;">Rename<\/button>';
-        html += '<button onclick="deletePublication(' + p.id + ', \'' + escapeHtml(p.fileName) + '\')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer;">Delete<\/button>';
+        html += '<button onclick="deletePublication(' + p.id + ', \'' + escapeHtml(p.fileName) + '\', this)" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; font-size: 0.8rem; cursor: pointer;">Delete<\/button>';
         html += '<\/td>';
         html += '<\/tr>';
       }
       tbody.innerHTML = html;
     }
 
-    window.deletePublication = async function(id, fileName) {
+    window.deletePublication = async function(id, fileName, btn) {
       if (confirm('Delete this publication?')) {
+        if (btn) { btn.textContent = 'Deleting...'; btn.disabled = true; }
         await fetch('/api/publications?id=' + id + '&fileName=' + encodeURIComponent(fileName), { method: 'DELETE' });
         loadPublications();
       }
@@ -796,14 +800,15 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         html += '<td style="padding: 1rem;">' + escapeHtml(b.title) + '<div style="font-size: 0.75rem; color: #666;">' + escapeHtml((b.abstract || '').substring(0, 80)) + '...<\/div><\/td>';
         html += '<td style="padding: 1rem;">' + blogDate + '<\/td>';
         html += '<td style="padding: 1rem;">' + (b.image_url ? '<img src="' + b.image_url + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.25rem;" />' : 'No image') + '<\/td>';
-        html += '<td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem;">View<\/a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem;">Edit<\/button><button onclick="deleteBlog(' + b.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete<\/button><\/td>';
+        html += '<td style="padding: 1rem;"><a href="/blog/' + b.slug + '" target="_blank" style="background: #6b8f47; color: white; padding: 0.375rem 0.75rem; text-decoration: none; border-radius: 0.375rem; margin-right: 0.5rem;">View<\/a><button onclick="editBlog(' + b.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem;">Edit<\/button><button onclick="deleteBlog(' + b.id + ', this)" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem;">Delete<\/button><\/td>';
         html += '<\/tr>';
       }
       tbody.innerHTML = html;
     }
 
-    window.deleteBlog = async function(id) {
+    window.deleteBlog = async function(id, btn) {
       if (confirm('Delete this blog post?')) {
+        if (btn) { btn.textContent = 'Deleting...'; btn.disabled = true; }
         await fetch('/api/blogs?id=' + id, { method: 'DELETE' });
         loadBlogs();
       }
@@ -864,14 +869,15 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         html += '<\/td>';
         html += '<td style="padding: 1rem;"><strong>' + escapeHtml(m.name) + '<\/strong><\/td>';
         html += '<td style="padding: 1rem;">' + escapeHtml(m.role) + '<\/td>';
-        html += '<td style="padding: 1rem;"><button onclick="editTeam(' + m.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem; cursor: pointer;">Edit<\/button><button onclick="deleteTeam(' + m.id + ')" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer;">Delete<\/button><\/td>';
+        html += '<td style="padding: 1rem;"><button onclick="editTeam(' + m.id + ')" style="background: #f59e0b; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; margin-right: 0.5rem; cursor: pointer;">Edit<\/button><button onclick="deleteTeam(' + m.id + ', this)" style="background: #dc2626; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer;">Delete<\/button><\/td>';
         html += '<\/tr>';
       }
       tbody.innerHTML = html;
     }
 
-    window.deleteTeam = async function(id) {
+    window.deleteTeam = async function(id, btn) {
       if (confirm('Delete this team member?')) {
+        if (btn) { btn.textContent = 'Deleting...'; btn.disabled = true; }
         await fetch('/api/team?id=' + id, { method: 'DELETE' });
         loadTeam();
       }
@@ -910,14 +916,15 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         html += '<img src="' + img.image_url + '" style="width: 100%; aspect-ratio: 1; object-fit: cover;" />';
         html += '<div style="padding: 0.5rem;">';
         html += '<p style="font-size: 0.75rem; color: #666; margin-bottom: 0.5rem;">' + escapeHtml(img.alt) + '<\/p>';
-        html += '<button onclick="deleteGalleryImage(' + img.id + ')" style="background: #dc2626; color: white; padding: 0.25rem 0.5rem; border: none; border-radius: 0.25rem; width: 100%; cursor: pointer;">Delete<\/button>';
+        html += '<button onclick="deleteGalleryImage(' + img.id + ', this)" style="background: #dc2626; color: white; padding: 0.25rem 0.5rem; border: none; border-radius: 0.25rem; width: 100%; cursor: pointer;">Delete<\/button>';
         html += '<\/div><\/div>';
       }
       container.innerHTML = html;
     }
 
-    window.deleteGalleryImage = async function(id) {
+    window.deleteGalleryImage = async function(id, btn) {
       if (confirm('Delete this image?')) {
+        if (btn) { btn.textContent = 'Deleting...'; btn.disabled = true; }
         await fetch('/api/gallery?id=' + id, { method: 'DELETE' });
         loadGallery();
       }
@@ -928,16 +935,30 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     if (pubForm) {
       pubForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const fd = new FormData(e.target);
-        const res = await fetch('/api/publications', { method: 'POST', body: fd });
-        if (res.ok) {
-          alert('Publication added successfully!');
-          e.target.reset();
-          document.getElementById('uploadForm').style.display = 'none';
-          loadPublications();
-        } else {
-          alert('Upload failed. Please try again.');
+        const files = e.target.elements.file.files;
+        if (!files || files.length === 0) return;
+        const btn = document.getElementById('pubUploadBtn');
+        const statusDiv = document.getElementById('uploadStatus');
+        btn.disabled = true;
+        let succeeded = 0, failed = 0;
+        for (let i = 0; i < files.length; i++) {
+          btn.textContent = 'Uploading ' + (i + 1) + ' of ' + files.length + '...';
+          statusDiv.innerHTML = '<span style="color:#666;">Uploading ' + escapeHtml(files[i].name) + '...<\/span>';
+          const fd = new FormData();
+          fd.append('file', files[i]);
+          const res = await fetch('/api/publications', { method: 'POST', body: fd });
+          if (res.ok) { succeeded++; } else { failed++; }
         }
+        btn.textContent = 'Upload';
+        btn.disabled = false;
+        if (failed === 0) {
+          statusDiv.innerHTML = '<span style="color:green;">' + succeeded + ' file' + (succeeded > 1 ? 's' : '') + ' uploaded successfully!<\/span>';
+        } else {
+          statusDiv.innerHTML = '<span style="color:orange;">' + succeeded + ' uploaded, ' + failed + ' failed.<\/span>';
+        }
+        e.target.reset();
+        loadPublications();
+        setTimeout(function() { statusDiv.innerHTML = ''; }, 4000);
       });
     }
 
@@ -945,10 +966,12 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     if (blogSubmit) {
       blogSubmit.addEventListener('submit', async function(e) {
         e.preventDefault();
+        const btn = document.getElementById('blogSubmitBtn');
+        btn.textContent = 'Publishing...'; btn.disabled = true;
         const fd = new FormData(e.target);
         const res = await fetch('/api/blogs', { method: 'POST', body: fd });
+        btn.textContent = 'Publish'; btn.disabled = false;
         if (res.ok) {
-          alert('Blog post published successfully!');
           e.target.reset();
           document.getElementById('blogForm').style.display = 'none';
           loadBlogs();
@@ -962,24 +985,24 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     if (teamSubmit) {
       teamSubmit.addEventListener('submit', async function(e) {
         e.preventDefault();
+        const btn = document.getElementById('teamSubmitBtn');
         const statusDiv = document.getElementById('teamStatus');
-        statusDiv.innerHTML = '<span style="color:#666;">Uploading...<\/span>';
+        btn.textContent = 'Adding...'; btn.disabled = true;
+        statusDiv.innerHTML = '';
         const fd = new FormData(e.target);
         try {
           const res = await fetch('/api/team', { method: 'POST', body: fd });
           const data = await res.json();
+          btn.textContent = 'Add Member'; btn.disabled = false;
           if (res.ok) {
-            statusDiv.innerHTML = '<span style="color:green;">Team member added! Image URL: ' + escapeHtml(data.image_url || 'none') + '<\/span>';
-            setTimeout(function() {
-              e.target.reset();
-              document.getElementById('teamForm').style.display = 'none';
-              statusDiv.innerHTML = '';
-              loadTeam();
-            }, 2000);
+            e.target.reset();
+            document.getElementById('teamForm').style.display = 'none';
+            loadTeam();
           } else {
             statusDiv.innerHTML = '<span style="color:red;">Error: ' + escapeHtml(data.error || 'Upload failed') + '<\/span>';
           }
         } catch(err) {
+          btn.textContent = 'Add Member'; btn.disabled = false;
           statusDiv.innerHTML = '<span style="color:red;">Network error: ' + escapeHtml(err.message) + '<\/span>';
         }
       });
@@ -989,10 +1012,12 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     if (editTeamForm) {
       editTeamForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        const btn = document.getElementById('editTeamSubmitBtn');
+        btn.textContent = 'Saving...'; btn.disabled = true;
         const fd = new FormData(e.target);
         const res = await fetch('/api/team', { method: 'PUT', body: fd });
+        btn.textContent = 'Save Changes'; btn.disabled = false;
         if (res.ok) {
-          alert('Team member updated successfully!');
           closeEditTeamModal();
           loadTeam();
         } else {
@@ -1006,10 +1031,12 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     if (gallerySubmit) {
       gallerySubmit.addEventListener('submit', async function(e) {
         e.preventDefault();
+        const btn = document.getElementById('gallerySubmitBtn');
+        btn.textContent = 'Uploading...'; btn.disabled = true;
         const fd = new FormData(e.target);
         const res = await fetch('/api/gallery', { method: 'POST', body: fd });
+        btn.textContent = 'Add Image'; btn.disabled = false;
         if (res.ok) {
-          alert('Image added successfully!');
           e.target.reset();
           document.getElementById('galleryForm').style.display = 'none';
           loadGallery();
@@ -1023,10 +1050,12 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     if (editBlogForm) {
       editBlogForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        const btn = document.getElementById('editBlogSubmitBtn');
+        btn.textContent = 'Saving...'; btn.disabled = true;
         const fd = new FormData(e.target);
         const res = await fetch('/api/blogs', { method: 'PUT', body: fd });
+        btn.textContent = 'Save Changes'; btn.disabled = false;
         if (res.ok) {
-          alert('Blog updated!');
           closeEditModal();
           loadBlogs();
         } else {
