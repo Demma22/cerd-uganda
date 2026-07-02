@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { supabase } from '../../lib/supabase.js';
+import { supabaseAdmin as supabase } from '../../lib/supabase-admin.js';
 import { checkAuth } from '../../utils/auth.js';
 
 const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -51,10 +51,16 @@ export async function POST({ request, cookies }) {
   
   // Upload image to Supabase Storage if provided
   if (imageFile && imageFile.size > 0) {
+    if (!imageFile.type || !imageFile.type.startsWith('image/')) {
+      return new Response(JSON.stringify({ error: 'Only image files are allowed' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
     const timestamp = Date.now();
     const safeName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '-');
     const fileName = `${timestamp}-${safeName}`;
-    
+
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('blog-images')
       .upload(fileName, imageFile, {
@@ -115,6 +121,12 @@ export async function PUT({ request, cookies }) {
   
   // Upload new image if provided
   if (imageFile && imageFile.size > 0) {
+    if (!imageFile.type || !imageFile.type.startsWith('image/')) {
+      return new Response(JSON.stringify({ error: 'Only image files are allowed' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
     // Delete old image if it exists in Supabase
     if (existingImage) {
       const oldFileName = existingImage.split('/').pop();

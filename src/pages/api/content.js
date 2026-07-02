@@ -118,6 +118,13 @@ export async function PATCH({ request, cookies }) {
     });
   }
 
+  if (!file.type || !file.type.startsWith('image/')) {
+    return new Response(JSON.stringify({ error: 'Only image files are allowed' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '-');
   const fileName = `page-content/${page}-${section}-${field}-${timestamp}-${safeName}`;

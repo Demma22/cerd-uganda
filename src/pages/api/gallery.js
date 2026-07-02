@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { supabase } from '../../lib/supabase.js';
+import { supabaseAdmin as supabase } from '../../lib/supabase-admin.js';
 import { checkAuth } from '../../utils/auth.js';
 
 const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -35,6 +35,13 @@ export async function POST({ request, cookies }) {
 
   if (!imageFile || imageFile.size === 0) {
     return new Response(JSON.stringify({ error: 'Image required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  if (!imageFile.type || !imageFile.type.startsWith('image/')) {
+    return new Response(JSON.stringify({ error: 'Only image files are allowed' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });

@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { supabase } from '../../lib/supabase.js';
+import { supabaseAdmin as supabase } from '../../lib/supabase-admin.js';
 import { checkAuth } from '../../utils/auth.js';
 
 const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -36,8 +36,14 @@ export async function POST({ request, cookies }) {
   const imageFile = formData.get('image');
   
   let imageUrl = null;
-  
+
   if (imageFile && imageFile.size > 0) {
+    if (!imageFile.type || !imageFile.type.startsWith('image/')) {
+      return new Response(JSON.stringify({ error: 'Only image files are allowed' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
     const timestamp = Date.now();
     const safeName = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, '-');
     const fileName = `${timestamp}-${safeName}`;
@@ -110,8 +116,14 @@ export async function PUT({ request, cookies }) {
   const existingImage = formData.get('existingImage');
   
   let imageUrl = existingImage;
-  
+
   if (imageFile && imageFile.size > 0) {
+    if (!imageFile.type || !imageFile.type.startsWith('image/')) {
+      return new Response(JSON.stringify({ error: 'Only image files are allowed' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
     if (existingImage) {
       // Extract just the team/filename part from the full URL
       const urlParts = existingImage.split('/team/');

@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { checkAuth } from "../../utils/auth.js";
+import { checkAuth, createSessionToken, safeCompare } from "../../utils/auth.js";
 
 if (checkAuth(Astro.cookies)) {
   return Astro.redirect('/admin/dashboard');
@@ -11,45 +11,67 @@ Astro.response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate
 Astro.response.headers.set('Pragma', 'no-cache');
 Astro.response.headers.set('Expires', '0');
 
+// In-memory rate limiter: max 5 failed attempts per IP per 15 minutes.
+// Resets on cold start, which is fine — it only needs to slow brute-forcing down.
+const MAX_ATTEMPTS = 5;
+const WINDOW_MS = 15 * 60 * 1000;
+globalThis._loginAttempts = globalThis._loginAttempts || new Map();
+const attempts = globalThis._loginAttempts;
+
 let error = null;
 
 if (Astro.request.method === 'POST') {
-  const formData = await Astro.request.formData();
-  const password = formData.get('password');
-  
-  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD;
-  
-  if (password === ADMIN_PASSWORD) {
-    // Clear any existing session first
-    Astro.cookies.delete('admin_session', { path: '/' });
-    Astro.cookies.delete('admin_login_time', { path: '/' });
-    
-    // Set new session cookie
-    Astro.cookies.set('admin_session', 'authenticated', {
-      path: '/',
-      httpOnly: true,
-      secure: import.meta.env.PROD,
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7 // 7 days
-    });
-    
-    // Set login timestamp
-    Astro.cookies.set('admin_login_time', Date.now().toString(), {
-      path: '/',
-      httpOnly: true,
-      secure: import.meta.env.PROD,
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24 * 7
-    });
-    
-    // Create response with redirect and no-cache headers
-    const response = Astro.redirect('/admin/dashboard');
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    return response;
+  let ip = 'unknown';
+  try { ip = Astro.clientAddress; } catch {}
+
+  const record = attempts.get(ip);
+  if (record && Date.now() - record.first < WINDOW_MS && record.count >= MAX_ATTEMPTS) {
+    error = 'Too many failed attempts. Please wait 15 minutes and try again.';
   } else {
-    error = 'Invalid password. Please try again.';
+    if (record && Date.now() - record.first >= WINDOW_MS) attempts.delete(ip);
+
+    const formData = await Astro.request.formData();
+    const password = formData.get('password');
+
+    const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD;
+
+    if (ADMIN_PASSWORD && password && safeCompare(password, ADMIN_PASSWORD)) {
+      attempts.delete(ip);
+
+      // Clear any existing session first
+      Astro.cookies.delete('admin_session', { path: '/' });
+      Astro.cookies.delete('admin_login_time', { path: '/' });
+
+      // Set new signed session cookie
+      Astro.cookies.set('admin_session', createSessionToken(), {
+        path: '/',
+        httpOnly: true,
+        secure: import.meta.env.PROD,
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 7 // 7 days
+      });
+
+      // Set login timestamp (informational only)
+      Astro.cookies.set('admin_login_time', Date.now().toString(), {
+        path: '/',
+        httpOnly: true,
+        secure: import.meta.env.PROD,
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 7
+      });
+
+      // Create response with redirect and no-cache headers
+      const response = Astro.redirect('/admin/dashboard');
+      response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '0');
+      return response;
+    } else {
+      const current = attempts.get(ip);
+      if (current) { current.count++; }
+      else { attempts.set(ip, { first: Date.now(), count: 1 }); }
+      error = 'Invalid password. Please try again.';
+    }
   }
 }
 ---

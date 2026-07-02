@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { supabase } from '../../lib/supabase.js';
+import { supabaseAdmin as supabase } from '../../lib/supabase-admin.js';
 import { checkAuth } from '../../utils/auth.js';
 
 const UNAUTHORIZED = new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -54,7 +54,7 @@ export async function POST({ request, cookies }) {
     });
   }
 
-  if (!file.name.endsWith('.pdf')) {
+  if (!file.name.toLowerCase().endsWith('.pdf') || file.type !== 'application/pdf') {
     return new Response(JSON.stringify({ error: 'Only PDF files are allowed' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
@@ -62,7 +62,7 @@ export async function POST({ request, cookies }) {
   }
 
   // Clean filename for storage
-  const cleanOriginal = file.name.replace('.pdf', '').replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
+  const cleanOriginal = file.name.replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
   const fileName = `${Date.now()}-${cleanOriginal}.pdf`;
 
   // Upload to Supabase Storage
