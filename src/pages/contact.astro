@@ -167,6 +167,22 @@ const address = ss.address       || 'Mpala, Entebbe Road\nEntebbe, Uganda';
 
   </section>
 
+  <!-- PARTNERS -->
+  <section class="partners">
+    <div class="container-site" style="text-align:center;margin-bottom:2.5rem;">
+      <span class="eyebrow">Collaborations &amp; Partnerships</span>
+    </div>
+    <div class="partners-track-wrap">
+      <div class="partners-track">
+        <img src="/images/partners/3C.avif" alt="3C" /><img src="/images/partners/BLI.avif" alt="BLI" />
+        <img src="/images/partners/eoa.avif" alt="EOA" /><img src="/images/partners/mcKnight.avif" alt="McKnight" />
+        <img src="/images/partners/nogamu.avif" alt="Nogamu" /><img src="/images/partners/3C.avif" alt="3C" />
+        <img src="/images/partners/BLI.avif" alt="BLI" /><img src="/images/partners/eoa.avif" alt="EOA" />
+        <img src="/images/partners/mcKnight.avif" alt="McKnight" /><img src="/images/partners/nogamu.avif" alt="Nogamu" />
+      </div>
+    </div>
+  </section>
+
 
   <style>
     :root {
@@ -419,6 +435,14 @@ const address = ss.address       || 'Mpala, Entebbe Road\nEntebbe, Uganda';
       .info-panel { padding: 3rem 1.5rem; }
 .submit-btn { width: 100%; justify-content: center; }
     }
+
+    /* PARTNERS */
+    .partners { padding: 5rem 0; background: var(--cream); overflow: hidden; }
+    .partners-track-wrap { overflow: hidden; }
+    .partners-track { display: flex; align-items: center; gap: 4rem; width: fit-content; animation: ticker 22s linear infinite; }
+    .partners-track img { height: 52px; width: auto; object-fit: contain; opacity: 0.6; transition: opacity 0.2s; filter: grayscale(30%); }
+    .partners-track img:hover { opacity: 1; }
+    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
   </style>
 
   <script>

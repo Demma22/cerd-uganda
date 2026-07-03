@@ -1126,9 +1126,71 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         '<\/div>';
       }
 
+      // Collapsible accordion section — collapsed by default.
       function section(title, fields) {
-        return '<div style="background: #f9fafb; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.5rem;"><h3 style="color: #2d5016; margin-bottom: 1rem;">' + title + '<\/h3>' + fields + '<\/div>';
+        return '<div class="content-accordion" style="margin-bottom: 0.85rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; background: #fff;">' +
+          '<button type="button" class="accordion-header" onclick="toggleSection(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: #f9fafb; border: none; padding: 1rem 1.25rem; cursor: pointer; text-align: left; font-family: inherit;">' +
+            '<span style="color: #2d5016; font-weight: 700; font-size: 0.98rem;">' + title + '<\/span>' +
+            '<span class="accordion-chevron" style="color: #2d5016; font-size: 0.8rem; transition: transform 0.2s; display: inline-block;">▶<\/span>' +
+          '<\/button>' +
+          '<div class="accordion-body" style="display: none; padding: 1.25rem;">' + fields + '<\/div>' +
+        '<\/div>';
       }
+
+      window.toggleSection = function(btn) {
+        const body = btn.nextElementSibling;
+        const chev = btn.querySelector('.accordion-chevron');
+        const isOpen = body.style.display !== 'none';
+        body.style.display = isOpen ? 'none' : 'block';
+        if (chev) chev.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+      };
+
+      // Dynamic, repeatable program card for the About Us "How We Make a Difference" section.
+      // data-field indexes are placeholders; renumberProgramCards() rewrites them on save.
+      let _pcSeq = 0;
+      function buildProgramCard(image, title, description) {
+        const n = _pcSeq++;
+        return '<div class="program-editor-card" style="border:1px solid #e5e7eb;border-radius:0.5rem;padding:1.25rem;margin-bottom:1rem;background:#fff;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">' +
+            '<strong style="color:#2d5016;font-size:0.9rem;">Program Card<\/strong>' +
+            '<button type="button" onclick="removeProgramCard(this)" style="background:#fee2e2;color:#dc2626;border:none;padding:0.4rem 0.85rem;border-radius:0.375rem;font-size:0.8rem;font-weight:600;cursor:pointer;">Remove<\/button>' +
+          '<\/div>' +
+          imageField('Image', 'pc_img_' + n, 'about', 'programs', 'items_' + n + '_image', image || '') +
+          field('Title', 'pc_title_' + n, 'about', 'programs', 'items_' + n + '_title', title || '') +
+          field('Description', 'pc_desc_' + n, 'about', 'programs', 'items_' + n + '_description', description || '', 'textarea') +
+        '<\/div>';
+      }
+      window.buildProgramCard = buildProgramCard;
+
+      window.addProgramCard = function() {
+        const wrap = document.getElementById('programs-cards-wrap');
+        if (!wrap) return;
+        const tmp = document.createElement('div');
+        tmp.innerHTML = buildProgramCard('', '', '');
+        wrap.appendChild(tmp.firstChild);
+      };
+
+      window.removeProgramCard = function(btn) {
+        const card = btn.closest('.program-editor-card');
+        const wrap = document.getElementById('programs-cards-wrap');
+        if (wrap && wrap.querySelectorAll('.program-editor-card').length <= 1) {
+          alert('You need at least one program card.');
+          return;
+        }
+        if (card) card.remove();
+      };
+
+      // Rewrite data-field indexes to match current DOM order so removed/added cards
+      // produce a clean, contiguous array on save.
+      window.renumberProgramCards = function() {
+        const cards = document.querySelectorAll('#programs-cards-wrap .program-editor-card');
+        cards.forEach(function(card, i) {
+          card.querySelectorAll('.content-field').forEach(function(f) {
+            const m = f.dataset.field.match(/^items_\d+_(.+)$/);
+            if (m) f.dataset.field = 'items_' + i + '_' + m[1];
+          });
+        });
+      };
 
       let html = '<div style="background: white; border-radius: 0.75rem; padding: 1.5rem;">';
 
@@ -1228,14 +1290,24 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         field('Stat 2 Label', 'about_stats_1_label', 'about', 'stats', 'items_1_label', ((ab.stats || {}).items || [])[1]?.label || '')
       );
 
-      html += section('Programs Section',
-        imageField('Program 1 Image', 'about_programs_0_image', 'about', 'programs', 'items_0_image', ((ab.programs || {}).items || [])[0]?.image || '') +
-        field('Program 1 Title', 'about_programs_0_title', 'about', 'programs', 'items_0_title', ((ab.programs || {}).items || [])[0]?.title || '') +
-        field('Program 1 Description', 'about_programs_0_desc', 'about', 'programs', 'items_0_description', ((ab.programs || {}).items || [])[0]?.description || '', 'textarea') +
-        imageField('Program 2 Image', 'about_programs_1_image', 'about', 'programs', 'items_1_image', ((ab.programs || {}).items || [])[1]?.image || '') +
-        field('Program 2 Title', 'about_programs_1_title', 'about', 'programs', 'items_1_title', ((ab.programs || {}).items || [])[1]?.title || '') +
-        field('Program 2 Description', 'about_programs_1_desc', 'about', 'programs', 'items_1_description', ((ab.programs || {}).items || [])[1]?.description || '', 'textarea')
-      );
+      {
+        let existingPrograms = (ab.programs || {}).items || [];
+        if (!Array.isArray(existingPrograms) || existingPrograms.length === 0) {
+          existingPrograms = [
+            { image: '', badge: '', title: '', description: '' },
+            { image: '', badge: '', title: '', description: '' }
+          ];
+        }
+        let cardsHtml = '';
+        for (const p of existingPrograms) {
+          cardsHtml += buildProgramCard(p.image, p.title, p.description || p.desc);
+        }
+        html += section('Programs Section — How We Make a Difference',
+          '<p style="font-size:0.8rem;color:#6b7280;margin:-0.5rem 0 1rem;">Add as many program cards as you like. Each shows an image, an optional badge, a title, and a description.<\/p>' +
+          '<div id="programs-cards-wrap">' + cardsHtml + '<\/div>' +
+          '<button type="button" onclick="addProgramCard()" style="background:#2d5016;color:#fff;border:none;padding:0.6rem 1.1rem;border-radius:0.375rem;font-size:0.85rem;font-weight:600;cursor:pointer;">+ Add Program Card<\/button>'
+        );
+      }
 
       html += section('Gallery Section',
         field('Title', 'about_gallery_title', 'about', 'gallery', 'title', (ab.gallery || {}).title || '') +
@@ -1259,15 +1331,15 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
       html += '<\/div>';
 
       html += '<div id="tab-settings" class="tab-pane" style="display: none;">';
-      html += '<div style="background: #f9fafb; padding: 1.25rem; border-radius: 0.5rem;">';
-      html += '<h3 style="color: #2d5016; margin-bottom: 1rem;">Site Settings<\/h3>';
-      html += field('Site Tagline', 'siteTagline', 'siteSettings', 'full', 'siteTagline', (ss.full || {}).siteTagline || '');
-      html += field('Footer Text', 'footerText', 'siteSettings', 'full', 'footerText', (ss.full || {}).footerText || '');
-      html += field('Contact Email', 'contactEmail', 'siteSettings', 'full', 'contactEmail', (ss.full || {}).contactEmail || '');
-      html += field('Primary Phone', 'contactPhone', 'siteSettings', 'full', 'contactPhone', (ss.full || {}).contactPhone || '');
-      html += field('Secondary Phone', 'contactPhone2', 'siteSettings', 'full', 'contactPhone2', (ss.full || {}).contactPhone2 || '');
-      html += field('Address', 'address', 'siteSettings', 'full', 'address', (ss.full || {}).address || '', 'textarea');
-      html += '<\/div><\/div>';
+      html += section('Site Settings',
+        field('Site Tagline', 'siteTagline', 'siteSettings', 'full', 'siteTagline', (ss.full || {}).siteTagline || '') +
+        field('Footer Text', 'footerText', 'siteSettings', 'full', 'footerText', (ss.full || {}).footerText || '') +
+        field('Contact Email', 'contactEmail', 'siteSettings', 'full', 'contactEmail', (ss.full || {}).contactEmail || '') +
+        field('Primary Phone', 'contactPhone', 'siteSettings', 'full', 'contactPhone', (ss.full || {}).contactPhone || '') +
+        field('Secondary Phone', 'contactPhone2', 'siteSettings', 'full', 'contactPhone2', (ss.full || {}).contactPhone2 || '') +
+        field('Address', 'address', 'siteSettings', 'full', 'address', (ss.full || {}).address || '', 'textarea')
+      );
+      html += '<\/div>';
 
       html += '<div style="margin-top: 1.5rem; text-align: right;">';
       html += '<button id="saveContentBtn" style="background: #2d5016; color: white; padding: 0.6rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 1rem;">Save All Changes<\/button>';
@@ -1297,6 +1369,9 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
         const btn = document.getElementById('saveContentBtn');
         btn.textContent = 'Saving...';
         btn.disabled = true;
+
+        // Normalize dynamic program card indexes to DOM order before collecting
+        if (typeof window.renumberProgramCards === 'function') window.renumberProgramCards();
 
         // Collect all plain content-field values
         const fields = container.querySelectorAll('.content-field');
