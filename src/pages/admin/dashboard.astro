@@ -1211,7 +1211,8 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
 
       html += section('Hero Section',
         field('Title', 'about_hero_title', 'about', 'hero', 'title', (ab.hero || {}).title || '') +
-        field('Description', 'about_hero_description', 'about', 'hero', 'description', (ab.hero || {}).description || '', 'textarea')
+        field('Description', 'about_hero_description', 'about', 'hero', 'description', (ab.hero || {}).description || '', 'textarea') +
+        imageField('Hero Image', 'about_hero_image', 'about', 'hero', 'image', (ab.hero || {}).image || '')
       );
 
       html += section('Current Focus Section',
