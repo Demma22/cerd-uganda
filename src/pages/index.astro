@@ -119,13 +119,13 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
       <div class="mission-pillars" data-anim="up" style="transition-delay:0.25s">
         <div class="pillar">
           <div class="pillar-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
+            <svg viewBox="0 0 256 256" fill="currentColor"><path d="M200,144h-76.7l2.35-2.35h0l20.06-20.06a59.55,59.55,0,0,0,26.1,6.36,49.56,49.56,0,0,0,25.89-7.22c23.72-14.36,36.43-47.6,34-88.92a8,8,0,0,0-7.52-7.52c-41.32-2.42-74.56,10.28-88.92,34-9.36,15.45-9.6,34.11-.87,52L120,124.68l-12.21-12.21c6-13.25,5.57-27-1.39-38.48C95.53,56,70.61,46.41,39.73,48.22a8,8,0,0,0-7.51,7.51C30.4,86.6,40,111.52,58,122.4A38.22,38.22,0,0,0,78,128a45,45,0,0,0,18.52-4.19L108.68,136l-8,8H56a8,8,0,0,0,0,16h9.59l13.21,59.47A15.91,15.91,0,0,0,94.42,232h67.17a15.91,15.91,0,0,0,15.62-12.53L190.42,160H200a8,8,0,0,0,0-16ZM149,66.58c10.46-17.26,35.24-27,67-26.57.41,31.81-9.31,56.58-26.57,67-11.51,7-25.4,6.54-39.28-1.18C142.42,92,142,78.09,149,66.58ZM92.11,108.11c-9.2,4.93-18.31,5.16-25.83.6C54.78,101.74,48.15,85.31,48,64c21.31.15,37.75,6.78,44.71,18.28C97.27,89.8,97,98.91,92.11,108.11ZM161.59,216H94.42L82,160H174Z"></path></svg>
           </div>
           <p>{missionData.pillar1 || "We provide agriculture services and support Organic Agriculture"}</p>
         </div>
         <div class="pillar">
           <div class="pillar-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg viewBox="0 0 256 256" fill="currentColor"><path d="M240,165.41V134a15.89,15.89,0,0,0-11.4-15.32l-.21-.06L192,108.71V72a8,8,0,0,0-16,0v32.38l-24-6.5V56h8a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16h8V88H40a8,8,0,0,0,0,16H68a68.07,68.07,0,0,1,68,68v12a8,8,0,0,0,8,8h32.23A36,36,0,1,0,240,165.41ZM68,88H64V56h72v66.77A83.92,83.92,0,0,0,68,88Zm84,26.45L224,134v20.1A36,36,0,0,0,178.06,176H152ZM212,208a20,20,0,1,1,20-20A20,20,0,0,1,212,208ZM68,120a52,52,0,1,0,52,52A52.06,52.06,0,0,0,68,120Zm0,88a36,36,0,1,1,36-36A36,36,0,0,1,68,208Zm12-36a12,12,0,1,1-12-12A12,12,0,0,1,80,172Z"></path></svg>
           </div>
           <p>{missionData.pillar2 || "We support small scale farmers to transition to Agroecology and transform the current food system"}</p>
         </div>
@@ -588,12 +588,11 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   .pillar-icon {
     flex-shrink: 0;
     width: 40px; height: 40px;
-    background: var(--forest);
-    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    color: #fff;
+    color: var(--forest);
     margin-top: 0.1rem;
   }
+  .pillar-icon svg { width: 100%; height: 100%; }
   .pillar p { font-size: 0.9rem; line-height: 1.65; color: var(--bark); margin: 0; padding-top: 0.6rem; }
 
   /* ═══════════════════════════════════ */
@@ -824,6 +823,7 @@ const displayPrinciples = principleItems.length > 0 ? principleItems : defaultPr
   }
   .partners-track img { height: 52px; width: auto; object-fit: contain; opacity: 0.6; transition: opacity 0.2s; filter: grayscale(30%); }
   .partners-track img:hover { opacity: 1; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
   /* ═══════════════════════════════════ */
   /* BLOG                                */
