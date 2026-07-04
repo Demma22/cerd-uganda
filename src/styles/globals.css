@@ -67,7 +67,7 @@ html, body {
     font-size: 0.8rem;
     transition: all 0.3s ease;
     border: 2px solid var(--color-forest);
-    border-radius: 0.375rem;
+    border-radius: 20px;
   }
 
   .btn-primary:hover {
@@ -87,7 +87,7 @@ html, body {
     font-size: 0.8rem;
     transition: all 0.3s ease;
     border: 2px solid white;
-    border-radius: 0.375rem;
+    border-radius: 20px;
   }
 
   .btn-outline:hover {
@@ -107,7 +107,7 @@ html, body {
     font-size: 0.8rem;
     transition: all 0.3s ease;
     border: 2px solid var(--color-sage);
-    border-radius: 0.375rem;
+    border-radius: 20px;
   }
 
   .btn-secondary:hover {
