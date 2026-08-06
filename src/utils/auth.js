@@ -1,7 +1,18 @@
 // src/utils/auth.js
 import crypto from 'node:crypto';
 
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+// A session is valid only if BOTH hold:
+//  - it was last used within INACTIVITY_MS  (sliding "logged out after idle" window)
+//  - it was first issued within ABSOLUTE_MAX_MS (hard ceiling, even for active users)
+const INACTIVITY_MS   = 2 * 60 * 60 * 1000;      // 2 hours of inactivity
+const ABSOLUTE_MAX_MS = 7 * 24 * 60 * 60 * 1000; // 7 days total lifetime
+
+const COOKIE_OPTS = {
+  path: '/',
+  httpOnly: true,
+  sameSite: 'strict',
+  maxAge: 60 * 60 * 24 * 7, // browser retention; server still enforces the windows above
+};
 
 // HMAC key for signing session tokens. Uses SESSION_SECRET if set,
 // otherwise derives one from ADMIN_PASSWORD so no extra config is needed.
@@ -23,26 +34,54 @@ export function safeCompare(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
-// Token format: <issued-at-ms>.<hmac-sha256-hex>
+// Token format: <issued-at-ms>.<last-activity-ms>.<hmac-sha256-hex>
+function buildToken(issuedAt, lastActivity) {
+  const payload = issuedAt + '.' + lastActivity;
+  return payload + '.' + sign(payload);
+}
+
 export function createSessionToken() {
-  const ts = Date.now().toString();
-  return ts + '.' + sign(ts);
+  const now = Date.now();
+  return buildToken(now, now);
+}
+
+// Parse and fully validate a cookie value. Returns { issuedAt, lastActivity }
+// when the token is genuine and within both windows, otherwise null.
+function parseValid(value) {
+  if (!value) return null;
+  const parts = value.split('.');
+  if (parts.length !== 3) return null; // rejects the old 2-part format
+
+  const [issuedStr, lastStr, sig] = parts;
+  if (!safeCompare(sig, sign(issuedStr + '.' + lastStr))) return null;
+
+  const issuedAt = parseInt(issuedStr, 10);
+  const lastActivity = parseInt(lastStr, 10);
+  if (isNaN(issuedAt) || isNaN(lastActivity)) return null;
+
+  const now = Date.now();
+  const age = now - issuedAt;
+  const idle = now - lastActivity;
+  if (age < 0 || age > ABSOLUTE_MAX_MS) return null;   // absolute lifetime exceeded
+  if (idle < 0 || idle > INACTIVITY_MS) return null;   // idle too long
+
+  return { issuedAt, lastActivity };
 }
 
 export function checkAuth(cookies) {
-  const session = cookies.get('admin_session');
-  if (!session || !session.value) return false;
+  return parseValid(cookies.get('admin_session')?.value) !== null;
+}
 
-  const dotIndex = session.value.indexOf('.');
-  if (dotIndex === -1) return false;
-
-  const ts = session.value.slice(0, dotIndex);
-  const sig = session.value.slice(dotIndex + 1);
-  if (!safeCompare(sig, sign(ts))) return false;
-
-  const age = Date.now() - parseInt(ts, 10);
-  if (isNaN(age) || age < 0 || age > SEVEN_DAYS_MS) return false;
-
+// Slide the inactivity window forward: if the session is still valid, re-issue
+// the cookie with last-activity = now (keeping the original issued-at). Returns
+// true if refreshed, false if the session was invalid/expired.
+export function touchSession(cookies, isProd) {
+  const parsed = parseValid(cookies.get('admin_session')?.value);
+  if (!parsed) return false;
+  cookies.set('admin_session', buildToken(parsed.issuedAt, Date.now()), {
+    ...COOKIE_OPTS,
+    secure: isProd,
+  });
   return true;
 }
 

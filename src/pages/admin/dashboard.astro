@@ -336,8 +336,10 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     let allGallery = [];
     let inactivityTimer;
     let warningTimer;
-    const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+    const INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000; // 2 hours (matches server-side session)
     const WARNING_BEFORE = 60 * 1000; // Show warning 1 minute before logout
+    const HEARTBEAT_INTERVAL = 5 * 60 * 1000; // Ping server every 5 min while active
+    let lastActivityTs = Date.now();
 
     // Session inactivity handling
     function resetInactivityTimer() {
@@ -370,9 +372,21 @@ const lastLogin = loginTime ? new Date(parseInt(loginTime.value)).toLocaleString
     // Reset timer on user activity
     const events = ['click', 'mousemove', 'keypress', 'scroll', 'touchstart'];
     events.forEach(event => {
-      document.addEventListener(event, resetInactivityTimer);
+      document.addEventListener(event, function() {
+        lastActivityTs = Date.now();
+        resetInactivityTimer();
+      });
     });
-    
+
+    // Heartbeat: while the admin is actively using the page, ping the server so
+    // the sliding session window stays open. If they walk away, the pings stop
+    // and the session lapses after 2 hours on the server too.
+    setInterval(function() {
+      if (Date.now() - lastActivityTs < HEARTBEAT_INTERVAL) {
+        fetch('/api/check-session', { method: 'GET', cache: 'no-store' }).catch(function() {});
+      }
+    }, HEARTBEAT_INTERVAL);
+
     // Start the timer
     resetInactivityTimer();
 
