@@ -3,7 +3,7 @@ import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://cerd-uganda.vercel.app',
+  site: 'https://cerd-uganda.org',
   output: 'server',
   adapter: vercel(),
   vite: {
